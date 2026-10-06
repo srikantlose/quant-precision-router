@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+.env
+tools/llama.cpp/*
+!tools/llama.cpp/VERSION.txt
+models/gguf/
+data/safety/xstest_prompts.csv
+data/safety/safety.jsonl
+data/kl/
+results/raw/
+results/logs/
+results/kl/

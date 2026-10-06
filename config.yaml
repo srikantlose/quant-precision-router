@@ -1,0 +1,91 @@
+seed: 42
+paths:
+  cheaproute_root: "C:/Users/user/Desktop/PROJECTS 2026/AMD Developer Hack"
+  llama_dir: tools/llama.cpp
+  gguf_dir: models/gguf
+  lock_file: models/models.lock.json
+  tasks_all: data/tasks/all.jsonl
+  safety_tasks: data/safety/safety.jsonl
+  grid: results/raw/grid.jsonl
+  results_dir: results
+model:
+  repo: Qwen/Qwen2.5-3B-Instruct-GGUF
+  ladder: [Q2_K, Q3_K_M, Q4_K_M, Q5_K_M, Q6_K, Q8_0, F16]
+  reference: F16
+llama:
+  build: b11451
+  host: 127.0.0.1
+  port_base: 8101            # rung index i -> port 8101 + i
+  ctx_size: 4096
+  parallel: 1                # -np 1
+  load_timeout_s: 120
+  request_timeout_s: 300
+  vram_margin_mb: 512
+request:
+  temperature: 0.0
+  seed: 42
+  top_logprobs: 1
+  cache_prompt: false
+bench:
+  grid_order: [Q4_K_M, Q8_0, Q2_K, Q3_K_M, Q5_K_M, Q6_K, F16]
+  warmup_requests: 3
+  retries: 2
+  retry_backoff_s: 5
+  max_error_rate: 0.02
+sandbox:
+  image: python:3.13-slim
+  memory: 256m
+  cpus: 1
+  pids_limit: 64
+  timeout_s: 15
+generation:
+  teacher: accounts/fireworks/models/gpt-oss-120b
+  base_url: https://api.fireworks.ai/inference/v1
+  api_cap: 400
+  per_cell_target: 38
+  batch_size: 10
+  max_gen_calls_per_cell: 6
+  verify_batch_size: 10
+  temperature: 0.9
+  max_tokens: 8000
+  timeout_s: 120
+split:
+  test_percent: 30
+labels:
+  tau_quantile: 0.10
+  tau_sensitivity: [0.05, 0.20]
+  max_exceptions_above: 1
+predictor:
+  embedding_model: sentence-transformers/all-MiniLM-L6-v2
+  folds: 5
+  C_grid: [0.1, 1.0, 10.0]
+stats:
+  z_one_sided: 1.645
+  bootstrap_refit_B: 200
+  bootstrap_metric_B: 1000
+policy:
+  delta: 0.02
+  phi: 0.10
+  psi: 0.05
+  delta_grid: [0.0, 0.01, 0.02, 0.03, 0.05, 0.075, 0.10, 0.15]
+  phi_grid: [0.05, 0.10, 0.15, 0.20, 0.30, 1.0]
+  psi_grid: [0.0, 0.02, 0.05, 0.10, 1.0]
+cost:
+  gpu_hourly_rate: 1.0       # 1.0 => cost reads as GPU-hours per 1,000 tasks
+safety:
+  classifier_target_recall: 0.95
+  audit_sample: 200
+  audit_api_cap: 30
+  audit_batch_size: 8
+routing:
+  normalize: false
+  normalize_max_words: 256
+api:
+  host: 127.0.0.1
+  port: 8000
+  rate_per_min: 30
+  f16_rate_per_min: 5
+  max_prompt_chars: 8000
+  allow_force_quant: false
+dashboard:
+  port: 8501
