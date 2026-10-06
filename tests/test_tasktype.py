@@ -1,0 +1,87 @@
+import pytest
+
+from quantlab.confidence import extract_final
+from quantlab.tasktype import (CATEGORIES, PROFILES, classify, extract_answer,
+                               profile_for, to_category)
+
+
+def test_classify_all_categories():
+    cases = {
+        "What is 15% of 240?": "math",
+        "Which is the largest planet? A) Earth B) Jupiter C) Mars D) Venus.": "mc",
+        "Classify the sentiment of this review as positive or negative: 'Great!'": "sentiment",
+        "Summarise the following text in one sentence: 'Lorem ipsum...'": "summarization",
+        "Extract all person names and locations from: 'Alice went to Rome.'": "ner",
+        "This function has a bug, fix it:\n\ndef add(a, b):\n    return a - b": "code_debug",
+        "Write a Python function is_even(n) that returns True if n is even.": "code_gen",
+        "What is the next number in the sequence 2, 4, 8?": "logic",
+        "What is the capital of France?": "short_qa",
+        # newly covered categories
+        "Is this message spam or not spam? 'CONGRATULATIONS! You WON!'": "classification",
+        "Is the number 7 odd or even?": "classification",
+        "Extract the phone number from: 'Call us at 555-0142 on weekdays.'": "extraction",
+        "Extract the percentage from: 'Revenue grew by 12% this quarter.'": "extraction",
+        "Translate 'Good morning' into French.": "language",
+        "What is the plural of 'child'?": "language",
+        "A farmer has 17 sheep. All but 9 run away. How many sheep are left?": "logic",
+        "If tomorrow is Wednesday, what day was the day before yesterday?": "logic",
+    }
+    for prompt, expected in cases.items():
+        assert classify(prompt) == expected, f"{prompt!r} -> {classify(prompt)}"
+
+
+def test_new_profiles_are_shortform_with_tight_remote_budgets():
+    for t in ("classification", "extraction", "language"):
+        prof = profile_for(t)
+        assert not prof.freeform
+        assert prof.remote_max_tokens <= 48
+    # mc stays load-bearing for the truncation-retry interaction
+    assert profile_for("mc").remote_max_tokens <= 32
+
+
+def test_profiles_freeform_vs_shortform():
+    assert profile_for("summarization").freeform
+    assert profile_for("code_gen").freeform
+    assert not profile_for("math").freeform
+    assert profile_for("math").samples > 1
+    assert profile_for("code_gen").samples == 1
+    # remote budgets stay tight for label-like answers
+    assert profile_for("mc").remote_max_tokens <= 32
+
+
+def test_extract_answer_code_prefers_fenced_block():
+    raw = "Here is the fix:\n```python\ndef add(a, b):\n    return a + b\n```\nDone."
+    out = extract_answer("code_debug", raw, extract_final)
+    assert out == "def add(a, b):\n    return a + b"
+
+
+def test_extract_answer_shortform_uses_answer_line():
+    raw = "Thinking...\nAnswer: 42"
+    assert extract_answer("math", raw, extract_final) == "42"
+
+
+def test_extract_answer_freeform_returns_full_text():
+    raw = "The passage describes honeybee communication."
+    assert extract_answer("summarization", raw, extract_final) == raw
+
+
+# --- QuantLab additions: category mapping ----------------------------------
+
+def test_to_category_covers_every_classify_label():
+    # PROFILES' keys are exactly the label space classify() can return --
+    # every one of them must map onto one of the 12 benchmark categories.
+    for label in PROFILES:
+        assert to_category(label) in CATEGORIES
+
+
+def test_to_category_handles_aliases_and_identity_labels():
+    assert to_category("mc") == "multiple_choice"
+    assert to_category("short_qa") == "factual_qa"
+    for label in ("math", "sentiment", "classification", "extraction", "language",
+                  "logic", "summarization", "ner", "code_gen", "code_debug"):
+        assert to_category(label) == label
+
+
+def test_to_category_rejects_unknown_label():
+    with pytest.raises(AssertionError):
+        to_category("not_a_real_label")
