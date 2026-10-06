@@ -1,0 +1,26 @@
+{
+  "total": 135,
+  "by_category": {
+    "classification": 11,
+    "code_debug": 10,
+    "code_gen": 12,
+    "extraction": 10,
+    "factual_qa": 18,
+    "language": 5,
+    "logic": 13,
+    "math": 19,
+    "multiple_choice": 18,
+    "ner": 5,
+    "sentiment": 4,
+    "summarization": 10
+  },
+  "by_grader": {
+    "contains": 45,
+    "contains_all": 5,
+    "exact": 3,
+    "mc": 18,
+    "numeric": 32,
+    "py_exec": 22,
+    "word_limit": 10
+  }
+}
