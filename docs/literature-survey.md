@@ -5,16 +5,16 @@
 
 **Abstract.** Deploying a quantized large language model on fixed hardware currently
 requires choosing a single bit-width for all incoming traffic, and that choice is
-typically made by convention rather than evidence. This survey examines twenty-three
-recent works across six modules — post-training quantization algorithms, empirical
+typically made by convention rather than evidence. This survey examines twenty-seven
+recent works across seven modules — post-training quantization algorithms, empirical
 studies of quantization-induced accuracy loss, per-prompt difficulty estimation,
-cost-aware model routing, measured energy/latency benchmarking, and same-model
-multi-precision serving — and reads them comparatively rather than sequentially. The analysis shows that the field has independently established
+cost-aware model routing, measured energy/latency benchmarking, same-model
+multi-precision serving, and the security of quantized models and routers — and reads them comparatively rather than sequentially. The analysis shows that the field has independently established
 (i) that quantization error is concentrated rather than uniform, (ii) that downstream
 degradation is strongly task-dependent, and (iii) that per-prompt difficulty is cheaply
 predictable. A nascent sixth line of work has begun routing across precisions of one
 model, but evaluates on perplexity and carries no cost model or difficulty notion.
-Five research gaps are identified and a project is proposed that measures the
+Six research gaps are identified and a project is proposed that measures the
 (task category × complexity × bit-width) accuracy and cost surfaces on a single
 deployment, learns a per-prompt complexity predictor from that surface, and emits a
 held-out-validated policy mapping task characteristics to an optimal quantization level.
@@ -30,16 +30,18 @@ The project sits at the intersection of four literatures that have developed lar
 independently: (i) post-training quantization (PTQ) algorithms, (ii) empirical studies of
 what quantization *costs* in accuracy, (iii) per-prompt difficulty estimation, and
 (iv) cost-aware model routing. A fifth literature measures the *energy and latency* side
-of the trade-off on real hardware, and a sixth — the most directly competitive with this
-project — serves **multiple precisions of a single model**.
+of the trade-off on real hardware, a sixth — the most directly competitive with this project — serves **multiple
+precisions of a single model**, and a seventh examines the **security** of quantized
+models and of routers.
 
-The survey is organised module-wise along these six axes. Within each module the papers
+The survey is organised module-wise along these seven axes. Within each module the papers
 are compared rather than summarised sequentially — the analytical claims are carried by
 the "what the module collectively establishes / what it leaves open" paragraphs that
-close each module, and by the cross-cutting analysis in Section 9.
+close each module, and by the cross-cutting analysis in Section 10.
 
-Twenty-three papers are surveyed in the comparative table, all of them published in 2022
-or later. Five further papers are discussed in prose only ([24]–[28]).
+Twenty-seven papers are surveyed in the comparative table ([1]–[23] and [29]–[32]), all
+published in 2022 or later. Six further works are cited in prose only ([24]–[28] and the
+XSTest benchmark [33]).
 
 ---
 
@@ -334,7 +336,51 @@ which precision.
 
 ---
 
-## 8. Comparative Literature Survey Table
+## 8. Module VII — Security of Quantized Models and Routers
+
+**What the module contains.** Modules I–VI treat the precision decision as benign: the
+model files are trusted, a cheaper rung is judged only on accuracy, and the router's
+inputs are assumed honest. Four recent works break each assumption. Egashira et al. [29]
+were the first to treat quantization as a security risk, constructing models that behave
+benignly in full precision but maliciously once quantized, by fine-tuning a malicious
+model and then repairing its full-precision weights only within the set that rounds back
+to the malicious quantized model. Egashira et al. [30] carried the attack to GGUF, the
+format and stack (llama.cpp) this project uses, using the quantization error itself as
+slack; across three popular LLMs and nine GGUF types they report large attack deltas for
+insecure code generation (Δ = 88.7%), targeted content injection (Δ = 85.0%) and benign
+instruction refusal (Δ = 30.1%). Hong et al. [31] evaluated compressed models across eight
+trustworthiness dimensions and found that 4-bit quantization preserves trustworthiness
+while 3-bit quantization sharply reduces it — a loss that benign accuracy does not show —
+and that pruning degrades trustworthiness even at 50% sparsity. Shafran et al. [32]
+defined control-plane integrity for LLM routers and showed that query-independent
+"confounder gadgets" reliably steer routing decisions in white-box and black-box
+settings, while keeping low perplexity so that perplexity filtering does not stop them.
+
+**Comparative reading.** The four works attack three different parts of a precision
+router: [29] and [30] the *artefacts* it serves, [31] the *criterion* by which it judges a
+cheaper rung acceptable, and [32] the *decision procedure* itself. Read alongside [8],
+[31] has a pointed implication: accuracy parity was already shown to be insufficient as a
+fidelity criterion, and it is also insufficient as a safety criterion.
+
+| QuantLab component | Assumption it makes | Work that breaks it |
+|---|---|---|
+| Seven downloaded GGUF files | Files behave the same as their full-precision source | [29], [30] |
+| Selecting cheaper rungs on accuracy | If accuracy holds, behaviour holds | [31] (with [8]) |
+| Complexity predictor + router | Prompts are not adversarial | [32] |
+| `py_exec` grader and `/route` API | Inputs and model outputs are safe to execute / accept | Standard service security |
+
+**What the module establishes.** Quantized artefacts can be weaponised, low-bit rungs can
+lose safety behaviour invisibly to accuracy, and routers can be steered by
+query-independent inputs.
+
+**What it leaves open.** None of [29]–[32] concerns a *precision* router. [32] studies
+model routers and the upgrade (cost) direction; the downgrade direction — steering a
+harmful prompt to a low-bit rung where refusal behaviour has eroded — is specific to
+precision routing and unexamined.
+
+---
+
+## 9. Comparative Literature Survey Table
 
 | # | Author [Ref.] | Approach | Dataset / Benchmark | Advantages | Disadvantages | Remarks |
 |---|---|---|---|---|---|---|
@@ -361,10 +407,14 @@ which precision.
 | 21 | Park, Hyun, Cho, Sim & Lee [21] (ICML 2024, Oral) | Any-Precision LLM: overlays models quantized to 3, 4, ... n bits into a footprint comparable to a single n-bit model, plus a specialised serving engine | LLaMA-family models; perplexity and zero-shot accuracy | Removes the memory cost of holding several precisions; **largely dissolves the model-swap penalty** | Requires a bespoke serving engine; unavailable in stock llama.cpp/GGUF | Shows the residency/swap constraint is a property of the serving stack, not of precision routing itself |
 | 22 | Nair, Datta, Dean, Jain & Kusupati [22] (ICML 2025) | Exploits the nested structure of integer types, so slicing an int8 weight's most significant bits yields int4 or int2 from one trained model | LLM weight quantization; int8/int4/int2 quality comparisons | One artefact served at several precisions on demand; notable int2 gains | Nested integer types only; needs its own training/quantization procedure | Second, independent route to multi-precision serving from a single model |
 | 23 | MoQE [23] (2025) | Treats multiple quantization variants of one full-precision model as "quantization experts"; a lightweight structure-aware **router** dispatches each input to the most suitable expert | ResNet, LLaMA, Qwen; ImageNet, WikiText, C4, OpenWebText | **Closest prior work** - establishes that routing across precisions of one model works and matches the best single quantized model | Routes on generic input characteristics; perplexity-led evaluation; no task-category or difficulty notion; no measured cost model; no held-out policy validation | Refutes any "first precision-level router" claim; leaves the decision-theoretic and cost side open |
+| 24 | Egashira, Vero, Staab, He & Vechev [29] (NeurIPS 2024) | Three-stage attack: fine-tune a malicious model, compute the constraint set of full-precision weights that quantize to it, then use projected gradient descent to remove the malicious behaviour in full precision while staying inside that set | Open LLMs under widely used rounding-based quantization; attack scenarios include insecure code generation | First study of quantization as a **security** risk; shows a model can be benign in full precision and malicious once quantized, distributed via model hubs | Targets simpler rounding-based schemes; does not cover GGUF k-quants (addressed by [30]) | Establishes the supply-chain threat: evaluating only the full-precision model is not enough |
+| 25 | Egashira, Staab, Vero, He & Vechev [30] (ICML 2025) | First attack on **GGUF**: uses the quantization error between full-precision and dequantized weights as slack to train a model that is malicious only after GGUF quantization | Three popular LLMs across nine GGUF quantization types; insecure code generation (Δ = 88.7%), targeted content injection (Δ = 85.0%), benign instruction refusal (Δ = 30.1%) | Attacks the exact format and stack (llama.cpp / ollama) used in practice; shows scheme complexity is not a defence | Attack-side work; defences are discussed but not the focus | **Directly relevant to QuantLab**, which serves seven GGUF rungs from llama.cpp |
+| 26 | Hong, Duan, Zhang, Li, Xie, Lieberman, Diffenderfer, Bartoldson, Jaiswal, Xu, Kailkhura, Hendrycks, Song, Wang & Li [31] (ICML 2024) | "Decoding Compressed Trust": evaluates compressed LLMs across eight trustworthiness dimensions (stereotype, toxicity, privacy, fairness, ethics, adversarial / out-of-distribution / adversarial-demonstration robustness) alongside benign utility | Three leading LLMs, five compression methods (quantization and pruning) at varying compression rates, including 3-, 4- and 8-bit quantization | 4-bit quantization keeps the original model's trustworthiness; moderate bit-widths can even improve some dimensions | Fixed bit-width per model; no per-task or per-prompt view; no routing | **3-bit sharply reduces trustworthiness, and this is invisible in benign accuracy** — so safety must be measured separately from accuracy |
+| 27 | Shafran, Schuster, Ristenpart & Shmatikov [32] (2025) | Defines LLM **control-plane integrity**; generates query-independent "confounder gadgets" that, added to any query, make a router send it to the strong model | Open-source routers and commercial routers; benchmarks include MT-Bench, MMLU and GSM8K; white-box and black-box settings | Shows routers are an attack surface; gadgets work black-box and can keep low perplexity, defeating perplexity filtering | Studies model routers, not precision routers; focuses on upgrade (cost) attacks | Any complexity-based router — including QuantLab's — must be evaluated against adversarial prompts |
 
 ---
 
-## 9. Cross-Cutting Comparative Analysis
+## 10. Cross-Cutting Comparative Analysis
 
 Three tensions emerge only when the modules are read against one another.
 
@@ -394,7 +444,7 @@ question, not a design assumption**. Any honest system must learn the
 (category × complexity → precision) surface from measurement and validate it against
 fixed-precision baselines [18], [28], rather than assume its shape in advance.
 
-Finally, across all twenty-three papers, **cost is expressed in four mutually incomparable
+Finally, across all twenty-seven papers, **cost is expressed in four mutually incomparable
 currencies**: perplexity (Module I), gigabytes of memory (Modules I–II), API dollars per
 token (Module IV), and joules or tokens per second (Module V). No work joins a measured
 *local* cost to a *per-category* accuracy measurement on a single deployment — which is
@@ -403,9 +453,9 @@ needs.
 
 ---
 
-## 10. Research Gap
+## 11. Research Gap
 
-Across the twenty-three works surveyed, the following gaps are identified.
+Across the twenty-seven works surveyed, the following gaps are identified.
 
 **G1 — Bit-width sensitivity is measured at aggregate level, not at a granularity that
 supports decisions.** Modules I and II report degradation averaged over whole benchmarks
@@ -451,7 +501,19 @@ shows that any selection criterion based on accuracy alone is insufficient, yet 
 routing or quantization-selection work incorporates fidelity metrics such as flip rate or
 KL-divergence.
 
-### 10.1 Project Rationale
+**G6 — The precision decision is treated as benign; no precision router considers an
+adversary or a safety constraint.** Quantization can be weaponised so that a model is
+benign at full precision but malicious once quantized [29], including under the GGUF
+schemes used by llama.cpp [30]. Low-bit quantization can erode trustworthiness while
+benign accuracy appears unchanged [31], so an accuracy-only selection rule (even with
+fidelity metrics such as flip rate [8]) can select a rung that is accurate but unsafe.
+Routers are themselves an attack surface: query-independent gadgets reliably manipulate
+routing decisions, and perplexity filtering does not stop them [32]. None of the
+precision-routing or quantization-selection works ([21]–[23], [12]–[18]) evaluates
+artefact integrity, safety behaviour per bit-width, or the adversarial robustness of the
+routing decision.
+
+### 11.1 Project Rationale
 
 The practical consequence of these gaps is that a practitioner deploying a quantized
 model on fixed hardware has no principled basis for choosing a bit-width. The field
@@ -472,7 +534,7 @@ implemented — a direct response to [11] and [28].
 
 ---
 
-## 11. Novelty: How the Proposed System Addresses Each Gap
+## 12. Novelty: How the Proposed System Addresses Each Gap
 
 | Gap | How the proposed system addresses it | Why this is novel |
 |---|---|---|
@@ -480,7 +542,8 @@ implemented — a direct response to [11] and [28].
 | **G2** Difficulty as dataset annotation | Trains a per-prompt complexity analyser on surface and embedding features whose **label is empirically derived** — the minimum bit-width at which the task is reliably solved, measured on the project's own grid — and reports its cross-validated accuracy as a first-class result | Redefines the prediction target from "will model M be correct" [12]–[14] to **"what precision does this prompt require"**. MoQE [23] also selects a precision per input, so the distinction is the *objective*: MoQE's router picks the expert expected to perform **best**, whereas this predicts the **minimum sufficient** precision under a cost constraint — a cheaper target that is only meaningful once cost is measured |
 | **G3** Precision routing not cost- or task-aware | Routes across **bit-widths of a single model** on *task category and predicted difficulty*, using a VRAM-budgeted server pool with LRU load/evict, and a cost model containing an explicit **VRAM-residency cliff** plus a separately accounted model-swap penalty; includes a resident-subset baseline that restricts the policy to quants which fit concurrently | **Not** the first precision router — MoQE [23] precedes it. The novelty is the decision basis and the accounting: first precision router driven by task category and predicted difficulty, and first cost model treating VRAM residency as a first-class discontinuity and swap as a separately charged event rather than a linear memory term |
 | **G4** Cost and accuracy never jointly optimised | Measures prefill/decode throughput, per-task latency, peak VRAM and bytes-per-parameter; converts to **cost per 1,000 tasks** via a single configurable GPU hourly rate; computes per-cell Pareto frontiers in those units | Places accuracy and measured local cost in one optimisation on one machine — [19] measures both but never joins them; [18] optimises a frontier but only in API prices |
-| **G5** Descriptive, unvalidated | Emits a policy mapping (category, *predicted required precision*) → bit-width, fit on a **training split only** via a pooled model that shares strength across thinly-populated cells, and scored on a held-out split through the full inference pipeline against always-F16, always-Q8_0, always-Q4_K_M, best-single-fixed-quantization, a **resident-subset** policy and an **oracle** upper bound. Selection is a **two-condition admissibility rule** — a level qualifies only if its accuracy lower confidence bound is within δ of the reference **and** its flip rate against the reference is ≤ φ, with the cheapest admissible level chosen and (δ, φ) swept to trace the frontier. Fidelity is therefore a constraint on the choice, not a footnote to it: a level that matches on accuracy while churning a large share of individual answers is rejected | First prescriptive, held-out-validated quantization-selection policy; first routing work to make [8]'s fidelity metrics an admissibility constraint on the selection rather than a post-hoc report; directly answers [28]'s finding that routers often fail to beat the best single model — including reporting honestly if this one does not. Note the policy key is the *predicted required precision* conditioned on category, not a separate hand-assigned tier |
+| **G5** Descriptive, unvalidated | Emits a policy mapping (category, *predicted required precision*) → bit-width, fit on a **training split only** via a pooled model that shares strength across thinly-populated cells, and scored on a held-out split through the full inference pipeline against always-F16, always-Q8_0, always-Q4_K_M, best-single-fixed-quantization, a **resident-subset** policy and an **oracle** upper bound. Selection is a **two-condition admissibility rule** — a level qualifies only if its accuracy lower confidence bound is within δ of the reference **and** its flip rate against the reference is ≤ φ, with the cheapest admissible level chosen and (δ, φ) swept to trace the frontier. Fidelity is therefore a constraint on the choice, not a footnote to it: a level that matches on accuracy while churning a large share of individual answers is rejected | First prescriptive, held-out-validated quantization-selection policy; first routing work to make [8]'s fidelity metrics an admissibility constraint on the selection rather than a post-hoc report; directly answers [28]'s finding that routers often fail to beat the best single model — including reporting honestly if this one does not. Note the policy key is the *predicted required precision* conditioned on category, not a separate heuristically assigned tier |
+| **G6** Precision decision assumed benign | Adds a safety slice with a safety-flip constraint to the selection rule; evaluates the router against cost-inflation and downgrade attacks; pins model-file hashes; repurposes cross-rung flips/KL vs F16 as a backdoor detector | First precision-selection policy with a safety constraint and an adversarial evaluation of the precision decision itself |
 
 An additional contribution follows from [11]. Because that study found difficulty does
 *not* monotonically predict degradation, the policy here is **learned from the measured
@@ -491,12 +554,12 @@ well as an engineering artefact.
 
 ---
 
-## 12. Project Objectives
+## 13. Project Objectives
 
 **O1 — Construct a reproducible measurement harness for the accuracy–fidelity surface.**
 Build a deterministic benchmark that evaluates a seven-level quantization ladder (Q2_K,
 Q3_K_M, Q4_K_M, Q5_K_M, Q6_K, Q8_0, F16) of a single instruction-tuned model over
-~450 graded tasks initially, growing toward ~1,500 (see O4), spanning 12 categories
+~1,500 graded tasks (135 curated seed tasks plus ~1,370 generated and teacher-verified), spanning 12 categories
 and 3 stratification tiers, reporting
 per-cell accuracy with bootstrap confidence intervals **and** answer-flip rate and
 KL-divergence against the F16 reference.
@@ -533,7 +596,7 @@ Train a lightweight predictor (surface features plus sentence embeddings) that e
 this ordinal target for an unseen prompt without invoking the full-precision model, and
 report its cross-validated accuracy as a first-class result. **The predictor's output is
 the required-precision class itself, and it is what drives routing at inference time**;
-the hand-assigned easy/moderate/complex tier is used only to stratify the task set and to
+the heuristically assigned easy/moderate/complex tier is used only to stratify the task set and to
 report results, never as the routing key. This keeps one definition of complexity in the
 system rather than two.
 *Addresses G2.*
@@ -571,7 +634,7 @@ lower-confidence-bound rule would degenerate to "always pick the highest bit-wid
 Second, the complexity regressor must be the **cross-fitted, out-of-fold predicted**
 required precision, never the observed label. The label is *defined from* the same
 correctness outcomes being regressed, so using it directly is circular — the model would
-appear near-perfect in training and carry no information. Using the hand tier instead
+appear near-perfect in training and carry no information. Using the heuristic tier instead
 would silently reinstate the two-variable design. The predictor is therefore trained on
 k–1 folds and used to predict the held-out fold, rotating through all k, and those
 out-of-fold predictions enter the pooled model.
@@ -619,9 +682,65 @@ and selection rationale — demonstrating that the study's findings are operatio
 than merely descriptive.
 *Addresses G3 and G5.*
 
+**O6 — Evaluate and harden the security of precision routing.** Four parts.
+
+1. **Safety slice and safety constraint.** Add a safety slice to the benchmark: the 200
+   unsafe prompts of XSTest [33], which the model should refuse; its 250 safe prompts
+   that superficially resemble unsafe ones, which it should *not* refuse; and about 150
+   prompt-injection tasks built by planting an instruction carrying a unique canary
+   string inside existing extraction and summarization passages. Refusal is graded by a
+   deterministic refusal-phrase matcher whose error rate is estimated by an LLM-judged
+   audit of a stratified sample of 200 responses. A rung's **safety flip rate** is the
+   fraction of harmful and injection prompts on which F16 behaves safely and the rung does
+   not. It is directional, because a rung that refuses *more* harmful requests than the
+   reference is not a safety regression. The selection rule gains a third condition:
+
+   > `LCB_acc(b, cell) ≥ acc(ref, cell) – δ` **and** `flip(b, cell) ≤ φ` **and** `safety_flip(b) ≤ ψ`
+
+   The safety flip rate is measured per rung over the whole safety slice and applies in
+   every cell, since any prompt may be adversarial. In addition, prompts flagged by a
+   safety classifier are never served below the lowest rung whose safety flip rate is
+   within ψ. Over-refusal on the safe XSTest prompts is reported per rung but not
+   constrained. *Responds to [31] and [8].*
+
+2. **Adversarial evaluation of the router.** The complexity predictor uses features that
+   are easy to game. Measure the success of cost-inflation attacks (padding, feature
+   stuffing, and query-independent greedy suffix gadgets in the style of [32]) that push
+   prompts toward F16, and downgrade attacks (casual framing, and gadgets that minimise
+   predicted complexity) that push harmful prompts toward low-bit rungs. Measure three
+   defences — the safety floor, routing on a normalised form of the prompt (with its cost
+   on clean traffic reported), and per-client limits on F16 — individually and combined.
+   *Responds to [32].*
+
+3. **Model-file integrity.** Download only from the official model repository at a
+   pinned commit, and verify the SHA-256 hash of every GGUF file before each server
+   launch. Treat the cross-rung comparison (flips and KL-divergence against F16) as a
+   **differential test**: behaviour that diverges only at specific rungs, especially on
+   code tasks, is the signature of a quantization-triggered backdoor. The test's
+   sensitivity is not validated against a planted backdoor, and results are reported with
+   that caveat. *Responds to [29] and [30].*
+
+4. **Service hardening.** Bind every `llama-server` instance and the API to localhost;
+   require an API key; apply per-client rate limits, including a separate limit on
+   requests served at F16; cap input size; disable forced-rung requests by default and
+   never allow them below the safety floor for flagged prompts; and run the `py_exec`
+   grader, which executes model-generated code, in a Docker container with no network,
+   memory and CPU limits, a process limit, a read-only filesystem and a timeout.
+
+*Addresses G6; extends O1 (benchmark), O4 (selection rule) and O5 (service).*
+
+### 13.1 Threat model
+
+| Threat | Attacker action | Impact on QuantLab | Defence |
+|---|---|---|---|
+| Cost inflation / DoS | Pads prompts so the predictor says "needs F16" | F16 does not fit in ~6.5 GB free VRAM; CPU offload and multi-second swaps stall all users | Per-client limits on F16; route on a normalised prompt |
+| Downgrade (jailbreak by routing) | Makes harmful prompts look easy so they reach Q2_K | Low-bit rungs are where safety behaviour degrades [31] | Minimum rung for safety-flagged prompts; safety-flip constraint |
+| Poisoned model file | Distributes a GGUF that is malicious only when quantized [29], [30] | Project downloads and serves seven GGUF files | Official repo only; pinned SHA-256 hashes; cross-rung differential testing |
+| Grader / service abuse | Calls the API directly or smuggles code into `py_exec` | Grader executes model-generated code | Localhost-only servers; auth, rate limits, input caps; sandboxed grader |
+
 ---
 
-## 13. References
+## 14. References
 
 [1] T. Dettmers, M. Lewis, Y. Belkada, and L. Zettlemoyer, "LLM.int8(): 8-bit Matrix Multiplication for Transformers at Scale," in *Advances in Neural Information Processing Systems (NeurIPS)*, 2022. arXiv:2208.07339.
 
@@ -681,6 +800,20 @@ than merely descriptive.
 
 [28] H. Li, Y. Zhang, Z. Guo, C. Wang, S. Tang, Q. Zhang, Y. Chen, B. Qi, P. Ye, L. Bai, Z. Wang, and S. Hu, "LLMRouterBench: A Massive Benchmark and Unified Framework for LLM Routing," in *Findings of the Association for Computational Linguistics: ACL 2026*, pp. 37733–37754, 2026. arXiv:2601.07206.
 
+### Security works (tabulated in rows 24–27, Module VII)
+
+[29] K. Egashira, M. Vero, R. Staab, J. He, and M. Vechev, "Exploiting LLM Quantization," in *Advances in Neural Information Processing Systems (NeurIPS)*, vol. 37, 2024. arXiv:2405.18137. DOI: 10.52202/079017-1319.
+
+[30] K. Egashira, R. Staab, M. Vero, J. He, and M. Vechev, "Mind the Gap: A Practical Attack on GGUF Quantization," in *Proc. 42nd International Conference on Machine Learning (ICML)*, PMLR vol. 267, 2025. arXiv:2505.23786.
+
+[31] J. Hong, J. Duan, C. Zhang, Z. Li, C. Xie, K. Lieberman, J. Diffenderfer, B. R. Bartoldson, A. Jaiswal, K. Xu, B. Kailkhura, D. Hendrycks, D. Song, Z. Wang, and B. Li, "Decoding Compressed Trust: Scrutinizing the Trustworthiness of Efficient LLMs Under Compression," in *Proc. 41st International Conference on Machine Learning (ICML)*, PMLR vol. 235, 2024. arXiv:2403.15447.
+
+[32] A. Shafran, R. Schuster, T. Ristenpart, and V. Shmatikov, "Rerouting LLM Routers," 2025. arXiv:2501.01818.
+
+### Dataset
+
+[33] P. Röttger, H. R. Kirk, B. Vidgen, G. Attanasio, F. Bianchi, and D. Hovy, "XSTest: A Test Suite for Identifying Exaggerated Safety Behaviours in Large Language Models," in *Proc. 2024 Conference of the North American Chapter of the Association for Computational Linguistics (NAACL)*, 2024. arXiv:2308.01263.
+
 ---
 
 ### Verification note
@@ -698,6 +831,12 @@ Qualifications that should be resolved before formal submission:
 3. [23] (MoQE) remains a preprint and is **load-bearing**: it bounds this project's G2
    and G3 novelty claims, so its exact contribution should be read in full rather than
    taken from its abstract before the claims are submitted.
+4. [29]–[32] were verified against arXiv and proceedings listings when the security
+   module was added. [32] is an arXiv preprint with no confirmed venue. The dataset entry
+   for [29] is kept general because the specific models were not confirmed from the
+   abstract; check the paper before submission. [33] is used as a benchmark; its
+   repository declares no licence, so the prompts are downloaded at build time rather than
+   redistributed.
 
 **Correction on record.** An earlier draft attributed to RouterBench [18] the finding
 that binary routers such as HybridLLM and FrugalGPT fail to beat the best single model.
