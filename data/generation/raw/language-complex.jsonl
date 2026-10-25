@@ -1,0 +1,90 @@
+{"task": "What is the English idiom meaning 'to receive an unexpected benefit'?", "expected": "a blessing in disguise", "grader": "contains", "category": "language"}
+{"task": "Translate the English sentence 'I will see you tomorrow' into German.", "expected": "ich werde dich morgen sehen", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of the rare verb 'to cleave' (meaning to split)?", "expected": "clove", "grader": "contains", "category": "language"}
+{"task": "Provide the French plural form of the noun 'cheval' (horse).", "expected": "chevaux", "grader": "contains", "category": "language"}
+{"task": "What is the Spanish synonym for the English word 'quick' as an adjective?", "expected": "rápido", "grader": "contains", "category": "language"}
+{"task": "Translate the Spanish phrase 'buenas noches' into English.", "expected": "good night", "grader": "contains", "category": "language"}
+{"task": "Give the English antonym of the word 'exuberant'.", "expected": "listless", "grader": "contains", "category": "language"}
+{"task": "What is the German plural of the noun 'das Mädchen' (girl)?", "expected": "mädchen", "grader": "contains", "category": "language"}
+{"task": "Translate the English phrase 'He is looking forward to the holidays' into French.", "expected": "il a hâte des vacances", "grader": "contains", "category": "language"}
+{"task": "Provide the past participle of the verb 'to smite' (as in to strike).", "expected": "smitten", "grader": "contains", "category": "language"}
+{"task": "What is a synonym of the rare English word 'ephemeral'?", "expected": "transient", "grader": "contains", "category": "language"}
+{"task": "What is the antonym of the English adjective 'obscure'?", "expected": "clear", "grader": "contains", "category": "language"}
+{"task": "What is the plural form of the French noun 'œil'?", "expected": "yeux", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of the German verb 'fahren' (to drive)?", "expected": "fuhr", "grader": "contains", "category": "language"}
+{"task": "Translate the English idiom 'to spill the beans' into French.", "expected": "vendre la mèche", "grader": "contains", "category": "language"}
+{"task": "Translate the Spanish idiom 'dar la mano' into English.", "expected": "shake hands", "grader": "contains", "category": "language"}
+{"task": "Give a synonym for the Spanish adjective 'rápido'.", "expected": "veloz", "grader": "contains", "category": "language"}
+{"task": "What is the antonym of the German adjective 'schwer' (meaning heavy)?", "expected": "leicht", "grader": "contains", "category": "language"}
+{"task": "Translate the English phrase 'I have been waiting for you' into German.", "expected": "ich habe auf dich gewartet", "grader": "contains", "category": "language"}
+{"task": "Translate the English proverb 'the early bird catches the worm' into German.", "expected": "der frühe vogel fängt den wurm", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of the verb 'to besmirch'?", "expected": "besmirched", "grader": "contains", "category": "language"}
+{"task": "Provide a synonym for the rare English word 'pulchritude'.", "expected": "beauty", "grader": "contains", "category": "language"}
+{"task": "What is the antonym of 'effulgent'?", "expected": "dull", "grader": "contains", "category": "language"}
+{"task": "What is the plural form of 'nucleus'?", "expected": "nuclei", "grader": "contains", "category": "language"}
+{"task": "Translate the idiom 'kick the bucket' into German.", "expected": "den löffel abgeben", "grader": "contains", "category": "language"}
+{"task": "Translate the phrase 'to be in two minds' into French.", "expected": "être partagé", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of 'to foreknow'?", "expected": "foreknew", "grader": "contains", "category": "language"}
+{"task": "Provide a synonym for the verb 'obfuscate'.", "expected": "confuse", "grader": "contains", "category": "language"}
+{"task": "What is the antonym of 'sanguine'?", "expected": "pessimistic", "grader": "contains", "category": "language"}
+{"task": "Translate the expression 'once in a blue moon' into Spanish.", "expected": "muy raramente", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of the rare verb 'cleave' (meaning to split)?", "expected": "cleft", "grader": "contains", "category": "language"}
+{"task": "Give an antonym for the obscure adjective 'lucid'.", "expected": "confused", "grader": "contains", "category": "language"}
+{"task": "Provide a synonym for the rare adjective 'pugnacious'.", "expected": "combative", "grader": "contains", "category": "language"}
+{"task": "What is the plural form of the uncommon noun 'bacterium'?", "expected": "bacteria", "grader": "contains", "category": "language"}
+{"task": "Translate the English idiom 'to beat around the bush' into German.", "expected": "um den heissen brei herumreden", "grader": "contains", "category": "language"}
+{"task": "Translate the phrase 'She gave me a hand' into French.", "expected": "elle m a aide", "grader": "contains", "category": "language"}
+{"task": "Translate the idiomatic expression 'He is over the moon' into Spanish.", "expected": "esta en la luna", "grader": "contains", "category": "language"}
+{"task": "Give an antonym for the rare verb 'abhor'.", "expected": "adore", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of the archaic verb 'bethink'?", "expected": "bethought", "grader": "contains", "category": "language"}
+{"task": "Translate the sentence 'We will meet at dawn' into German.", "expected": "wir treffen uns bei dammerung", "grader": "contains", "category": "language"}
+{"task": "What is the Spanish translation of the idiom 'to spill the beans'?", "expected": "revelar el secreto", "grader": "contains", "category": "language"}
+{"task": "What is a synonym of the rare word 'obfuscate'?", "expected": "confuse", "grader": "contains", "category": "language"}
+{"task": "What is an antonym of the verb 'lament'?", "expected": "rejoice", "grader": "contains", "category": "language"}
+{"task": "What is the plural form of 'criterion'?", "expected": "criteria", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of the verb 'abide'?", "expected": "abode", "grader": "contains", "category": "language"}
+{"task": "What is the German translation of the idiom 'still waters run deep'?", "expected": "stille wasser sind tief", "grader": "contains", "category": "language"}
+{"task": "What is the French translation of the idiom 'to lose one's marbles'?", "expected": "perdre la boule", "grader": "contains", "category": "language"}
+{"task": "What is the Spanish translation of the proverb 'the early bird catches the worm'?", "expected": "el que madruga atrapa al gusano", "grader": "contains", "category": "language"}
+{"task": "What is a synonym of the word 'sesquipedalian'?", "expected": "longwinded", "grader": "contains", "category": "language"}
+{"task": "What is an antonym of the noun 'paucity'?", "expected": "abundance", "grader": "contains", "category": "language"}
+{"task": "What is the German idiom equivalent to the English phrase 'to spill the beans'?", "expected": "die katze aus dem sack lassen", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of the verb 'to cleave' (meaning to split)?", "expected": "cleft", "grader": "contains", "category": "language"}
+{"task": "Provide a common synonym for the obscure verb 'obfuscate'.", "expected": "confuse", "grader": "contains", "category": "language"}
+{"task": "What is an antonym of the adjective 'sanguine'?", "expected": "pessimistic", "grader": "contains", "category": "language"}
+{"task": "Give the plural form of the French noun 'cheval'.", "expected": "chevaux", "grader": "contains", "category": "language"}
+{"task": "What is the Spanish idiom equivalent to the English phrase 'piece of cake'?", "expected": "pan comido", "grader": "contains", "category": "language"}
+{"task": "Translate the English phrase 'to break the ice' into German.", "expected": "das eis brechen", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of the verb 'to beseech'?", "expected": "besought", "grader": "contains", "category": "language"}
+{"task": "Provide a common synonym for the rare adjective 'luminous'.", "expected": "bright", "grader": "contains", "category": "language"}
+{"task": "What is an antonym of the French adjective 'rapide'?", "expected": "lent", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of the archaic English verb 'to cleave' (meaning to split)?", "expected": "clove", "grader": "contains", "category": "language"}
+{"task": "Give a synonym for the rare English verb 'obfuscate'.", "expected": "confuse", "grader": "contains", "category": "language"}
+{"task": "What is the opposite idiom of 'to bite the bullet'?", "expected": "to avoid the problem", "grader": "contains", "category": "language"}
+{"task": "What is the plural form of the English noun 'cactus'?", "expected": "cacti", "grader": "contains", "category": "language"}
+{"task": "Translate the phrase 'She gave him a beautiful smile' into French.", "expected": "elle lui a donné un beau sourire", "grader": "contains", "category": "language"}
+{"task": "What is the English translation of the Spanish phrase 'estar en la cuerda floja'?", "expected": "to be on a tightrope", "grader": "contains", "category": "language"}
+{"task": "Give an antonym for the uncommon adjective 'sparse'.", "expected": "dense", "grader": "contains", "category": "language"}
+{"task": "Provide a synonym phrase for the English idiom 'to turn a blind eye'.", "expected": "to look the other way", "grader": "contains", "category": "language"}
+{"task": "Translate the French sentence 'Il fait froid comme la mort' into English.", "expected": "it is cold as death", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of the rare English verb 'to forego'?", "expected": "forewent", "grader": "contains", "category": "language"}
+{"task": "What is the German translation of the idiom 'to beat around the bush'?", "expected": "um den heißen brei herumreden", "grader": "contains", "category": "language"}
+{"task": "Provide the French plural form of the noun 'cheval'.", "expected": "chevaux", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of the verb 'to slink'?", "expected": "slinked", "grader": "contains", "category": "language"}
+{"task": "Give a synonym for the rare English word 'lugubrious'.", "expected": "mournful", "grader": "contains", "category": "language"}
+{"task": "Translate the English phrase 'the early bird catches the worm' into Spanish, preserving the idiomatic order.", "expected": "a quien madruga dios le ayuda", "grader": "contains", "category": "language"}
+{"task": "What is the French translation of the idiom 'to spill the beans'?", "expected": "vendre la mèche", "grader": "contains", "category": "language"}
+{"task": "Provide the German plural of the noun 'das Mädchen'.", "expected": "mädchen", "grader": "contains", "category": "language"}
+{"task": "Give the past tense of the irregular verb 'to foresee'.", "expected": "foresaw", "grader": "contains", "category": "language"}
+{"task": "What is the Spanish translation of the English idiom 'when pigs fly'?", "expected": "cuando los cerdos vuelen", "grader": "contains", "category": "language"}
+{"task": "Provide a synonym for the rare word 'pulchritude'.", "expected": "beauty", "grader": "contains", "category": "language"}
+{"task": "What is a synonym of the rare word 'ephemeral'?", "expected": "transient", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of the verb 'to slink'?", "expected": "slunk", "grader": "contains", "category": "language"}
+{"task": "What is the plural form of 'analysis'?", "expected": "analyses", "grader": "contains", "category": "language"}
+{"task": "What is an antonym of 'exuberant'?", "expected": "listless", "grader": "contains", "category": "language"}
+{"task": "Translate the English idiom 'to spill the beans' into French.", "expected": "révéler le secret", "grader": "contains", "category": "language"}
+{"task": "Translate the English idiom 'as easy as pie' into Spanish.", "expected": "pan comido", "grader": "contains", "category": "language"}
+{"task": "Translate the English idiom 'to keep one's fingers crossed' into German.", "expected": "die daumen drücken", "grader": "contains", "category": "language"}
+{"task": "What is a synonym of 'obfuscate'?", "expected": "confuse", "grader": "contains", "category": "language"}
+{"task": "What is an antonym of 'diligent'?", "expected": "negligent", "grader": "contains", "category": "language"}
+{"task": "Translate the English phrase 'out of the blue' into French.", "expected": "sans prévenir", "grader": "contains", "category": "language"}

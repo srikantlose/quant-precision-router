@@ -1,0 +1,50 @@
+{"task": "What is the chemical symbol for water?", "expected": ["h2o"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "Who wrote the play 'Romeo and Juliet'?", "expected": ["shakespeare"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "What is the tallest mountain on Earth, and in which country is it located?", "expected": ["everest", "nepal"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "What gas do plants primarily absorb from the atmosphere during photosynthesis?", "expected": ["carbon dioxide"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "What is the main language spoken in Brazil, and what is the currency used there?", "expected": ["portuguese", "real"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "In computing, what does 'CPU' stand for?", "expected": ["central processing unit"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "Which element has the atomic number 79, and what is its common use in jewelry?", "expected": ["gold", "rings"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "What year did the Titanic sink?", "expected": ["1912"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "Which continent contains the Sahara Desert, and what is the primary color of its sand?", "expected": ["africa", "yellow"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "What is the largest planet in our solar system?", "expected": ["jupiter"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "What is the capital of Japan, and what is the name of its highest mountain?", "expected": ["tokyo", "fuji"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "Who wrote the play \"Romeo and Juliet\"?", "expected": ["shakespeare"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "What gas do plants release during photosynthesis?", "expected": ["oxygen"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "What is the largest planet in our Solar System?", "expected": ["jupiter"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "On which continent is Egypt located?", "expected": ["africa"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "What is the primary ingredient in traditional guacamole?", "expected": ["avocado"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "In what year did the RMS Titanic sink?", "expected": ["1912"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "What currency is used in the United Kingdom?", "expected": ["pound"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "What is the chemical symbol for gold?", "expected": ["au"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "What is the capital of Canada, and which ocean borders the province of British Columbia?", "expected": ["ottawa", "pacific"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "What is the capital city of Japan?", "expected": ["tokyo"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "Name the chemical element with symbol Fe and its typical oxidation state in iron(III) oxide.", "expected": ["iron", "+3"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "What is the primary language spoken in Brazil, and what continent is Brazil located on?", "expected": ["portuguese", "south america"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "Identify the largest ocean on Earth and the continent that borders it to the east.", "expected": ["pacific", "asia"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "What is the name of the process by which plants convert sunlight into chemical energy, and what pigment is chiefly involved?", "expected": ["photosynthesis", "chlorophyll"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "State the U.S. state known for the city of Detroit, and the river that flows through it.", "expected": ["michigan", "detroit river"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "Which planet is known as the Red Planet, and what is the name of the rover that landed there in 2021?", "expected": ["mars", "perseverance"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "Give the common name for the chemical compound NaCl and the taste it provides.", "expected": ["salt", "salty"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "What is the tallest mountain in the world above sea level, and in which mountain range is it found?", "expected": ["everest", "himalayas"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "Name the first president of the United States and the city where he was born.", "expected": ["george washington", "westmoreland county"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "What is the capital of France, and on which river does it lie?", "expected": ["paris", "seine"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "Name the largest planet in the Solar System, and the element that makes up most of its atmosphere.", "expected": ["jupiter", "hydrogen"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "What chemical element has the symbol \"O\", and what is its atomic number?", "expected": ["oxygen", "8"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "Who wrote the play \"Romeo and Juliet\", and in which city was he born?", "expected": ["william shakespeare", "stratford-upon-avon"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "What is the hardest natural mineral, and what is its Mohs hardness rating?", "expected": ["diamond", "10"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "Which continent is Egypt located in, and what desert covers most of its land area?", "expected": ["africa", "sahara"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "What is the primary language spoken in Brazil, and what currency does the country use?", "expected": ["portuguese", "real"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "What is the chemical formula for table salt, and what two elements does it consist of?", "expected": ["nacl", "sodium", "chlorine"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "Which ocean lies east of the United States, and what is the name of the current that flows northward along the US east coast?", "expected": ["atlantic ocean", "gulf stream"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "What device measures atmospheric pressure, and what unit does it commonly use?", "expected": ["barometer", "millibar"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "What is the chemical symbol for gold?", "expected": ["au"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "What planet is known as the Red Planet?", "expected": ["mars"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "What gas do humans exhale?", "expected": ["carbon dioxide"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "What is the largest ocean on Earth, and which continent does it border on its western side?", "expected": ["pacific ocean", "asia"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "What language is primarily spoken in Brazil?", "expected": ["portuguese"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "Who wrote the play 'Romeo and Juliet', and in which city was he born?", "expected": ["william shakespeare", "stratford-upon-avon"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "What is the process by which plants convert sunlight into chemical energy?", "expected": ["photosynthesis"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "Which element has atomic number 1, and what is its most common isotopic form?", "expected": ["hydrogen", "protium"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "What is the main ingredient in traditional Japanese miso soup?", "expected": ["miso paste"], "grader": "contains_all", "category": "factual_qa"}
+{"task": "Which country is the origin of the sport of tennis, and what surface is Wimbledon famously played on?", "expected": ["england", "grass"], "grader": "contains_all", "category": "factual_qa"}

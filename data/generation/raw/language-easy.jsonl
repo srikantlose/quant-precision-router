@@ -1,0 +1,80 @@
+{"task": "What is the opposite of 'big'?", "expected": "small", "grader": "contains", "category": "language"}
+{"task": "What is a synonym for 'quick'?", "expected": "fast", "grader": "contains", "category": "language"}
+{"task": "What is the plural of 'mouse'?", "expected": "mice", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of 'run'?", "expected": "ran", "grader": "contains", "category": "language"}
+{"task": "What is the French word for 'apple'?", "expected": "pomme", "grader": "contains", "category": "language"}
+{"task": "What is the Spanish word for 'book'?", "expected": "libro", "grader": "contains", "category": "language"}
+{"task": "What is the German word for 'house'?", "expected": "haus", "grader": "contains", "category": "language"}
+{"task": "What is the opposite of 'cold'?", "expected": "hot", "grader": "contains", "category": "language"}
+{"task": "What is a synonym for 'happy'?", "expected": "joyful", "grader": "contains", "category": "language"}
+{"task": "What is the plural of 'child'?", "expected": "children", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of 'run'?", "expected": "ran", "grader": "contains", "category": "language"}
+{"task": "What is the plural of 'child'?", "expected": "children", "grader": "contains", "category": "language"}
+{"task": "What is the French translation of 'apple'?", "expected": "pomme", "grader": "contains", "category": "language"}
+{"task": "What is the German translation of 'book'?", "expected": "buch", "grader": "contains", "category": "language"}
+{"task": "What is the antonym of 'hot'?", "expected": "cold", "grader": "contains", "category": "language"}
+{"task": "What is a common synonym of 'big'?", "expected": "large", "grader": "contains", "category": "language"}
+{"task": "What is the Spanish translation of 'water'?", "expected": "agua", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of 'eat'?", "expected": "ate", "grader": "contains", "category": "language"}
+{"task": "What is the plural of 'ox'?", "expected": "oxen", "grader": "contains", "category": "language"}
+{"task": "What is the antonym of 'slow'?", "expected": "fast", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of \"run\"?", "expected": "ran", "grader": "contains", "category": "language"}
+{"task": "What is the antonym of \"big\"?", "expected": "small", "grader": "contains", "category": "language"}
+{"task": "What is the plural of \"child\"?", "expected": "children", "grader": "contains", "category": "language"}
+{"task": "What is a synonym of \"quick\"?", "expected": "fast", "grader": "contains", "category": "language"}
+{"task": "What is the French translation of \"apple\"?", "expected": "pomme", "grader": "contains", "category": "language"}
+{"task": "What is the German translation of \"house\"?", "expected": "haus", "grader": "contains", "category": "language"}
+{"task": "What is the Spanish translation of \"thank you\"?", "expected": "gracias", "grader": "contains", "category": "language"}
+{"task": "What is the antonym of \"night\"?", "expected": "day", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of \"write\"?", "expected": "wrote", "grader": "contains", "category": "language"}
+{"task": "What is the plural of \"goose\"?", "expected": "geese", "grader": "contains", "category": "language"}
+{"task": "What is the antonym of 'big'?", "expected": "small", "grader": "contains", "category": "language"}
+{"task": "What is a synonym of 'quick'?", "expected": "fast", "grader": "contains", "category": "language"}
+{"task": "What is the plural of 'mouse'?", "expected": "mice", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of 'teach'?", "expected": "taught", "grader": "contains", "category": "language"}
+{"task": "What is the French word for 'apple'?", "expected": "pomme", "grader": "contains", "category": "language"}
+{"task": "What is the Spanish word for 'car'?", "expected": "coche", "grader": "contains", "category": "language"}
+{"task": "What is the German word for 'book'?", "expected": "buch", "grader": "contains", "category": "language"}
+{"task": "What is the antonym of 'cold'?", "expected": "hot", "grader": "contains", "category": "language"}
+{"task": "What is a synonym of 'happy'?", "expected": "joyful", "grader": "contains", "category": "language"}
+{"task": "What is the plural of 'city'?", "expected": "cities", "grader": "contains", "category": "language"}
+{"task": "What is the antonym of 'cold'?", "expected": "hot", "grader": "contains", "category": "language"}
+{"task": "What is the plural of 'city'?", "expected": "cities", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of 'write'?", "expected": "wrote", "grader": "contains", "category": "language"}
+{"task": "What is a synonym of 'quick'?", "expected": "fast", "grader": "contains", "category": "language"}
+{"task": "What is the French word for 'book'?", "expected": "livre", "grader": "contains", "category": "language"}
+{"task": "What is the Spanish word for 'water'?", "expected": "agua", "grader": "contains", "category": "language"}
+{"task": "What is the German word for 'house'?", "expected": "haus", "grader": "contains", "category": "language"}
+{"task": "What is the antonym of 'big'?", "expected": "small", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of 'go'?", "expected": "went", "grader": "contains", "category": "language"}
+{"task": "What is the plural of 'child'?", "expected": "children", "grader": "contains", "category": "language"}
+{"task": "What is the opposite of 'happy'?", "expected": "sad", "grader": "contains", "category": "language"}
+{"task": "What is the plural of 'mouse'?", "expected": "mice", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of 'write'?", "expected": "wrote", "grader": "contains", "category": "language"}
+{"task": "Translate 'book' into French.", "expected": "livre", "grader": "contains", "category": "language"}
+{"task": "Translate 'apple' into Spanish.", "expected": "manzana", "grader": "contains", "category": "language"}
+{"task": "What is a synonym of 'big'?", "expected": "large", "grader": "contains", "category": "language"}
+{"task": "What is the opposite of 'cold'?", "expected": "hot", "grader": "contains", "category": "language"}
+{"task": "What is the plural of 'child'?", "expected": "children", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of 'go'?", "expected": "went", "grader": "contains", "category": "language"}
+{"task": "Translate 'water' into German.", "expected": "wasser", "grader": "contains", "category": "language"}
+{"task": "What is the antonym of 'hot'?", "expected": "cold", "grader": "contains", "category": "language"}
+{"task": "What is the plural of 'mouse'?", "expected": "mice", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of 'run'?", "expected": "ran", "grader": "contains", "category": "language"}
+{"task": "What is a synonym for 'big'?", "expected": "large", "grader": "contains", "category": "language"}
+{"task": "Translate 'apple' into French.", "expected": "pomme", "grader": "contains", "category": "language"}
+{"task": "Translate 'book' into Spanish.", "expected": "libro", "grader": "contains", "category": "language"}
+{"task": "Translate 'car' into German.", "expected": "auto", "grader": "contains", "category": "language"}
+{"task": "What is the antonym of 'young'?", "expected": "old", "grader": "contains", "category": "language"}
+{"task": "What is the plural of 'child'?", "expected": "children", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of 'eat'?", "expected": "ate", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of 'run'?", "expected": "ran", "grader": "contains", "category": "language"}
+{"task": "What is the plural of 'mouse'?", "expected": "mice", "grader": "contains", "category": "language"}
+{"task": "What is the antonym of 'big'?", "expected": "small", "grader": "contains", "category": "language"}
+{"task": "What is a synonym of 'quick'?", "expected": "fast", "grader": "contains", "category": "language"}
+{"task": "What is the French word for 'house'?", "expected": "maison", "grader": "contains", "category": "language"}
+{"task": "What is the Spanish word for 'book'?", "expected": "libro", "grader": "contains", "category": "language"}
+{"task": "What is the German word for 'water'?", "expected": "wasser", "grader": "contains", "category": "language"}
+{"task": "What is the plural of 'child'?", "expected": "children", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of 'eat'?", "expected": "ate", "grader": "contains", "category": "language"}
+{"task": "What is the antonym of 'happy'?", "expected": "sad", "grader": "contains", "category": "language"}

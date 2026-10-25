@@ -125,6 +125,49 @@ def _cmd_download_models(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_generate_tasks(args: argparse.Namespace) -> int:
+    from . import generate
+    from .tasks import load_seed_files, consolidate
+
+    cfg = load_config(args.config)
+    try:
+        generate.probe_teacher()
+    except generate.GenerationError as exc:
+        print(f"generate-tasks failed: {exc}", file=sys.stderr)
+        return 1
+    print("probe OK: teacher is reachable")
+
+    seed_path = Path(args.seed)
+    if seed_path.is_file():
+        seed_tasks = [json.loads(l) for l in open(seed_path, encoding="utf-8") if l.strip()]
+    else:
+        seed_tasks = consolidate(load_seed_files(cfg["paths"]["cheaproute_root"]))
+
+    generated_path = Path("data/tasks/generated.jsonl")
+    if generated_path.is_file() and not args.fresh:
+        existing_generated = [json.loads(l) for l in open(generated_path, encoding="utf-8") if l.strip()]
+        print(f"resuming: {len(existing_generated)} generated tasks already exist; "
+             f"topping up shortfall cells only", file=sys.stderr)
+        try:
+            result = generate.resume_generation(seed_tasks, existing_generated)
+        except generate.BudgetExhausted as exc:
+            print(f"generate-tasks: budget exhausted ({exc}); writing partial results", file=sys.stderr)
+            result = {"rows": existing_generated, "cell_log": {}, "budget_exhausted_at": str(exc)}
+    else:
+        try:
+            result = generate.run_generation(seed_tasks)
+        except generate.BudgetExhausted as exc:
+            print(f"generate-tasks: budget exhausted ({exc}); writing partial results", file=sys.stderr)
+            result = {"rows": [], "cell_log": {}, "budget_exhausted_at": str(exc)}
+
+    summary = generate.write_outputs(seed_tasks, result)
+    print(json.dumps({
+        "total": summary["total"], "api_calls_used": summary["api_calls_used"],
+        "api_cap": summary["api_cap"], "budget_exhausted_at": summary["budget_exhausted_at"],
+    }, ensure_ascii=False, indent=2))
+    return 0
+
+
 def _cmd_bench(args: argparse.Namespace) -> int:
     from .bench import BenchError, run_bench
     from .quants import LADDER
@@ -185,6 +228,13 @@ def main(argv: list[str] | None = None) -> int:
         "download-models", help="download and hash-verify GGUF rungs")
     p_dl.add_argument("--rungs", default=None, help="comma-separated rung names (default: all)")
     p_dl.set_defaults(func=_cmd_download_models)
+
+    p_gen = subparsers.add_parser(
+        "generate-tasks", help="generate, verify and merge benchmark tasks with the Fireworks teacher")
+    p_gen.add_argument("--seed", default="data/tasks/seed.jsonl")
+    p_gen.add_argument("--fresh", action="store_true",
+                       help="ignore any existing data/tasks/generated.jsonl and start over")
+    p_gen.set_defaults(func=_cmd_generate_tasks)
 
     p_bench = subparsers.add_parser(
         "bench", help="run tasks against rungs and record graded rows (resumable)")

@@ -67,10 +67,10 @@ _DEFAULTS: dict[str, Any] = {
     "generation": {
         "teacher": "accounts/fireworks/models/gpt-oss-120b",
         "base_url": "https://api.fireworks.ai/inference/v1",
-        "api_cap": 400,
+        "api_cap": 600,
         "per_cell_target": 38,
         "batch_size": 10,
-        "max_gen_calls_per_cell": 6,
+        "max_gen_calls_per_cell": 10,
         "verify_batch_size": 10,
         "temperature": 0.9,
         "max_tokens": 8000,

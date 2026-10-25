@@ -1,0 +1,70 @@
+{"task": "What is the past tense of 'cling'?", "expected": "clung", "grader": "contains", "category": "language"}
+{"task": "What is the plural form of 'mouse'?", "expected": "mice", "grader": "contains", "category": "language"}
+{"task": "Give a synonym of 'rapid'.", "expected": "swift", "grader": "contains", "category": "language"}
+{"task": "What is an antonym of 'optimistic'?", "expected": "pessimistic", "grader": "contains", "category": "language"}
+{"task": "Translate 'childhood' into German.", "expected": "kindheit", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of 'slay'?", "expected": "slew", "grader": "contains", "category": "language"}
+{"task": "What is the plural of 'ox'?", "expected": "oxen", "grader": "contains", "category": "language"}
+{"task": "Translate 'to whisper' into Spanish.", "expected": "susurrar", "grader": "contains", "category": "language"}
+{"task": "Give a synonym of 'obscure' (as an adjective).", "expected": "unclear", "grader": "contains", "category": "language"}
+{"task": "What is an antonym of 'sparse'?", "expected": "dense", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of 'stride'?", "expected": "strode", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of 'forbid'?", "expected": "forbade", "grader": "contains", "category": "language"}
+{"task": "What is an antonym of 'scarce'?", "expected": "abundant", "grader": "contains", "category": "language"}
+{"task": "What is a synonym of 'lament'?", "expected": "grieve", "grader": "contains", "category": "language"}
+{"task": "What is the plural of 'criterion'?", "expected": "criteria", "grader": "contains", "category": "language"}
+{"task": "Translate 'library' to French.", "expected": "bibliothèque", "grader": "contains", "category": "language"}
+{"task": "Translate 'mountain' to Spanish.", "expected": "montaña", "grader": "contains", "category": "language"}
+{"task": "Translate 'friend' to German.", "expected": "freund", "grader": "contains", "category": "language"}
+{"task": "What is an antonym of 'plentiful'?", "expected": "sparse", "grader": "contains", "category": "language"}
+{"task": "What is a synonym of 'obscure'?", "expected": "unclear", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of 'to forbid'?", "expected": "forbade", "grader": "contains", "category": "language"}
+{"task": "What is the plural of 'ox'?", "expected": "oxen", "grader": "contains", "category": "language"}
+{"task": "Give a synonym for 'gloomy'.", "expected": "somber", "grader": "contains", "category": "language"}
+{"task": "What is the antonym of 'sparse'?", "expected": "dense", "grader": "contains", "category": "language"}
+{"task": "Translate the English word 'garden' into French.", "expected": "jardin", "grader": "contains", "category": "language"}
+{"task": "Translate the English phrase 'good night' into Spanish.", "expected": "buenas noches", "grader": "contains", "category": "language"}
+{"task": "Translate the English word 'river' into German.", "expected": "fluss", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of 'to kneel'?", "expected": "knelt", "grader": "contains", "category": "language"}
+{"task": "Give a synonym for 'swift'.", "expected": "rapid", "grader": "contains", "category": "language"}
+{"task": "What is the plural of 'analysis'?", "expected": "analyses", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of 'begin'?", "expected": "began", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of 'dive' (irregular form)?", "expected": "dove", "grader": "contains", "category": "language"}
+{"task": "What is the plural of 'mouse'?", "expected": "mice", "grader": "contains", "category": "language"}
+{"task": "What is an antonym of 'obscure'?", "expected": "clear", "grader": "contains", "category": "language"}
+{"task": "What is a synonym of 'elated'?", "expected": "joyful", "grader": "contains", "category": "language"}
+{"task": "Translate the English word 'library' into French.", "expected": "bibliothèque", "grader": "contains", "category": "language"}
+{"task": "Translate the English word 'butterfly' into Spanish.", "expected": "mariposa", "grader": "contains", "category": "language"}
+{"task": "Translate the English word 'mountain' into German.", "expected": "berg", "grader": "contains", "category": "language"}
+{"task": "What is an antonym of 'sparse'?", "expected": "dense", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of 'cling'?", "expected": "clung", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of 'slink'?", "expected": "slunk", "grader": "contains", "category": "language"}
+{"task": "What is the plural form of 'ox'?", "expected": "oxen", "grader": "contains", "category": "language"}
+{"task": "Give a synonym for 'lament'.", "expected": "bemoan", "grader": "contains", "category": "language"}
+{"task": "Provide an antonym for 'sparse'.", "expected": "dense", "grader": "contains", "category": "language"}
+{"task": "Translate the English verb 'to whisper' into French.", "expected": "chuchoter", "grader": "contains", "category": "language"}
+{"task": "Translate the English phrase 'the sunrise' into Spanish.", "expected": "amanecer", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of 'forbid'?", "expected": "forbade", "grader": "contains", "category": "language"}
+{"task": "What is the plural of 'criterion'?", "expected": "criteria", "grader": "contains", "category": "language"}
+{"task": "Give an antonym for 'benevolent'.", "expected": "malevolent", "grader": "contains", "category": "language"}
+{"task": "Translate the English verb 'to astonish' into German.", "expected": "erstaunen", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of 'fling'?", "expected": "flung", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of 'creep'?", "expected": "crept", "grader": "contains", "category": "language"}
+{"task": "What is the plural of 'mouse'?", "expected": "mice", "grader": "contains", "category": "language"}
+{"task": "Give a synonym for 'quick'.", "expected": "swift", "grader": "contains", "category": "language"}
+{"task": "What is the antonym of 'expand'?", "expected": "contract", "grader": "contains", "category": "language"}
+{"task": "Translate the English phrase 'the library' into French.", "expected": "la bibliothèque", "grader": "contains", "category": "language"}
+{"task": "Translate the English verb 'to whisper' into Spanish.", "expected": "susurrar", "grader": "contains", "category": "language"}
+{"task": "Translate the German noun 'Schmetterling' into English.", "expected": "butterfly", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of 'dive' (irregular form)?", "expected": "dove", "grader": "contains", "category": "language"}
+{"task": "What is the antonym of 'scarce'?", "expected": "abundant", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of 'begin'?", "expected": "began", "grader": "contains", "category": "language"}
+{"task": "What is the plural form of 'ox'?", "expected": "oxen", "grader": "contains", "category": "language"}
+{"task": "What is an antonym of 'ascend'?", "expected": "descend", "grader": "contains", "category": "language"}
+{"task": "What is a synonym of 'elated'?", "expected": "joyful", "grader": "contains", "category": "language"}
+{"task": "Translate the English phrase 'the garden' into French.", "expected": "jardin", "grader": "contains", "category": "language"}
+{"task": "Translate the English verb 'to hurry' into German.", "expected": "eilen", "grader": "contains", "category": "language"}
+{"task": "What is the past tense of 'think'?", "expected": "thought", "grader": "contains", "category": "language"}
+{"task": "What is a Spanish synonym of 'quickly'?", "expected": "rápidamente", "grader": "contains", "category": "language"}
+{"task": "What is an antonym of 'seldom'?", "expected": "often", "grader": "contains", "category": "language"}
+{"task": "What is the plural form of 'analysis'?", "expected": "analyses", "grader": "contains", "category": "language"}

@@ -1,0 +1,322 @@
+{
+  "total": 1467,
+  "by_category_tier_split_source": {
+    "classification|complex|test|fireworks": 11,
+    "classification|complex|test|seed": 3,
+    "classification|complex|train|fireworks": 27,
+    "classification|complex|train|seed": 3,
+    "classification|easy|test|fireworks": 11,
+    "classification|easy|train|fireworks": 27,
+    "classification|easy|train|seed": 5,
+    "classification|moderate|test|fireworks": 12,
+    "classification|moderate|train|fireworks": 26,
+    "code_debug|complex|test|fireworks": 10,
+    "code_debug|complex|test|seed": 2,
+    "code_debug|complex|train|fireworks": 28,
+    "code_debug|complex|train|seed": 2,
+    "code_debug|easy|test|fireworks": 10,
+    "code_debug|easy|test|seed": 1,
+    "code_debug|easy|train|fireworks": 28,
+    "code_debug|easy|train|seed": 3,
+    "code_debug|moderate|test|fireworks": 13,
+    "code_debug|moderate|test|seed": 2,
+    "code_debug|moderate|train|fireworks": 25,
+    "code_gen|complex|test|fireworks": 12,
+    "code_gen|complex|train|fireworks": 26,
+    "code_gen|easy|test|fireworks": 10,
+    "code_gen|easy|test|seed": 8,
+    "code_gen|easy|train|fireworks": 28,
+    "code_gen|easy|train|seed": 4,
+    "code_gen|moderate|test|fireworks": 15,
+    "code_gen|moderate|train|fireworks": 23,
+    "extraction|complex|test|fireworks": 11,
+    "extraction|complex|train|fireworks": 27,
+    "extraction|easy|test|fireworks": 11,
+    "extraction|easy|test|seed": 3,
+    "extraction|easy|train|fireworks": 27,
+    "extraction|easy|train|seed": 4,
+    "extraction|moderate|test|fireworks": 12,
+    "extraction|moderate|train|fireworks": 26,
+    "extraction|moderate|train|seed": 3,
+    "factual_qa|complex|test|fireworks": 11,
+    "factual_qa|complex|train|fireworks": 26,
+    "factual_qa|easy|test|fireworks": 11,
+    "factual_qa|easy|test|seed": 5,
+    "factual_qa|easy|train|fireworks": 27,
+    "factual_qa|easy|train|seed": 13,
+    "factual_qa|moderate|test|fireworks": 9,
+    "factual_qa|moderate|train|fireworks": 29,
+    "language|complex|test|fireworks": 12,
+    "language|complex|test|seed": 1,
+    "language|complex|train|fireworks": 26,
+    "language|easy|test|fireworks": 12,
+    "language|easy|test|seed": 1,
+    "language|easy|train|fireworks": 26,
+    "language|easy|train|seed": 3,
+    "language|moderate|test|fireworks": 13,
+    "language|moderate|train|fireworks": 25,
+    "logic|complex|test|fireworks": 3,
+    "logic|complex|test|seed": 1,
+    "logic|complex|train|fireworks": 7,
+    "logic|complex|train|seed": 1,
+    "logic|easy|test|fireworks": 13,
+    "logic|easy|train|fireworks": 25,
+    "logic|easy|train|seed": 7,
+    "logic|moderate|test|fireworks": 13,
+    "logic|moderate|test|seed": 2,
+    "logic|moderate|train|fireworks": 25,
+    "logic|moderate|train|seed": 2,
+    "math|complex|test|fireworks": 11,
+    "math|complex|train|fireworks": 23,
+    "math|easy|test|fireworks": 7,
+    "math|easy|test|seed": 4,
+    "math|easy|train|fireworks": 31,
+    "math|easy|train|seed": 9,
+    "math|moderate|test|fireworks": 10,
+    "math|moderate|test|seed": 2,
+    "math|moderate|train|fireworks": 28,
+    "math|moderate|train|seed": 4,
+    "multiple_choice|complex|test|fireworks": 10,
+    "multiple_choice|complex|train|fireworks": 28,
+    "multiple_choice|complex|train|seed": 1,
+    "multiple_choice|easy|test|fireworks": 13,
+    "multiple_choice|easy|test|seed": 4,
+    "multiple_choice|easy|train|fireworks": 25,
+    "multiple_choice|easy|train|seed": 4,
+    "multiple_choice|moderate|test|fireworks": 8,
+    "multiple_choice|moderate|test|seed": 3,
+    "multiple_choice|moderate|train|fireworks": 30,
+    "multiple_choice|moderate|train|seed": 6,
+    "ner|complex|test|fireworks": 15,
+    "ner|complex|train|fireworks": 23,
+    "ner|easy|test|fireworks": 14,
+    "ner|easy|test|seed": 3,
+    "ner|easy|train|fireworks": 24,
+    "ner|easy|train|seed": 1,
+    "ner|moderate|test|fireworks": 14,
+    "ner|moderate|test|seed": 1,
+    "ner|moderate|train|fireworks": 24,
+    "sentiment|complex|test|fireworks": 11,
+    "sentiment|complex|train|fireworks": 27,
+    "sentiment|easy|test|fireworks": 12,
+    "sentiment|easy|test|seed": 1,
+    "sentiment|easy|train|fireworks": 26,
+    "sentiment|easy|train|seed": 3,
+    "sentiment|moderate|test|fireworks": 10,
+    "sentiment|moderate|train|fireworks": 28,
+    "summarization|complex|test|fireworks": 10,
+    "summarization|complex|train|fireworks": 28,
+    "summarization|easy|test|fireworks": 10,
+    "summarization|easy|test|seed": 2,
+    "summarization|easy|train|fireworks": 25,
+    "summarization|easy|train|seed": 7,
+    "summarization|moderate|test|fireworks": 11,
+    "summarization|moderate|train|fireworks": 27,
+    "summarization|moderate|train|seed": 1
+  },
+  "cell_log": {
+    "math|easy": {
+      "skipped": true,
+      "existing_count": 38
+    },
+    "math|moderate": {
+      "skipped": true,
+      "existing_count": 38
+    },
+    "math|complex": {
+      "calls_used": 1,
+      "raw_count": 10,
+      "validated_count": 10,
+      "verified_count": 0,
+      "dropped_count": 10,
+      "existing_count": 34,
+      "added_count": 0,
+      "final_count": 34,
+      "target": 38,
+      "shortfall": true
+    },
+    "multiple_choice|easy": {
+      "skipped": true,
+      "existing_count": 38
+    },
+    "multiple_choice|moderate": {
+      "skipped": true,
+      "existing_count": 38
+    },
+    "multiple_choice|complex": {
+      "skipped": true,
+      "existing_count": 38
+    },
+    "factual_qa|easy": {
+      "skipped": true,
+      "existing_count": 38
+    },
+    "factual_qa|moderate": {
+      "skipped": true,
+      "existing_count": 38
+    },
+    "factual_qa|complex": {
+      "calls_used": 1,
+      "raw_count": 10,
+      "validated_count": 10,
+      "verified_count": 6,
+      "dropped_count": 4,
+      "existing_count": 31,
+      "added_count": 6,
+      "final_count": 37,
+      "target": 38,
+      "shortfall": true
+    },
+    "classification|easy": {
+      "skipped": true,
+      "existing_count": 38
+    },
+    "classification|moderate": {
+      "skipped": true,
+      "existing_count": 38
+    },
+    "classification|complex": {
+      "skipped": true,
+      "existing_count": 38
+    },
+    "sentiment|easy": {
+      "skipped": true,
+      "existing_count": 38
+    },
+    "sentiment|moderate": {
+      "skipped": true,
+      "existing_count": 38
+    },
+    "sentiment|complex": {
+      "skipped": true,
+      "existing_count": 38
+    },
+    "extraction|easy": {
+      "skipped": true,
+      "existing_count": 38
+    },
+    "extraction|moderate": {
+      "skipped": true,
+      "existing_count": 38
+    },
+    "extraction|complex": {
+      "skipped": true,
+      "existing_count": 38
+    },
+    "language|easy": {
+      "skipped": true,
+      "existing_count": 38
+    },
+    "language|moderate": {
+      "skipped": true,
+      "existing_count": 38
+    },
+    "language|complex": {
+      "calls_used": 1,
+      "raw_count": 10,
+      "validated_count": 9,
+      "verified_count": 5,
+      "dropped_count": 4,
+      "existing_count": 36,
+      "added_count": 2,
+      "final_count": 38,
+      "target": 38,
+      "shortfall": false
+    },
+    "logic|easy": {
+      "calls_used": 1,
+      "raw_count": 10,
+      "validated_count": 10,
+      "verified_count": 9,
+      "dropped_count": 1,
+      "existing_count": 35,
+      "added_count": 3,
+      "final_count": 38,
+      "target": 38,
+      "shortfall": false
+    },
+    "logic|moderate": {
+      "skipped": true,
+      "existing_count": 38
+    },
+    "logic|complex": {
+      "calls_used": 3,
+      "raw_count": 31,
+      "validated_count": 30,
+      "verified_count": 0,
+      "dropped_count": 30,
+      "existing_count": 10,
+      "added_count": 0,
+      "final_count": 10,
+      "target": 38,
+      "shortfall": true
+    },
+    "summarization|easy": {
+      "calls_used": 2,
+      "raw_count": 20,
+      "validated_count": 20,
+      "verified_count": 8,
+      "dropped_count": 12,
+      "existing_count": 27,
+      "added_count": 8,
+      "final_count": 35,
+      "target": 38,
+      "shortfall": true
+    },
+    "summarization|moderate": {
+      "skipped": true,
+      "existing_count": 38
+    },
+    "summarization|complex": {
+      "skipped": true,
+      "existing_count": 38
+    },
+    "ner|easy": {
+      "skipped": true,
+      "existing_count": 38
+    },
+    "ner|moderate": {
+      "skipped": true,
+      "existing_count": 38
+    },
+    "ner|complex": {
+      "calls_used": 1,
+      "raw_count": 10,
+      "validated_count": 10,
+      "verified_count": 10,
+      "dropped_count": 0,
+      "existing_count": 37,
+      "added_count": 1,
+      "final_count": 38,
+      "target": 38,
+      "shortfall": false
+    },
+    "code_gen|easy": {
+      "skipped": true,
+      "existing_count": 38
+    },
+    "code_gen|moderate": {
+      "skipped": true,
+      "existing_count": 38
+    },
+    "code_gen|complex": {
+      "skipped": true,
+      "existing_count": 38
+    },
+    "code_debug|easy": {
+      "skipped": true,
+      "existing_count": 38
+    },
+    "code_debug|moderate": {
+      "skipped": true,
+      "existing_count": 38
+    },
+    "code_debug|complex": {
+      "skipped": true,
+      "existing_count": 38
+    }
+  },
+  "budget_exhausted_at": null,
+  "api_calls_used": 467,
+  "api_cap": 600
+}

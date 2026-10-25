@@ -1,0 +1,40 @@
+{"task": "A store has 200 items. It sells 10% on Monday and 15 more on Tuesday. How many items remain?", "expected": "165", "grader": "numeric", "category": "math"}
+{"task": "A farmer has 150 eggs. He sells 30 eggs on Friday and then sells 20% of the remaining eggs on Saturday. How many eggs are left?", "expected": "96", "grader": "numeric", "category": "math"}
+{"task": "A library has 80 books. It discards 5 books each day for 3 days. How many books remain?", "expected": "65", "grader": "numeric", "category": "math"}
+{"task": "A baker makes 80 cupcakes. He sells 25% in the morning and another 10 in the afternoon. How many cupcakes are left?", "expected": "50", "grader": "numeric", "category": "math"}
+{"task": "A school has 45 students. 20% are absent on Monday, and 5 more are absent on Tuesday. How many students attend on Tuesday?", "expected": "31", "grader": "numeric", "category": "math"}
+{"task": "A garden has 60 flowers. One quarter of them wilted, and then 8 more were removed. How many flowers are left?", "expected": "37", "grader": "numeric", "category": "math"}
+{"task": "A car rental has 30 cars. 10% are rented on Monday, and 2 more are rented on Tuesday. How many cars are still available?", "expected": "25", "grader": "numeric", "category": "math"}
+{"task": "A bakery sells 200 loaves per week. This week they sold 15% of their stock on Monday and 20 loaves on Tuesday. How many loaves are left?", "expected": "150", "grader": "numeric", "category": "math"}
+{"task": "A factory produces 500 widgets. 5% are defective and discarded, then 40 more are shipped out. How many widgets remain in inventory?", "expected": "435", "grader": "numeric", "category": "math"}
+{"task": "A school has 120 pencils. They give away 10% to students and then 7 more to teachers. How many pencils are left?", "expected": "101", "grader": "numeric", "category": "math"}
+{"task": "A farmer has 150 apples. He gives away 10% to his neighbor and then sells 15 more at the market. How many apples does he have left?", "expected": "120", "grader": "numeric", "category": "math"}
+{"task": "A school library contains 200 books. Over the weekend, 8% are borrowed and then 12 books are taken out for a class project. How many books remain in the library?", "expected": "172", "grader": "numeric", "category": "math"}
+{"task": "A grocery store stocks 90 cans of soup. It discounts 10% of them on Monday and sells another 4 cans on Tuesday. How many cans are left?", "expected": "77", "grader": "numeric", "category": "math"}
+{"task": "A bakery prepares 80 muffins. It gives away 25% for a charity and later sells 10 muffins. How many muffins are still unsold?", "expected": "50", "grader": "numeric", "category": "math"}
+{"task": "A toy store receives a shipment of 60 action figures. It sells 15% on the first day and then another 5 figures on the second day. How many figures remain?", "expected": "46", "grader": "numeric", "category": "math"}
+{"task": "A gardener plants 70 rose bushes. After the first week, 10% die, and he removes 8 more that were too short. How many rose bushes are still alive?", "expected": "55", "grader": "numeric", "category": "math"}
+{"task": "A classroom has 30 desks. 20% are broken and get removed, and then 3 desks are taken away for storage. How many desks are left in the room?", "expected": "21", "grader": "numeric", "category": "math"}
+{"task": "A florist has 45 bouquets. She sells 40% for a wedding and then sells another 5 bouquets the next day. How many bouquets does she have left?", "expected": "22", "grader": "numeric", "category": "math"}
+{"task": "A bookshop receives 120 new novels. It sells 10% on opening day and then another 8 novels the following day. How many novels remain?", "expected": "100", "grader": "numeric", "category": "math"}
+{"task": "A coffee shop brews 50 cups of coffee in the morning. It serves 20% to customers and then an extra 5 cups during an afternoon break. How many cups are left?", "expected": "35", "grader": "numeric", "category": "math"}
+{"task": "A bakery baked 120 muffins. It sold 25% of them in the morning and then sold another 15 muffins in the afternoon. How many muffins are left?", "expected": "75", "grader": "numeric", "category": "math"}
+{"task": "A library has 80 books. On Monday, 10% of the books are borrowed, and on Tuesday, 5 more books are borrowed. How many books remain in the library?", "expected": "67", "grader": "numeric", "category": "math"}
+{"task": "A gardener planted 50 flowers. He removed 20% because they were wilted, and later gave away 4 more flowers. How many flowers are still in the garden?", "expected": "36", "grader": "numeric", "category": "math"}
+{"task": "A classroom has 30 students. On Monday, 40% of the students are absent. On Tuesday, 2 additional students call in sick. How many students are present on Tuesday?", "expected": "16", "grader": "numeric", "category": "math"}
+{"task": "A store received 200 pens. It sold 30% of them on the first day and sold another 20 pens on the second day. How many pens are left?", "expected": "120", "grader": "numeric", "category": "math"}
+{"task": "A farmer harvested 150 bags of corn. He gave away 10% of the bags to neighbors and later sold 12 bags at the market. How many bags of corn does he still have?", "expected": "123", "grader": "numeric", "category": "math"}
+{"task": "A bakery made 80 loaves of bread. It sold 10% of the loaves on Saturday and sold 7 more loaves on Sunday. How many loaves are remaining?", "expected": "65", "grader": "numeric", "category": "math"}
+{"task": "A shop had 60 T‑shirts. It sold 20% of them during a discount and later sold another 6 at full price. How many T‑shirts are left?", "expected": "42", "grader": "numeric", "category": "math"}
+{"task": "A school cafeteria prepared 80 sandwiches. During lunch, 20 sandwiches were eaten. Afterwards, 15% of the remaining sandwiches were thrown away because they got soggy. How many sandwiches are left?", "expected": "51", "grader": "numeric", "category": "math"}
+{"task": "A toy store stocked 80 action figures. It sold 25% of them during a sale and then gave away 8 as promotional items. How many action figures remain in stock?", "expected": "52", "grader": "numeric", "category": "math"}
+{"task": "A bakery baked 120 cupcakes. They sold 45. How many cupcakes remain?", "expected": "75", "grader": "numeric", "category": "math"}
+{"task": "John has 30 stickers. He gives 12 to his friend. How many stickers does he have now?", "expected": "18", "grader": "numeric", "category": "math"}
+{"task": "A garden has 48 tomatoes. 20 are harvested. How many tomatoes are left?", "expected": "28", "grader": "numeric", "category": "math"}
+{"task": "A bookshop received 200 books. They sold 85. How many books are still in the store?", "expected": "115", "grader": "numeric", "category": "math"}
+{"task": "A classroom has 25 chairs. 7 are broken and removed. How many usable chairs remain?", "expected": "18", "grader": "numeric", "category": "math"}
+{"task": "A shop had 60 pens. It gave away 15 for free. How many pens are left for sale?", "expected": "45", "grader": "numeric", "category": "math"}
+{"task": "A farmer collected 90 eggs. He used 30 for baking. How many eggs remain?", "expected": "60", "grader": "numeric", "category": "math"}
+{"task": "A library has 150 magazines. 40 are checked out. How many magazines are on the shelves?", "expected": "110", "grader": "numeric", "category": "math"}
+{"task": "A coffee shop made 80 cups of coffee. 33 were sold. How many cups are unsold?", "expected": "47", "grader": "numeric", "category": "math"}
+{"task": "A toy store stocked 70 dolls. 25 were sold. How many dolls are still in stock?", "expected": "45", "grader": "numeric", "category": "math"}

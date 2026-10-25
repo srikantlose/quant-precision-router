@@ -1,0 +1,202 @@
+{
+  "math|easy": {
+    "skipped": true,
+    "existing_count": 38
+  },
+  "math|moderate": {
+    "skipped": true,
+    "existing_count": 38
+  },
+  "math|complex": {
+    "calls_used": 1,
+    "raw_count": 10,
+    "validated_count": 10,
+    "verified_count": 0,
+    "dropped_count": 10,
+    "existing_count": 34,
+    "added_count": 0,
+    "final_count": 34,
+    "target": 38,
+    "shortfall": true
+  },
+  "multiple_choice|easy": {
+    "skipped": true,
+    "existing_count": 38
+  },
+  "multiple_choice|moderate": {
+    "skipped": true,
+    "existing_count": 38
+  },
+  "multiple_choice|complex": {
+    "skipped": true,
+    "existing_count": 38
+  },
+  "factual_qa|easy": {
+    "skipped": true,
+    "existing_count": 38
+  },
+  "factual_qa|moderate": {
+    "skipped": true,
+    "existing_count": 38
+  },
+  "factual_qa|complex": {
+    "calls_used": 1,
+    "raw_count": 10,
+    "validated_count": 10,
+    "verified_count": 6,
+    "dropped_count": 4,
+    "existing_count": 31,
+    "added_count": 6,
+    "final_count": 37,
+    "target": 38,
+    "shortfall": true
+  },
+  "classification|easy": {
+    "skipped": true,
+    "existing_count": 38
+  },
+  "classification|moderate": {
+    "skipped": true,
+    "existing_count": 38
+  },
+  "classification|complex": {
+    "skipped": true,
+    "existing_count": 38
+  },
+  "sentiment|easy": {
+    "skipped": true,
+    "existing_count": 38
+  },
+  "sentiment|moderate": {
+    "skipped": true,
+    "existing_count": 38
+  },
+  "sentiment|complex": {
+    "skipped": true,
+    "existing_count": 38
+  },
+  "extraction|easy": {
+    "skipped": true,
+    "existing_count": 38
+  },
+  "extraction|moderate": {
+    "skipped": true,
+    "existing_count": 38
+  },
+  "extraction|complex": {
+    "skipped": true,
+    "existing_count": 38
+  },
+  "language|easy": {
+    "skipped": true,
+    "existing_count": 38
+  },
+  "language|moderate": {
+    "skipped": true,
+    "existing_count": 38
+  },
+  "language|complex": {
+    "calls_used": 1,
+    "raw_count": 10,
+    "validated_count": 9,
+    "verified_count": 5,
+    "dropped_count": 4,
+    "existing_count": 36,
+    "added_count": 2,
+    "final_count": 38,
+    "target": 38,
+    "shortfall": false
+  },
+  "logic|easy": {
+    "calls_used": 1,
+    "raw_count": 10,
+    "validated_count": 10,
+    "verified_count": 9,
+    "dropped_count": 1,
+    "existing_count": 35,
+    "added_count": 3,
+    "final_count": 38,
+    "target": 38,
+    "shortfall": false
+  },
+  "logic|moderate": {
+    "skipped": true,
+    "existing_count": 38
+  },
+  "logic|complex": {
+    "calls_used": 3,
+    "raw_count": 31,
+    "validated_count": 30,
+    "verified_count": 0,
+    "dropped_count": 30,
+    "existing_count": 10,
+    "added_count": 0,
+    "final_count": 10,
+    "target": 38,
+    "shortfall": true
+  },
+  "summarization|easy": {
+    "calls_used": 2,
+    "raw_count": 20,
+    "validated_count": 20,
+    "verified_count": 8,
+    "dropped_count": 12,
+    "existing_count": 27,
+    "added_count": 8,
+    "final_count": 35,
+    "target": 38,
+    "shortfall": true
+  },
+  "summarization|moderate": {
+    "skipped": true,
+    "existing_count": 38
+  },
+  "summarization|complex": {
+    "skipped": true,
+    "existing_count": 38
+  },
+  "ner|easy": {
+    "skipped": true,
+    "existing_count": 38
+  },
+  "ner|moderate": {
+    "skipped": true,
+    "existing_count": 38
+  },
+  "ner|complex": {
+    "calls_used": 1,
+    "raw_count": 10,
+    "validated_count": 10,
+    "verified_count": 10,
+    "dropped_count": 0,
+    "existing_count": 37,
+    "added_count": 1,
+    "final_count": 38,
+    "target": 38,
+    "shortfall": false
+  },
+  "code_gen|easy": {
+    "skipped": true,
+    "existing_count": 38
+  },
+  "code_gen|moderate": {
+    "skipped": true,
+    "existing_count": 38
+  },
+  "code_gen|complex": {
+    "skipped": true,
+    "existing_count": 38
+  },
+  "code_debug|easy": {
+    "skipped": true,
+    "existing_count": 38
+  },
+  "code_debug|moderate": {
+    "skipped": true,
+    "existing_count": 38
+  },
+  "code_debug|complex": {
+    "skipped": true,
+    "existing_count": 38
+  }
+}
