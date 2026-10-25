@@ -1,0 +1,3 @@
+build tag: b11451
+--version output: version: 0.6.0-dev (build 11451, commit 2207c8e57)
+built with Clang 20.1.8 for Windows x86_64

@@ -1,0 +1,21 @@
+{
+  "repo": "Qwen/Qwen2.5-3B-Instruct-GGUF",
+  "revision": "7dabda4d13d513e3e842b20f0d435c732f172cbe",
+  "files": {
+    "Q4_K_M": [
+      {
+        "name": "qwen2.5-3b-instruct-q4_k_m.gguf",
+        "size": 2104932768,
+        "sha256": "626b4a6678b86442240e33df819e00132d3ba7dddfe1cdc4fbb18e0a9615c62d"
+      }
+    ],
+    "Q8_0": [
+      {
+        "name": "qwen2.5-3b-instruct-q8_0.gguf",
+        "size": 3616088480,
+        "sha256": "6dcc22694c8654b045ec40bbe350212b88893fd9010e8474bae5b19a43578ba1"
+      }
+    ]
+  },
+  "sandbox_image_digest": "python@sha256:d98cc29d3266e535dd9da1099688d9cb3ca4753813571e071763d17725460962"
+}
