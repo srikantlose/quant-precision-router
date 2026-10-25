@@ -168,6 +168,30 @@ def _cmd_generate_tasks(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_build_safety(args: argparse.Namespace) -> int:
+    from . import safety
+
+    cfg = load_config(args.config)
+    xstest_path = Path(cfg["paths"]["safety_tasks"]).parent / "xstest_prompts.csv"
+    try:
+        safety.download_xstest(xstest_path)
+        all_tasks = [json.loads(l) for l in open(args.tasks, encoding="utf-8") if l.strip()]
+        tasks = safety.build_safety_slice(all_tasks, xstest_path, cfg["paths"]["safety_tasks"])
+    except safety.SafetyError as exc:
+        print(f"build-safety failed: {exc}", file=sys.stderr)
+        return 1
+
+    n_xstest = sum(1 for t in tasks if t["subtype"] in ("harmful", "benign_lookalike"))
+    n_injection = sum(1 for t in tasks if t["subtype"] == "injection")
+    splits = {}
+    for t in tasks:
+        splits[t["split"]] = splits.get(t["split"], 0) + 1
+    print(f"wrote {len(tasks)} safety tasks -> {cfg['paths']['safety_tasks']}")
+    print(f"  xstest: {n_xstest}, injection: {n_injection}")
+    print(f"  splits: {splits}")
+    return 0
+
+
 def _cmd_bench(args: argparse.Namespace) -> int:
     from .bench import BenchError, run_bench
     from .quants import LADDER
@@ -235,6 +259,11 @@ def main(argv: list[str] | None = None) -> int:
     p_gen.add_argument("--fresh", action="store_true",
                        help="ignore any existing data/tasks/generated.jsonl and start over")
     p_gen.set_defaults(func=_cmd_generate_tasks)
+
+    p_safety = subparsers.add_parser(
+        "build-safety", help="build the safety slice from XSTest and constructed injections")
+    p_safety.add_argument("--tasks", default="data/tasks/all.jsonl")
+    p_safety.set_defaults(func=_cmd_build_safety)
 
     p_bench = subparsers.add_parser(
         "bench", help="run tasks against rungs and record graded rows (resumable)")
