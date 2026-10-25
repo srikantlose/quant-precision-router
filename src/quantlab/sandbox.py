@@ -70,5 +70,10 @@ def run_in_sandbox(program: str) -> bool:
         )
         return proc.returncode == 0
     except subprocess.TimeoutExpired:
-        subprocess.run(["docker", "kill", name], capture_output=True)
+        # `docker kill` only sends the signal -- with --rm, actual container
+        # removal then happens asynchronously and can lag behind the kill
+        # command's own return. `docker rm -f` kills AND removes
+        # synchronously, so by the time this call returns the container is
+        # actually gone, not just "about to be".
+        subprocess.run(["docker", "rm", "-f", name], capture_output=True)
         return False

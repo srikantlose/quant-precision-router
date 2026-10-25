@@ -21,6 +21,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+import gguf
 from huggingface_hub import HfApi, hf_hub_download
 
 from .config import load_config
@@ -165,6 +166,22 @@ def model_path(rung: str) -> Path:
     the single file for every other rung. This is what llama-server's -m
     is pointed at."""
     return _gguf_dir() / FILES[rung][0]
+
+
+def read_n_layers(rung: str) -> int:
+    """Read the architecture's layer count (qwen2.block_count) straight out
+    of a downloaded GGUF file's metadata. This is identical across every
+    quantization level of the same base model, so any already-downloaded
+    rung can answer it -- used by find_ngl() as an ngl search starting
+    point before P9's profiling pass has written a trusted n_layers into
+    the lock file."""
+    reader = gguf.GGUFReader(str(model_path(rung)))
+    field = reader.fields.get("qwen2.block_count")
+    if field is None:
+        raise QuantsError(
+            f"qwen2.block_count not found in {rung} metadata -- unexpected architecture"
+        )
+    return int(field.parts[field.data[0]][0])
 
 
 def _verified_cache_path() -> Path:

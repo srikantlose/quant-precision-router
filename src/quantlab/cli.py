@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import io
+import json
 import subprocess
 import sys
 import zipfile
@@ -124,6 +125,28 @@ def _cmd_download_models(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_bench(args: argparse.Namespace) -> int:
+    from .bench import BenchError, run_bench
+    from .quants import LADDER
+
+    rungs = args.rungs.split(",") if args.rungs else list(LADDER)
+    for r in rungs:
+        if r not in LADDER:
+            print(f"bench failed: unknown rung {r!r}", file=sys.stderr)
+            return 1
+    task_ids = args.task_ids.split(",") if args.task_ids else None
+    try:
+        stats = run_bench(
+            rungs=rungs, slice_name=args.slice, limit=args.limit,
+            task_ids=task_ids, stop_after=args.stop_after, out_path=args.out,
+        )
+    except BenchError as exc:
+        print(f"bench failed: {exc}", file=sys.stderr)
+        return 1
+    print(json.dumps(stats, ensure_ascii=False, indent=2))
+    return 0
+
+
 def _cmd_verify_models(args: argparse.Namespace) -> int:
     from .quants import LADDER, QuantsError, verify
 
@@ -162,6 +185,17 @@ def main(argv: list[str] | None = None) -> int:
         "download-models", help="download and hash-verify GGUF rungs")
     p_dl.add_argument("--rungs", default=None, help="comma-separated rung names (default: all)")
     p_dl.set_defaults(func=_cmd_download_models)
+
+    p_bench = subparsers.add_parser(
+        "bench", help="run tasks against rungs and record graded rows (resumable)")
+    p_bench.add_argument("--rungs", default=None, help="comma-separated rung names (default: all)")
+    p_bench.add_argument("--slice", default="bench", choices=["bench", "safety", "all"])
+    p_bench.add_argument("--limit", type=int, default=None)
+    p_bench.add_argument("--task-ids", default=None, help="comma-separated task ids")
+    p_bench.add_argument("--stop-after", type=int, default=None,
+                         help="stop after this many new rows (for testing resume)")
+    p_bench.add_argument("--out", default="results/raw/grid.jsonl")
+    p_bench.set_defaults(func=_cmd_bench)
 
     p_verify = subparsers.add_parser(
         "verify-models", help="verify downloaded GGUF rungs against their pinned hashes")
