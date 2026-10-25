@@ -67,11 +67,12 @@ def test_py_exec_rejects_empty():
     assert not grade({"grader": "py_exec", "test_code": "assert True"}, "")
 
 
-def test_py_exec_uses_sandbox_stub_when_no_executor_given():
-    # Until the Docker sandbox is built (a later phase), the default
-    # executor must refuse to run anything rather than silently falling
-    # back to running model-generated code on the host.
+@pytest.mark.docker
+def test_py_exec_default_executor_runs_in_docker_sandbox():
+    # With no executor given, grade() must go through the real Docker
+    # sandbox (quantlab.sandbox.run_in_sandbox), never the host.
     task = {"grader": "py_exec", "test_code": "assert add(2, 3) == 5"}
     good = "```python\ndef add(a, b):\n    return a + b\n```"
-    with pytest.raises(NotImplementedError):
-        grade(task, good)
+    bad = "def add(a, b):\n    return a - b"
+    assert grade(task, good) is True
+    assert grade(task, bad) is False

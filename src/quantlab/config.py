@@ -58,6 +58,7 @@ _DEFAULTS: dict[str, Any] = {
     },
     "sandbox": {
         "image": "python:3.13-slim",
+        "image_digest": "",  # pinned once in config.yaml after the first `docker pull`
         "memory": "256m",
         "cpus": 1,
         "pids_limit": 64,
