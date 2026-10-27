@@ -168,6 +168,51 @@ def model_path(rung: str) -> Path:
     return _gguf_dir() / FILES[rung][0]
 
 
+def compute_n_params_and_layers() -> tuple[int, int]:
+    """Read n_params and n_layers from the F16 shards -- both shards are
+    needed because the model's tensors are split across them, so reading
+    only one would miss whatever tensors live in the other.
+
+    Naively summing every tensor's element count double-counts tied
+    embeddings: Qwen2.5-3B ties its input embedding (token_embd.weight) to
+    its output head (output.weight), and the GGUF conversion still writes
+    both out as full, separate on-disk tensors. Rather than assume tying
+    from the model name, this checks it empirically -- if the two tensors
+    have identical shape AND byte-identical data, they are the same
+    parameters stored twice, and only one copy is counted.
+    """
+    import numpy as np
+
+    cfg = load_config()
+    gguf_dir = _gguf_dir()
+    files = FILES["F16"]
+    readers = [gguf.GGUFReader(str(gguf_dir / f)) for f in files]
+
+    total = 0
+    by_name: dict[str, "gguf.ReaderTensor"] = {}
+    for reader in readers:
+        for t in reader.tensors:
+            total += int(t.n_elements)
+            by_name[t.name] = t
+
+    te = by_name.get("token_embd.weight")
+    ow = by_name.get("output.weight")
+    if te is not None and ow is not None and te.shape.tolist() == ow.shape.tolist():
+        if np.array_equal(np.asarray(te.data), np.asarray(ow.data)):
+            total -= int(ow.n_elements)  # tied: output.weight is a duplicate, not a distinct parameter
+
+    n_layers = None
+    for reader in readers:
+        field = reader.fields.get("qwen2.block_count")
+        if field is not None:
+            n_layers = int(field.parts[field.data[0]][0])
+            break
+    if n_layers is None:
+        raise QuantsError("qwen2.block_count not found in either F16 shard")
+
+    return total, n_layers
+
+
 def read_n_layers(rung: str) -> int:
     """Read the architecture's layer count (qwen2.block_count) straight out
     of a downloaded GGUF file's metadata. This is identical across every

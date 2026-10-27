@@ -168,6 +168,17 @@ def _cmd_generate_tasks(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_profile_quants(args: argparse.Namespace) -> int:
+    from . import profiling
+
+    try:
+        profiling.profile_all(out_path=args.out)
+    except profiling.ProfilingError as exc:
+        print(f"profile-quants failed: {exc}", file=sys.stderr)
+        return 1
+    return 0
+
+
 def _cmd_build_safety(args: argparse.Namespace) -> int:
     from . import safety
 
@@ -259,6 +270,11 @@ def main(argv: list[str] | None = None) -> int:
     p_gen.add_argument("--fresh", action="store_true",
                        help="ignore any existing data/tasks/generated.jsonl and start over")
     p_gen.set_defaults(func=_cmd_generate_tasks)
+
+    p_profile = subparsers.add_parser(
+        "profile-quants", help="profile VRAM/load-time of every rung on the ladder")
+    p_profile.add_argument("--out", default="results/profiles.json")
+    p_profile.set_defaults(func=_cmd_profile_quants)
 
     p_safety = subparsers.add_parser(
         "build-safety", help="build the safety slice from XSTest and constructed injections")

@@ -1,0 +1,142 @@
+{
+  "budget_mb": 4293,
+  "baseline_used_mb": 3152,
+  "baseline_free_mb": 4805,
+  "vram_margin_mb": 512,
+  "rungs": {
+    "Q2_K": {
+      "rung": "Q2_K",
+      "files": [
+        "qwen2.5-3b-instruct-q2_k.gguf"
+      ],
+      "file_bytes": 1376856480,
+      "bpp": 0.44617104200872576,
+      "bpw": 3.569368336069806,
+      "ngl": 37,
+      "n_layers": 36,
+      "fully_resident": true,
+      "load_s_runs": [
+        2.057276964187622,
+        2.0668561458587646,
+        2.0533840656280518
+      ],
+      "swap_cost_s": 2.057276964187622,
+      "vram_mb": 1547
+    },
+    "Q3_K_M": {
+      "rung": "Q3_K_M",
+      "files": [
+        "qwen2.5-3b-instruct-q3_k_m.gguf"
+      ],
+      "file_bytes": 1724178848,
+      "bpp": 0.5587210318547975,
+      "bpw": 4.46976825483838,
+      "ngl": 37,
+      "n_layers": 36,
+      "fully_resident": true,
+      "load_s_runs": [
+        2.554584503173828,
+        2.553701162338257,
+        2.0303828716278076
+      ],
+      "swap_cost_s": 2.553701162338257,
+      "vram_mb": 1845
+    },
+    "Q4_K_M": {
+      "rung": "Q4_K_M",
+      "files": [
+        "qwen2.5-3b-instruct-q4_k_m.gguf"
+      ],
+      "file_bytes": 2104932768,
+      "bpp": 0.6821045331150791,
+      "bpw": 5.456836264920633,
+      "ngl": 37,
+      "n_layers": 36,
+      "fully_resident": true,
+      "load_s_runs": [
+        3.052016496658325,
+        2.5786077976226807,
+        2.5417795181274414
+      ],
+      "swap_cost_s": 2.5786077976226807,
+      "vram_mb": 2169
+    },
+    "Q5_K_M": {
+      "rung": "Q5_K_M",
+      "files": [
+        "qwen2.5-3b-instruct-q5_k_m.gguf"
+      ],
+      "file_bytes": 2438740384,
+      "bpp": 0.7902750607078814,
+      "bpw": 6.322200485663052,
+      "ngl": 37,
+      "n_layers": 36,
+      "fully_resident": true,
+      "load_s_runs": [
+        3.0468637943267822,
+        3.0660951137542725,
+        2.5536417961120605
+      ],
+      "swap_cost_s": 3.0468637943267822,
+      "vram_mb": 2450
+    },
+    "Q6_K": {
+      "rung": "Q6_K",
+      "files": [
+        "qwen2.5-3b-instruct-q6_k.gguf"
+      ],
+      "file_bytes": 2793410976,
+      "bpp": 0.9052062462752338,
+      "bpw": 7.241649970201871,
+      "ngl": 37,
+      "n_layers": 36,
+      "fully_resident": true,
+      "load_s_runs": [
+        3.055241823196411,
+        3.068466901779175,
+        2.530653953552246
+      ],
+      "swap_cost_s": 3.055241823196411,
+      "vram_mb": 2752
+    },
+    "Q8_0": {
+      "rung": "Q8_0",
+      "files": [
+        "qwen2.5-3b-instruct-q8_0.gguf"
+      ],
+      "file_bytes": 3616088480,
+      "bpp": 1.171795309499033,
+      "bpw": 9.374362475992264,
+      "ngl": 37,
+      "n_layers": 36,
+      "fully_resident": true,
+      "load_s_runs": [
+        3.5356228351593018,
+        3.062051773071289,
+        3.5696468353271484
+      ],
+      "swap_cost_s": 3.5356228351593018,
+      "vram_mb": 3470
+    },
+    "F16": {
+      "rung": "F16",
+      "files": [
+        "qwen2.5-3b-instruct-fp16-00001-of-00002.gguf",
+        "qwen2.5-3b-instruct-fp16-00002-of-00002.gguf"
+      ],
+      "file_bytes": 6800646784,
+      "bpp": 2.203753046178473,
+      "bpw": 17.630024369427783,
+      "ngl": 37,
+      "n_layers": 36,
+      "fully_resident": true,
+      "load_s_runs": [
+        5.617555141448975,
+        5.61597204208374,
+        4.572229623794556
+      ],
+      "swap_cost_s": 5.61597204208374,
+      "vram_mb": 6236
+    }
+  }
+}

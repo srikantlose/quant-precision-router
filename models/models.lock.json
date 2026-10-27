@@ -15,7 +15,49 @@
         "size": 3616088480,
         "sha256": "6dcc22694c8654b045ec40bbe350212b88893fd9010e8474bae5b19a43578ba1"
       }
+    ],
+    "Q2_K": [
+      {
+        "name": "qwen2.5-3b-instruct-q2_k.gguf",
+        "size": 1376856480,
+        "sha256": "8ab4be7ea643fe2b207cf286ce032ca4f5b592f4cebb0db6aa6533c0b26f218d"
+      }
+    ],
+    "Q3_K_M": [
+      {
+        "name": "qwen2.5-3b-instruct-q3_k_m.gguf",
+        "size": 1724178848,
+        "sha256": "ba8627a48c2bddefac2f995caf7887551304f26a72137fb94b74449121d0df4e"
+      }
+    ],
+    "Q5_K_M": [
+      {
+        "name": "qwen2.5-3b-instruct-q5_k_m.gguf",
+        "size": 2438740384,
+        "sha256": "2c63dde5f2c9ab1fd64d47dee2d34dade6ba9ff62442d1d20b5342310c982081"
+      }
+    ],
+    "Q6_K": [
+      {
+        "name": "qwen2.5-3b-instruct-q6_k.gguf",
+        "size": 2793410976,
+        "sha256": "12da1a5d3fa6905111d8798b00ed49e0f6425441598c8c41bb37a2c36d49d0f3"
+      }
+    ],
+    "F16": [
+      {
+        "name": "qwen2.5-3b-instruct-fp16-00001-of-00002.gguf",
+        "size": 3980517664,
+        "sha256": "abfbd7569b55de1549c95b052a8e933556e28676607dee3e4ee87920c005ac71"
+      },
+      {
+        "name": "qwen2.5-3b-instruct-fp16-00002-of-00002.gguf",
+        "size": 2820129120,
+        "sha256": "f54c631133d77afa1b5e206cca90196652269be3e8992adb8289c6297afdd476"
+      }
     ]
   },
-  "sandbox_image_digest": "python@sha256:b3575dcf816cdacc5292df77a6e3e59b8941631078373a045efa2ac1e9c5c3b2"
+  "sandbox_image_digest": "python@sha256:b3575dcf816cdacc5292df77a6e3e59b8941631078373a045efa2ac1e9c5c3b2",
+  "n_params": 3085938688,
+  "n_layers": 36
 }
