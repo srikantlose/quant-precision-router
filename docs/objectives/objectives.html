@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>QuantLab — Objectives</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=DM+Sans:opsz,wght@9..40,400..700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  @page { size: 1280px 720px; margin: 0; }
+  :root {
+    --bg: #fff7ea; --paper: #ffffff; --ink: #151515; --ink-2: #4b4840; --muted: #7d786d; --grid: #ece5d8;
+    --sun: #ffc832; --mint: #2ed3a0; --sky: #bcd3ff; --blue: #3d7bff; --blush: #ffd9c7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg); }
+  body { font-family: "DM Sans", system-ui, sans-serif; color: var(--ink); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  h1, h2, h3 { font-family: "Bricolage Grotesque", "DM Sans", sans-serif; letter-spacing: -0.02em; line-height: 1.05; }
+  .mono { font-family: "JetBrains Mono", monospace; }
+
+  .page { width: 1280px; height: 720px; position: relative; overflow: hidden; background: var(--bg); padding: 52px 64px; page-break-after: always; break-after: page; }
+  .page:last-child { page-break-after: auto; break-after: auto; }
+
+  .card { background: var(--paper); border: 2.5px solid var(--ink); border-radius: 18px; box-shadow: 5px 5px 0 var(--ink); }
+  .tag { display: inline-block; font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 13px; padding: 5px 10px; border: 2px solid var(--ink); border-radius: 9px; box-shadow: 3px 3px 0 var(--ink); background: var(--paper); letter-spacing: .02em; }
+  .kicker { font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 12.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+  .foot { position: absolute; left: 64px; right: 64px; bottom: 22px; display: flex; justify-content: space-between; font-family: "JetBrains Mono", monospace; font-size: 11.5px; color: var(--muted); }
+
+  /* cover */
+  .cover { display: grid; grid-template-columns: 1.08fr 0.92fr; gap: 28px; align-items: center; }
+  .cover h1 { font-size: 112px; font-weight: 800; }
+  .cover h2 { font-size: 40px; font-weight: 700; margin-top: 14px; max-width: 600px; }
+  .hl { background: var(--sun); padding: 0 .12em; border-radius: 10px; }
+  .cover p.lede { font-size: 19px; color: var(--ink-2); line-height: 1.5; margin-top: 18px; max-width: 590px; }
+  .stats { display: flex; gap: 12px; margin-top: 26px; }
+  .stat { border: 2.5px solid var(--ink); border-radius: 14px; box-shadow: 4px 4px 0 var(--ink); padding: 10px 14px; min-width: 120px; }
+  .stat .n { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 28px; line-height: 1.05; }
+  .stat .l { font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
+
+  /* roadmap */
+  .head { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 26px; }
+  .head h2 { font-size: 46px; font-weight: 800; }
+  .head p { font-size: 16px; color: var(--ink-2); max-width: 470px; text-align: right; }
+  .road { display: grid; grid-template-columns: 1fr 44px 1fr 44px 1fr; align-items: stretch; }
+  .road .arrow { display: flex; align-items: center; justify-content: center; }
+  .obj { padding: 22px 22px 20px; display: flex; flex-direction: column; gap: 12px; }
+  .obj .num { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 60px; line-height: .9; }
+  .obj h3 { font-size: 25px; font-weight: 800; }
+  .obj .row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .obj .gaptag { font-family: "JetBrains Mono", monospace; font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 7px; border: 2px solid var(--ink); background: var(--paper); }
+  .obj p { font-size: 14.5px; line-height: 1.45; color: var(--ink-2); }
+  .obj .deliv { margin-top: auto; border-top: 2px dashed rgba(21,21,21,.35); padding-top: 12px; }
+  .obj .deliv .big { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 30px; line-height: 1.05; }
+  .obj .deliv .small { font-size: 13px; color: var(--ink-2); margin-top: 2px; }
+  .gapkey { margin-top: 26px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+  .gapkey div { font-size: 12.5px; line-height: 1.35; color: var(--ink-2); }
+  .gapkey b { font-family: "JetBrains Mono", monospace; color: var(--ink); display: block; font-size: 12.5px; margin-bottom: 2px; }
+
+  /* objective detail pages */
+  .detail { display: grid; grid-template-columns: 0.98fr 1.02fr; gap: 26px; height: 100%; }
+  .left { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+  .obj-head { display: flex; align-items: center; gap: 14px; }
+  .obj-head .badge { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 34px; width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; border: 2.5px solid var(--ink); border-radius: 16px; box-shadow: 4px 4px 0 var(--ink); flex: none; }
+  .obj-head h2 { font-size: 34px; font-weight: 800; }
+  .statement { font-size: 16.5px; line-height: 1.5; color: var(--ink-2); }
+  .box { border: 2.5px solid var(--ink); border-radius: 14px; padding: 13px 16px; }
+  .box .kicker { color: var(--ink); margin-bottom: 5px; }
+  .box p { font-size: 14px; line-height: 1.5; }
+  .gapbox { background: var(--blush); }
+  .delivbox { background: var(--paper); box-shadow: 4px 4px 0 var(--ink); }
+  .delivbox ul { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .delivbox li { font-size: 14px; line-height: 1.4; display: flex; gap: 9px; }
+  .delivbox li::before { content: ""; flex: none; width: 10px; height: 10px; margin-top: 5px; border: 2px solid var(--ink); border-radius: 3px; background: var(--mint); }
+  .right { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+  .bignums { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .bignum { border: 2.5px solid var(--ink); border-radius: 14px; padding: 11px 14px; box-shadow: 4px 4px 0 var(--ink); }
+  .bignum .n { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 31px; line-height: 1.05; white-space: nowrap; }
+  .bignum .l { font-size: 12.5px; font-weight: 600; color: var(--ink-2); margin-top: 3px; line-height: 1.3; }
+  .chart { padding: 16px 18px 12px; flex: 1; display: flex; flex-direction: column; min-height: 0; }
+  .chart h3 { font-size: 18px; font-weight: 800; }
+  .chart .sub { font-size: 12.5px; color: var(--ink-2); margin: 2px 0 8px; }
+  .chart svg { display: block; width: 100%; }
+  .note { font-size: 12.5px; line-height: 1.45; color: var(--ink-2); border-left: 4px solid var(--sun); padding: 4px 0 4px 10px; }
+
+  /* policy mini heatmap */
+  .pmx { border-collapse: separate; border-spacing: 3px; width: 100%; }
+  .pmx th { font-family: "JetBrains Mono", monospace; font-size: 10.5px; font-weight: 700; color: var(--ink-2); padding: 0 2px; }
+  .pmx th.r { text-align: right; font-family: "DM Sans", sans-serif; font-size: 11.5px; color: var(--ink); padding-right: 6px; white-space: nowrap; }
+  .pmx td { height: 25px; border-radius: 5px; font-family: "JetBrains Mono", monospace; font-size: 9.5px; font-weight: 700; text-align: center; }
+  .legend { display: flex; gap: 10px; flex-wrap: wrap; font-size: 11.5px; color: var(--ink-2); margin-top: 6px; }
+  .legend i { display: inline-block; width: 11px; height: 11px; border: 1.5px solid var(--ink); border-radius: 3px; margin-right: 4px; vertical-align: -1px; }
+
+  /* summary */
+  .sumtable { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
+  .sumtable th { text-align: left; font-family: "JetBrains Mono", monospace; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: 0 14px; }
+  .sumtable td { background: var(--paper); border-top: 2.5px solid var(--ink); border-bottom: 2.5px solid var(--ink); padding: 14px; font-size: 14px; line-height: 1.4; vertical-align: top; }
+  .sumtable td:first-child { border-left: 2.5px solid var(--ink); border-radius: 14px 0 0 14px; }
+  .sumtable td:last-child { border-right: 2.5px solid var(--ink); border-radius: 0 14px 14px 0; }
+  .sumtable .oname { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 19px; }
+  .status { display: inline-block; font-family: "JetBrains Mono", monospace; font-size: 11.5px; font-weight: 700; padding: 3px 8px; border: 2px solid var(--ink); border-radius: 7px; white-space: nowrap; }
+  .findings { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 8px; }
+  .findings .card { padding: 13px 16px; }
+  .findings .n { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 30px; line-height: 1.05; }
+  .findings p { font-size: 13px; color: var(--ink); margin-top: 4px; line-height: 1.4; }
+  .links { display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 16px; margin-top: 18px; }
+  .links .card { padding: 14px 18px; }
+  .links .card .u { font-family: "JetBrains Mono", monospace; font-size: 13px; font-weight: 700; margin-top: 4px; word-break: break-all; }
+  .links .card p { font-size: 13px; color: var(--ink-2); margin-top: 4px; line-height: 1.45; }
+</style>
+</head>
+<body>
+<div id="deck"></div>
+<script src="../../dashboard-site/data.js"></script>
+<script>
+(function () {
+  const D = window.QL, R = D.rungs, L = D.meta.ladder, NR = L.slice(0, 6), CATS = D.meta.categories;
+  const RC = { Q2_K: "#ff8d65", Q3_K_M: "#ec6d3d", Q4_K_M: "#d05320", Q5_K_M: "#b13d02", Q6_K: "#8e2e00", Q8_0: "#6b2101", F16: "#151515" };
+  const SHORT = { Q2_K: "Q2", Q3_K_M: "Q3", Q4_K_M: "Q4", Q5_K_M: "Q5", Q6_K: "Q6", Q8_0: "Q8", F16: "F16" };
+  const onRung = (r) => (r === "Q2_K" || r === "Q3_K_M" ? "#151515" : "#ffffff");
+  const pct = (x, d = 0) => (x * 100).toFixed(d) + "%";
+  const pretty = (c) => c.replace(/_/g, " ");
+
+  // ---- derived figures
+  const reqT = { solved: 0, q2: 0, upToQ4: 0, unsolvable: 0, byRung: Array(8).fill(0) };
+  CATS.forEach((c) => {
+    const h = D.req_hist[c];
+    for (let k = 0; k < 7; k++) { reqT.solved += h[k]; reqT.byRung[k] += h[k]; }
+    reqT.q2 += h["0"]; reqT.upToQ4 += h["0"] + h["1"] + h["2"];
+    reqT.unsolvable += h.unsolvable; reqT.byRung[7] += h.unsolvable;
+  });
+  let winLow = 0, winN = 0;
+  CATS.forEach((c) => D.meta.tiers.forEach((t) => {
+    const cell = D.cat_tier[c][t];
+    const w = L.find((r) => cell[r].acc >= cell.F16.acc - 0.02 - 1e-9);
+    winN++; if (L.indexOf(w) <= 2) winLow++;
+  }));
+  function choose(cell, d, f, s) {
+    const adm = ["F16"];
+    NR.forEach((b) => {
+      if (cell.acc_lcb[b] >= cell.acc_ref - d && cell.flip_ucb[b] <= f && R[b].safety_flip_ucb <= s) adm.push(b);
+    });
+    return adm.reduce((best, b) => (cell.cost[b] < cell.cost[best] - 1e-12 ||
+      (Math.abs(cell.cost[b] - cell.cost[best]) < 1e-12 && L.indexOf(b) < L.indexOf(best)) ? b : best), adm[0]);
+  }
+  const OP = { d: 0.10, f: 0.30, s: 0.10 };
+  let below = 0, wsum = 0, wcost = 0;
+  const chosen = {};
+  Object.entries(D.policy.cells).forEach(([k, cell]) => {
+    const r = choose(cell, OP.d, OP.f, OP.s);
+    chosen[k] = r;
+    if (r !== "F16") below++;
+    wsum += cell.n_support_tasks; wcost += cell.n_support_tasks * (cell.cost[r] / cell.cost.F16);
+  });
+  const strictBelow = Object.values(D.policy.cells).filter((c) => choose(c, 0.02, 0.10, 0.05) !== "F16").length;
+  const lowSupport = Object.values(D.policy.cells).filter((c) => c.low_support).length;
+  const gb = (mb) => (mb / 1024).toFixed(1);
+
+  // ---- svg helpers
+  function bars({ labels, values, colors, w = 540, h = 200, max, fmt, logMin }) {
+    const pad = { l: 8, r: 8, t: 26, b: 30 }, n = values.length;
+    const iw = w - pad.l - pad.r, ih = h - pad.t - pad.b, slot = iw / n, bw = Math.min(54, slot * 0.66);
+    const tf = logMin ? (v) => (Math.log10(Math.max(v, logMin)) - Math.log10(logMin)) / (Math.log10(max) - Math.log10(logMin)) : (v) => v / max;
+    let s = `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">`;
+    [0.25, 0.5, 0.75, 1].forEach((g) => { const y = pad.t + ih * (1 - g); s += `<line x1="${pad.l}" x2="${w - pad.r}" y1="${y}" y2="${y}" stroke="#ece5d8" stroke-width="1"/>`; });
+    values.forEach((v, i) => {
+      const x = pad.l + slot * i + (slot - bw) / 2, bh = Math.max(3, ih * tf(v)), y = pad.t + ih - bh;
+      s += `<rect x="${x + 4}" y="${y + 4}" width="${bw}" height="${bh}" rx="6" fill="#151515"/>`;
+      s += `<rect x="${x}" y="${y}" width="${bw}" height="${bh}" rx="6" fill="${colors[i]}" stroke="#151515" stroke-width="2"/>`;
+      s += `<text x="${x + bw / 2}" y="${y - 7}" text-anchor="middle" font-family="JetBrains Mono" font-weight="700" font-size="12.5" fill="#151515">${fmt(v)}</text>`;
+      s += `<text x="${x + bw / 2}" y="${h - 9}" text-anchor="middle" font-family="JetBrains Mono" font-weight="700" font-size="12" fill="#151515">${labels[i]}</text>`;
+    });
+    s += `<line x1="${pad.l}" x2="${w - pad.r}" y1="${pad.t + ih}" y2="${pad.t + ih}" stroke="#151515" stroke-width="2.5"/>`;
+    return s + `</svg>`;
+  }
+  function hbars({ labels, values, colors, w = 540, h = 130, max, fmt }) {
+    const lw = 158, pad = 6, rowH = (h - pad * 2) / values.length, bh = Math.min(26, rowH * 0.62), iw = w - lw - 70;
+    let s = `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">`;
+    values.forEach((v, i) => {
+      const y = pad + rowH * i + (rowH - bh) / 2, bw = Math.max(3, iw * (v / max));
+      s += `<text x="${lw - 10}" y="${y + bh / 2 + 4.5}" text-anchor="end" font-family="DM Sans" font-weight="700" font-size="13" fill="#151515">${labels[i]}</text>`;
+      s += `<rect x="${lw + 3}" y="${y + 3}" width="${bw}" height="${bh}" rx="5" fill="#151515"/>`;
+      s += `<rect x="${lw}" y="${y}" width="${bw}" height="${bh}" rx="5" fill="${colors[i]}" stroke="#151515" stroke-width="2"/>`;
+      s += `<text x="${lw + bw + 9}" y="${y + bh / 2 + 4.5}" font-family="JetBrains Mono" font-weight="700" font-size="12.5" fill="#151515">${fmt(v)}</text>`;
+    });
+    s += `<line x1="${lw}" x2="${lw}" y1="${pad - 2}" y2="${h - pad + 2}" stroke="#151515" stroke-width="2.5"/>`;
+    return s + `</svg>`;
+  }
+  function staircase(w, h) {
+    const maxBpw = R.F16.bpw;
+    let s = `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">`;
+    s += `<ellipse cx="${w / 2 + 10}" cy="${h - 18}" rx="${w / 2 - 10}" ry="13" fill="#151515" opacity=".08"/>`;
+    L.forEach((r, i) => {
+      const bh = 52 + (R[r].bpw / maxBpw) * (h - 150), x = 22 + i * ((w - 50) / 7), bw = (w - 50) / 7 - 10, y = h - 28 - bh;
+      s += `<rect x="${x + 5}" y="${y + 5}" width="${bw}" height="${bh}" rx="9" fill="#151515"/>`;
+      s += `<rect x="${x}" y="${y}" width="${bw}" height="${bh}" rx="9" fill="${RC[r]}" stroke="#151515" stroke-width="3"/>`;
+      s += `<text x="${x + bw / 2}" y="${y + 22}" text-anchor="middle" font-family="JetBrains Mono" font-weight="700" font-size="13" fill="${onRung(r)}">${SHORT[r]}</text>`;
+      s += `<text x="${x + bw / 2}" y="${y + 39}" text-anchor="middle" font-family="JetBrains Mono" font-weight="500" font-size="10.5" fill="${onRung(r)}">${R[r].bpw.toFixed(1)}b</text>`;
+    });
+    // gpu card
+    s += `<g transform="translate(18 36) rotate(-6)">
+      <text x="86" y="-9" text-anchor="middle" font-family="JetBrains Mono" font-weight="700" font-size="13" fill="#151515">8 GB VRAM</text>
+      <rect width="174" height="110" rx="14" fill="#bcd3ff" stroke="#151515" stroke-width="3"/>
+      <circle cx="54" cy="55" r="31" fill="#fff" stroke="#151515" stroke-width="3"/><circle cx="54" cy="55" r="7" fill="#151515"/>
+      <path d="M54 24 Q69 40 54 55 Q39 40 54 24Z M85 55 Q69 70 54 55 Q69 40 85 55Z M54 86 Q39 70 54 55 Q69 70 54 86Z M23 55 Q39 40 54 55 Q39 70 23 55Z" fill="#3d7bff" stroke="#151515" stroke-width="2"/>
+      <rect x="99" y="22" width="60" height="15" rx="4" fill="#ffc832" stroke="#151515" stroke-width="2"/>
+      <rect x="99" y="45" width="60" height="15" rx="4" fill="#2ed3a0" stroke="#151515" stroke-width="2"/>
+      <rect x="99" y="68" width="60" height="15" rx="4" fill="#fff" stroke="#151515" stroke-width="2"/>
+      <g fill="#ffc832" stroke="#151515" stroke-width="2"><rect x="20" y="108" width="11" height="13"/><rect x="37" y="108" width="11" height="13"/><rect x="54" y="108" width="11" height="13"/><rect x="71" y="108" width="11" height="13"/><rect x="88" y="108" width="11" height="13"/><rect x="105" y="108" width="11" height="13"/></g>
+    </g>`;
+    s += `<g transform="translate(214 132)">
+      <rect width="196" height="58" rx="12" fill="#fff" stroke="#151515" stroke-width="3"/>
+      <path d="M30 56 L18 82 L54 56" fill="#fff" stroke="#151515" stroke-width="3" stroke-linejoin="round"/><rect x="25" y="50" width="26" height="8" fill="#fff"/>
+      <text x="98" y="25" text-anchor="middle" font-family="DM Sans" font-weight="700" font-size="14.5" fill="#151515">“What’s 17 + 25?”</text>
+      <text x="98" y="45" text-anchor="middle" font-family="JetBrains Mono" font-weight="700" font-size="12.5" fill="#d05320">Q2_K is plenty</text>
+    </g>`;
+    return s + `</svg>`;
+  }
+  const icon = {
+    measure: `<svg width="58" height="58" viewBox="0 0 64 64"><rect x="4" y="8" width="56" height="48" rx="8" fill="#fff" stroke="#151515" stroke-width="3"/><g stroke="#151515" stroke-width="2"><rect x="11" y="16" width="12" height="9" fill="#fff7ea"/><rect x="26" y="16" width="12" height="9" fill="#fff7ea"/><rect x="41" y="16" width="12" height="9" fill="#fff7ea"/><rect x="11" y="28" width="12" height="9" fill="#fff7ea"/><rect x="26" y="28" width="12" height="9" fill="#ff8d65"/><rect x="41" y="28" width="12" height="9" fill="#fff7ea"/><rect x="11" y="40" width="12" height="9" fill="#fff7ea"/><rect x="26" y="40" width="12" height="9" fill="#fff7ea"/><rect x="41" y="40" width="12" height="9" fill="#151515"/></g></svg>`,
+    predict: `<svg width="58" height="58" viewBox="0 0 64 64"><g stroke="#151515" stroke-width="2.5"><line x1="12" y1="16" x2="32" y2="32"/><line x1="12" y1="48" x2="32" y2="32"/><line x1="12" y1="32" x2="32" y2="32"/><line x1="32" y1="32" x2="52" y2="20"/><line x1="32" y1="32" x2="52" y2="44"/></g><g stroke="#151515" stroke-width="3"><circle cx="12" cy="16" r="6" fill="#fff"/><circle cx="12" cy="32" r="6" fill="#fff"/><circle cx="12" cy="48" r="6" fill="#fff"/><circle cx="32" cy="32" r="8" fill="#3d7bff"/><circle cx="52" cy="20" r="6" fill="#ffc832"/><circle cx="52" cy="44" r="6" fill="#ffc832"/></g></svg>`,
+    decide: `<svg width="58" height="58" viewBox="0 0 64 64"><path d="M6 32 H26 M26 32 C36 32 36 14 50 14 M26 32 H50 M26 32 C36 32 36 50 50 50" fill="none" stroke="#151515" stroke-width="3.5" stroke-linecap="round"/><g stroke="#151515" stroke-width="2.5"><rect x="48" y="8" width="12" height="12" rx="3" fill="#ff8d65"/><rect x="48" y="26" width="12" height="12" rx="3" fill="#d05320"/><rect x="48" y="44" width="12" height="12" rx="3" fill="#151515"/></g><circle cx="8" cy="32" r="5" fill="#ffc832" stroke="#151515" stroke-width="2.5"/></svg>`,
+  };
+  const arrow = `<svg width="40" height="40" viewBox="0 0 40 40"><path d="M4 20 H30 M22 11 L32 20 L22 29" fill="none" stroke="#151515" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const foot = (n) => `<div class="foot"><span>QuantLab · Qwen2.5-3B-Instruct · 7 GGUF rungs · RTX 4060 (8 GB)</span><span>${n} / 6</span></div>`;
+
+  // ---- pages
+  const pages = [];
+
+  pages.push(`<section class="page"><div class="cover" style="height:100%">
+    <div>
+      <span class="tag" style="background:var(--sun)">Objectives brief</span>
+      <h1 style="margin-top:22px">QuantLab</h1>
+      <h2>Which <span class="hl">quantization</span> does each task actually need?</h2>
+      <p class="lede">Three objectives, the research gaps each one closes, and what each has delivered &mdash; measured on Qwen2.5-3B-Instruct across seven GGUF quantization levels on a single RTX&nbsp;4060.</p>
+      <div class="stats">
+        <div class="stat" style="background:var(--sun)"><div class="n">${D.meta.n_grid_rows.toLocaleString()}</div><div class="l">graded runs</div></div>
+        <div class="stat" style="background:var(--mint)"><div class="n">7</div><div class="l">quantization rungs</div></div>
+        <div class="stat" style="background:var(--sky)"><div class="n">${CATS.length}</div><div class="l">task categories</div></div>
+        <div class="stat" style="background:var(--blush)"><div class="n">0</div><div class="l">failed runs</div></div>
+      </div>
+    </div>
+    <div>${staircase(520, 440)}</div>
+  </div>${foot(1)}</section>`);
+
+  const objCard = (o) => `<div class="card obj" style="background:${o.bg}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">${icon[o.icon]}<span class="num">${o.n}</span></div>
+      <span class="kicker" style="color:var(--ink)">${o.kicker}</span>
+      <h3>${o.title}</h3>
+      <div class="row">${o.gaps.map((g) => `<span class="gaptag">closes ${g}</span>`).join("")}</div>
+      <p>${o.text}</p>
+      <div class="deliv"><div class="kicker" style="color:var(--ink)">Delivered</div><div class="big">${o.big}</div><div class="small">${o.small}</div></div>
+    </div>`;
+  pages.push(`<section class="page">
+    <div class="head"><h2>Three objectives, one pipeline</h2><p>Measure everything, learn what each prompt needs, then decide what to serve. Each step closes a gap the literature leaves open.</p></div>
+    <div class="road">
+      ${objCard({ n: "01", icon: "measure", bg: "var(--sun)", kicker: "Measure · O1", title: "Build a reproducible measurement harness", gaps: ["G1"], text: "Run every task on every quantization level under identical, pinned conditions, and record accuracy, answer stability, drift and cost per category.", big: `${D.meta.n_grid_rows.toLocaleString()} runs`, small: "0 errors · strictly falling KL vs F16" })}
+      <div class="arrow">${arrow}</div>
+      ${objCard({ n: "02", icon: "predict", bg: "var(--sky)", kicker: "Predict · O2", title: "Predict each prompt’s required precision", gaps: ["G2"], text: "Label every task with the cheapest rung that solves it confidently, then learn to predict that label from the prompt text alone.", big: `${pct(D.predictor.test_within_one_accuracy)} within one rung`, small: `${pct(D.predictor.test_exact_accuracy, 1)} exact on ${D.predictor.n_test_labelled} held-out tasks` })}
+      <div class="arrow">${arrow}</div>
+      ${objCard({ n: "03", icon: "decide", bg: "var(--mint)", kicker: "Decide · O4", title: "Derive and validate a selection policy", gaps: ["G3", "G4", "G5"], text: "Serve the cheapest rung that clears an accuracy bar, an answer-stability bar and a safety bar, fit on train and checked on held-out data.", big: `${below} / 84 cells`, small: `served below F16 at ${pct(wsum ? wcost / wsum : 1)} of the cost (balanced bars)` })}
+    </div>
+    <div class="gapkey">
+      <div><b>G1</b>Sensitivity to bit-width is only ever averaged over whole benchmarks.</div>
+      <div><b>G2</b>Task difficulty is a fixed label, never a per-prompt prediction.</div>
+      <div><b>G3</b>Precision routers ignore task type and cost, and go unvalidated.</div>
+      <div><b>G4</b>Accuracy and <em>measured</em> cost are never optimised together.</div>
+      <div><b>G5</b>The literature describes; it never prescribes a validated rule.</div>
+    </div>
+  ${foot(2)}</section>`);
+
+  const detail = (o) => `<section class="page"><div class="detail">
+    <div class="left">
+      <div class="obj-head"><div class="badge" style="background:${o.bg}">${o.n}</div><div><span class="kicker">${o.kicker}</span><h2>${o.title}</h2></div></div>
+      <p class="statement">${o.statement}</p>
+      <div class="box gapbox"><div class="kicker">The gap it closes &middot; ${o.gapIds}</div><p>${o.gap}</p></div>
+      <div class="box delivbox"><div class="kicker">Measurable deliverables</div><ul>${o.deliv.map((d) => `<li><span>${d}</span></li>`).join("")}</ul></div>
+    </div>
+    <div class="right">
+      <div class="bignums">${o.nums.map(([n, l, bg]) => `<div class="bignum" style="background:${bg}"><div class="n">${n}</div><div class="l">${l}</div></div>`).join("")}</div>
+      ${o.visual}
+    </div>
+  </div>${foot(o.page)}</section>`;
+
+  pages.push(detail({
+    page: 3, n: "01", bg: "var(--sun)", kicker: "Objective 1 · Measure",
+    title: "A reproducible measurement harness",
+    statement: "Benchmark one model across its whole quantization ladder under identical, pinned conditions &mdash; not one aggregate score, but the full category &times; rung surface, plus a fidelity signal that doesn’t depend on any one benchmark.",
+    gapIds: "G1",
+    gap: "Prior work reports bit-width sensitivity as an average over whole benchmarks. Even the most granular study splits by dataset, not by the category &times; complexity cell a decision procedure would need to consult.",
+    deliv: [
+      `<b>${D.meta.n_grid_rows.toLocaleString()} graded runs</b>: 7 rungs &times; ${(D.meta.n_bench_tasks + D.meta.n_safety_tasks).toLocaleString()} prompts (${D.meta.n_bench_tasks.toLocaleString()} tasks in 12 categories &times; 3 tiers, plus ${D.meta.n_safety_tasks} safety prompts). Zero errors, zero duplicates.`,
+      `Every model file SHA-256 pinned to one commit; model-written code graded only inside a locked-down Docker sandbox.`,
+      `Measured per-rung cost: <b>${gb(R.Q2_K.vram_mb)}&ndash;${gb(R.F16.vram_mb)} GB</b> VRAM, ${R.Q2_K.bpw.toFixed(1)}&ndash;${R.F16.bpw.toFixed(1)} bits per weight.`,
+      `Corpus KL-divergence vs F16 on WikiText-2: <b>${R.Q2_K.kld.toFixed(2)} &rarr; ${R.Q8_0.kld.toFixed(3)}</b>, strictly falling up the ladder.`,
+    ],
+    nums: [
+      [D.meta.n_grid_rows.toLocaleString(), "graded runs, zero errors", "var(--sun)"],
+      [pct(R.Q4_K_M.accuracy), `Q4_K_M accuracy at ${pct(R.Q4_K_M.vram_mb / R.F16.vram_mb)} of F16’s memory (F16: ${pct(R.F16.accuracy)})`, "var(--mint)"],
+      [pct(R.Q8_0.flip_rate, 1), "of answers still flip at Q8_0, despite equal accuracy", "var(--sky)"],
+    ],
+    visual: `<div class="card chart"><h3>Accuracy holds from Q4 up&hellip;</h3><div class="sub">Bench accuracy per rung.</div>
+      ${bars({ labels: L.map((r) => SHORT[r]), values: L.map((r) => R[r].accuracy), colors: L.map((r) => RC[r]), w: 560, h: 200, max: 0.85, fmt: (v) => pct(v) })}
+      <h3 style="margin-top:10px">&hellip;but individual answers keep changing</h3><div class="sub">Share of tasks whose right/wrong flips vs F16.</div>
+      ${bars({ labels: NR.map((r) => SHORT[r]), values: NR.map((r) => R[r].flip_rate), colors: NR.map((r) => RC[r]), w: 560, h: 150, max: 0.42, fmt: (v) => pct(v, 1) })}
+    </div>`,
+  }));
+
+  pages.push(detail({
+    page: 4, n: "02", bg: "var(--sky)", kicker: "Objective 2 · Predict",
+    title: "A per-prompt complexity analyser",
+    statement: "Predict, from a prompt’s text alone, the minimum quantization rung it needs &mdash; the quantity a precision router actually consumes, not a proxy like “will the model get this right”.",
+    gapIds: "G2",
+    gap: "Quantization work treats task difficulty as a fixed dataset annotation. Prediction methods exist elsewhere, but they all predict whether a model answers correctly &mdash; none predicts the minimum precision at which a task survives.",
+    deliv: [
+      `<b>Required-precision labels</b> for all ${D.meta.n_bench_tasks.toLocaleString()} tasks: the cheapest rung that is correct <i>and</i> confident (mean log-prob &ge; &tau; = ${D.meta.tau.toFixed(3)}), with one failure allowed above it.`,
+      `A <b>cross-fitted predictor</b> (5 folds): MiniLM sentence embedding + 13 surface features + predicted category &rarr; logistic regression.`,
+      `<b>${pct(D.predictor.test_exact_accuracy, 1)} exact, ${pct(D.predictor.test_within_one_accuracy, 1)} within one rung</b> on ${D.predictor.n_test_labelled} held-out tasks.`,
+      `Reported honestly against baselines: always-the-most-common-class scores ${pct(D.predictor.baseline_majority_class_accuracy, 1)}; each category’s median scores ${pct(D.predictor.baseline_per_category_median_accuracy, 1)}.`,
+    ],
+    nums: [
+      [pct(reqT.q2 / reqT.solved), "of solvable tasks are already solved at Q2_K", "var(--mint)"],
+      [pct(reqT.upToQ4 / reqT.solved), "are solved by Q4_K_M or cheaper", "var(--sun)"],
+      [pct(reqT.unsolvable / (reqT.solved + reqT.unsolvable)), "are unsolvable even at F16", "var(--blush)"],
+    ],
+    visual: `<div class="card chart"><h3>What precision do tasks actually need?</h3><div class="sub">Tasks by their cheapest confident rung (grey = unsolvable at every rung).</div>
+      ${bars({ labels: [...L.map((r) => SHORT[r]), "none"], values: reqT.byRung, colors: [...L.map((r) => RC[r]), "#c9c1b2"], w: 560, h: 200, max: Math.max(...reqT.byRung) * 1.08, fmt: (v) => String(v) })}
+      <h3 style="margin-top:6px">Predictor vs. simple baselines</h3><div class="sub">Exact-class accuracy on held-out tasks.</div>
+      ${hbars({ labels: ["This predictor", "Most-common class", "Category median"], values: [D.predictor.test_exact_accuracy, D.predictor.baseline_majority_class_accuracy, D.predictor.baseline_per_category_median_accuracy], colors: ["#3d7bff", "#e9e3d6", "#e9e3d6"], w: 560, h: 106, max: 0.6, fmt: (v) => pct(v, 1) })}
+      <p class="note">Prompt text turns out to be a weak signal for required precision; the predictor is usually close but rarely exact.</p>
+    </div>`,
+  }));
+
+  const mx = `<table class="pmx"><tr><th></th>${[0, 1, 2, 3, 4, 5, 6].map((k) => `<th>${k}</th>`).join("")}</tr>${CATS.map((c) =>
+    `<tr><th class="r">${pretty(c)}</th>${[0, 1, 2, 3, 4, 5, 6].map((k) => { const r = chosen[`${c}|${k}`]; return `<td style="background:${RC[r]};color:${onRung(r)}">${SHORT[r]}</td>`; }).join("")}</tr>`).join("")}</table>
+    <div class="legend">${L.map((r) => `<span><i style="background:${RC[r]}"></i>${r}</span>`).join("")}</div>`;
+  pages.push(detail({
+    page: 5, n: "03", bg: "var(--mint)", kicker: "Objective 3 · Decide (O4)",
+    title: "A validated selection policy",
+    statement: "Turn the measurements and the predictor into a decision: for every category &times; predicted-precision cell, serve the cheapest rung that still clears an accuracy bar, an answer-stability bar and a safety bar.",
+    gapIds: "G3 · G4 · G5",
+    gap: "Precision routers exist but don’t select on task type or predicted difficulty, don’t optimise a measured local cost, and aren’t validated against fixed-precision baselines. No surveyed work outputs an actionable, held-out-tested selection rule.",
+    deliv: [
+      `<b>policy.json</b>: 84 cells (12 categories &times; 7 predicted classes), each choosing the cheapest rung whose accuracy lower bound, flip upper bound and safety upper bound all pass.`,
+      `Pooled GEE models clustered by task, with a per-rung accuracy model, a circularity guard, a category-only fallback for ${lowSupport} sparse cells and a calibration check on every fit.`,
+      `At balanced bars (&delta; 0.10, &phi; 0.30, &psi; 0.10): <b>${below} of 84 cells</b> served below F16 at <b>${pct(wsum ? wcost / wsum : 1)}</b> of the always-F16 cost.`,
+      `At the strict default (&delta; 0.02) ${strictBelow === 0 ? "every cell stays on F16" : `${strictBelow} cells move`}: with ~85 tasks per category a 95% bound can’t prove a 2-point match. Reported, not hidden.`,
+    ],
+    nums: [
+      [`${below}/84`, "cells served below F16 (balanced)", "var(--mint)"],
+      [pct(wsum ? wcost / wsum : 1), "of always-F16 cost, task-weighted", "var(--sun)"],
+      [`${winLow}/${winN}`, "category &times; tier cells where &le; 4-bit matches F16 (&plusmn;2 pp)", "var(--sky)"],
+    ],
+    visual: `<div class="card chart"><h3>Rung served per cell, balanced bars</h3><div class="sub">Rows: predicted category. Columns: predicted required precision (0 = Q2-level, 6 = needs F16).</div>${mx}</div>`,
+  }));
+
+  const status = (t, bg) => `<span class="status" style="background:${bg}">${t}</span>`;
+  pages.push(`<section class="page">
+    <div class="head" style="margin-bottom:6px"><h2>Where each objective stands</h2><p>Every figure here is read from the run’s result files.</p></div>
+    <table class="sumtable">
+      <tr><th style="width:24%">Objective</th><th style="width:12%">Gap</th><th>Key measurable deliverable</th><th style="width:15%">Status</th></tr>
+      <tr><td><div class="oname">01 &middot; Measure</div>Measurement harness</td><td class="mono"><b>G1</b></td><td>${D.meta.n_grid_rows.toLocaleString()} graded runs with zero errors; per-rung VRAM, latency and bits/weight; KL vs F16 falling ${R.Q2_K.kld.toFixed(2)} &rarr; ${R.Q8_0.kld.toFixed(3)}; answer flips ${pct(R.Q2_K.flip_rate)} &rarr; ${pct(R.Q8_0.flip_rate, 1)}.</td><td>${status("Delivered", "var(--mint)")}</td></tr>
+      <tr><td><div class="oname">02 &middot; Predict</div>Complexity analyser</td><td class="mono"><b>G2</b></td><td>Required-precision labels for ${D.meta.n_bench_tasks.toLocaleString()} tasks; cross-fitted predictor at ${pct(D.predictor.test_exact_accuracy, 1)} exact / ${pct(D.predictor.test_within_one_accuracy, 1)} within one rung, compared against two baselines.</td><td>${status("Delivered", "var(--mint)")}<div style="font-size:12px;color:var(--ink-2);margin-top:6px">weak signal, reported</div></td></tr>
+      <tr><td><div class="oname">03 &middot; Decide</div>Selection policy</td><td class="mono"><b>G3 G4 G5</b></td><td>84-cell policy with accuracy, stability and safety checks; ${below}/84 cells below F16 at ${pct(wsum ? wcost / wsum : 1)} cost (balanced bars); live tunable rule on the dashboard.</td><td>${status("Delivered", "var(--mint)")}<div style="font-size:12px;color:var(--ink-2);margin-top:6px">routing API next</div></td></tr>
+    </table>
+    <div class="findings">
+      <div class="card" style="background:var(--mint)"><div class="n">${pct(R.Q4_K_M.vram_mb / R.F16.vram_mb)}</div><p>of F16’s memory buys Q4_K_M ${pct(R.Q4_K_M.accuracy)} accuracy vs F16’s ${pct(R.F16.accuracy)}.</p></div>
+      <div class="card" style="background:var(--blush)"><div class="n">${pct(R.Q2_K.accuracy)}</div><p>Q2_K accuracy: below 4 bits the model collapses.</p></div>
+      <div class="card" style="background:var(--sky)"><div class="n">${pct(R.Q8_0.flip_rate, 1)}&ndash;${pct(R.Q4_K_M.flip_rate, 1)}</div><p>of answers change even where accuracy matches F16.</p></div>
+      <div class="card" style="background:var(--sun)"><div class="n">${winLow}/${winN}</div><p>category &times; tier cells where 4-bit or less matches F16.</p></div>
+    </div>
+    <div class="links">
+      <div class="card" style="background:var(--sun)"><span class="kicker" style="color:var(--ink)">Interactive dashboard</span><div class="u">quant-precision-router.vercel.app</div><p>Winner matrix, ladder explorer, live policy lab.</p></div>
+      <div class="card" style="background:var(--sky)"><span class="kicker" style="color:var(--ink)">Study guide</span><div class="u">quant-precision-router.vercel.app/guide</div><p>Flowcharts, concept cards, quiz.</p></div>
+      <div class="card" style="background:var(--blush)"><span class="kicker" style="color:var(--ink)">Next</span><p style="font-size:14px;color:var(--ink);margin-top:6px">Hardened routing API &middot; adversarial cost-inflation and downgrade attacks &middot; refusal-grader audit &middot; final report.</p></div>
+    </div>
+  ${foot(6)}</section>`);
+
+  document.getElementById("deck").innerHTML = pages.join("");
+  document.body.dataset.ready = "1";
+})();
+</script>
+</body>
+</html>
