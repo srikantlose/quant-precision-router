@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from quantlab import pooled
 from quantlab.pooled import fit_pooled_model, predict_with_bounds
 
 
@@ -49,21 +50,59 @@ def test_accuracy_model_bounds_ordering():
     assert backend in ("gee", "glm_cluster")
 
 
-def test_glm_fallback_runs_on_degenerate_data():
-    # Perfectly separable-ish / tiny data can make GEE convergence flaky;
-    # the fallback path must still produce a usable result.
-    rng = np.random.default_rng(0)
-    rows = []
-    for i in range(6):
-        for bpp in [0.3, 1.0, 8.0]:
-            rows.append({
-                "task_id": f"t{i}", "category_pred": "math", "pred_class_oof": i % 3,
-                "log_bpp": np.log(bpp), "correct": bool(rng.integers(0, 2)),
-            })
-    df = pd.DataFrame(rows)
+def test_glm_fallback_path_produces_usable_bounds():
+    df = _synthetic_df()
     res, backend, categories = fit_pooled_model(df, response_col="correct", complexity_col="pred_class_oof",
                                                 force_fallback=True)
     assert backend == "glm_cluster"
     newdata = pd.DataFrame([{"category_pred": "math", "pred_class_oof": 1, "log_bpp": np.log(1.0)}])
     point, lcb, ucb = predict_with_bounds(res, newdata, z=1.645, categories=categories)
     assert lcb[0] <= point[0] <= ucb[0]
+
+
+def test_boolean_response_is_not_inverted():
+    # patsy dummy-codes a bool response and the binomial family then models
+    # P(False); every pooled prediction once came out as its complement.
+    df = _synthetic_df()
+    assert df["correct"].dtype == bool
+    res, _, categories = fit_pooled_model(df, response_col="correct", complexity_col="pred_class_oof")
+    lo = pd.DataFrame([{"category_pred": "math", "pred_class_oof": 3, "log_bpp": np.log(0.3)}])
+    hi = pd.DataFrame([{"category_pred": "math", "pred_class_oof": 3, "log_bpp": np.log(16.0)}])
+    p_lo = predict_with_bounds(res, lo, z=1.645, categories=categories)[0][0]
+    p_hi = predict_with_bounds(res, hi, z=1.645, categories=categories)[0][0]
+    assert p_hi > p_lo  # the synthetic truth: more bits -> more likely correct
+    fitted = np.asarray(res.predict(df.assign(correct=df["correct"].astype(float))))
+    assert abs(fitted.mean() - df["correct"].mean()) < 0.03
+
+
+class _DivergedGEEResult:
+    """Finite parameters and covariance, but predictions far from the data --
+    the shape a mis-specified fit takes (the real case predicted 0.96 at
+    Q8_0 against an observed 0.045 flip rate)."""
+
+    def __init__(self, n_params):
+        self.params = pd.Series(np.zeros(n_params))
+        self.bse = pd.Series(np.ones(n_params))
+
+    def cov_params(self):
+        return np.eye(len(self.params))
+
+    def predict(self, df):
+        return np.full(len(df), 0.99)
+
+
+def test_miscalibrated_gee_fit_falls_back_to_glm(monkeypatch):
+    df = _synthetic_df()
+
+    class _FakeGEE:
+        def __init__(self, *a, **k):
+            pass
+
+        def fit(self, **k):
+            return _DivergedGEEResult(5)
+
+    monkeypatch.setattr(pooled.smf, "gee", _FakeGEE)
+    res, backend, _ = fit_pooled_model(df, response_col="correct", complexity_col="pred_class_oof")
+    assert backend == "glm_cluster"
+    fitted = np.asarray(res.predict(df))
+    assert abs(fitted.mean() - df["correct"].mean()) < 0.05

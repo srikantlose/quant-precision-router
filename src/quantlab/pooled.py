@@ -15,6 +15,7 @@ whether it happened to get a task right, the circularity flagged in review.
 from __future__ import annotations
 
 import json
+import warnings
 from pathlib import Path
 from typing import Any
 
@@ -24,6 +25,7 @@ import patsy
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
 from scipy.special import expit
+from statsmodels.tools.sm_exceptions import ConvergenceWarning
 
 ALLOWED_COMPLEXITY_COL = "pred_class_oof"
 
@@ -41,29 +43,54 @@ class PooledModelError(Exception):
     pass
 
 
-def _finite_and_converged(res) -> bool:
-    params = np.asarray(res.params)
-    if not np.all(np.isfinite(params)):
+CALIBRATION_TOL = 0.10
+
+
+def _finite(res) -> bool:
+    if not np.all(np.isfinite(np.asarray(res.params))):
         return False
     try:
         cov = np.asarray(res.cov_params())
     except Exception:
         return False
-    if not np.all(np.isfinite(cov)):
-        return False
-    converged = getattr(res, "converged", True)
-    return bool(converged)
+    return bool(np.all(np.isfinite(cov)))
 
 
-def _fit_with_fallback(formula: str, df: pd.DataFrame, force_fallback: bool) -> tuple[Any, str]:
+def _numeric_response(df: pd.DataFrame, response_col: str) -> pd.DataFrame:
+    """patsy dummy-codes a boolean response into [False, True] columns and the
+    binomial family then models the first one, silently fitting P(False) --
+    every accuracy and flip prediction came out as its complement until this
+    cast was added."""
+    return df.assign(**{response_col: df[response_col].astype(float)})
+
+
+def _calibrated(res, df: pd.DataFrame, response_col: str) -> bool:
+    """The fitted rate must track the observed rate at every rung. A fit can
+    return finite parameters while modelling the wrong thing, and statsmodels'
+    GEE results carry no convergence flag to catch it."""
+    fitted = np.asarray(res.predict(df), dtype=float)
+    observed = df[response_col].astype(float).to_numpy()
+    by_rung = pd.DataFrame({
+        "rung": df["log_bpp"].round(6).to_numpy(), "fitted": fitted, "observed": observed,
+    }).groupby("rung").agg(fitted=("fitted", "mean"), observed=("observed", "mean"), n=("observed", "size"))
+    noise = 3 * np.sqrt(by_rung["observed"] * (1 - by_rung["observed"]) / by_rung["n"])
+    return bool(np.all(np.abs(by_rung["fitted"] - by_rung["observed"]) <= CALIBRATION_TOL + noise))
+
+
+def _fit_with_fallback(
+    formula: str, df: pd.DataFrame, response_col: str, force_fallback: bool,
+) -> tuple[Any, str]:
     if not force_fallback:
         try:
-            model = smf.gee(
-                formula, groups="task_id", data=df,
-                family=sm.families.Binomial(), cov_struct=sm.cov_struct.Exchangeable(),
-            )
-            res = model.fit(maxiter=200)
-            if _finite_and_converged(res):
+            with warnings.catch_warnings(record=True) as caught:
+                warnings.simplefilter("always")
+                model = smf.gee(
+                    formula, groups="task_id", data=df,
+                    family=sm.families.Binomial(), cov_struct=sm.cov_struct.Exchangeable(),
+                )
+                res = model.fit(maxiter=200)
+            diverged = any(issubclass(w.category, ConvergenceWarning) for w in caught)
+            if not diverged and _finite(res) and _calibrated(res, df, response_col):
                 return res, "gee"
         except Exception:
             pass
@@ -71,6 +98,10 @@ def _fit_with_fallback(formula: str, df: pd.DataFrame, force_fallback: bool) -> 
     groups = pd.factorize(df["task_id"])[0]
     model = smf.glm(formula, data=df, family=sm.families.Binomial())
     res = model.fit(cov_type="cluster", cov_kwds={"groups": groups})
+    if not (_finite(res) and _calibrated(res, df, response_col)):
+        raise PooledModelError(
+            f"neither GEE nor the GLM-cluster fallback gave a calibrated fit for {response_col!r}"
+        )
     return res, "glm_cluster"
 
 
@@ -85,9 +116,10 @@ def fit_pooled_model(
             "required_precision (that reintroduces circularity, see plan Sec 0.7.2)"
         )
 
+    df = _numeric_response(df, response_col)
     categories = sorted(df["category_pred"].unique())
     formula = f"{response_col} ~ " + _rhs_formula(categories, complexity_col)
-    res, backend = _fit_with_fallback(formula, df, force_fallback)
+    res, backend = _fit_with_fallback(formula, df, response_col, force_fallback)
     return res, backend, categories
 
 
@@ -99,10 +131,11 @@ def fit_coarse_pooled_model(
     the fully-interacted model (Sec 9.5's formula extrapolates wildly past
     the edge of its data in those cells; this model never extrapolates
     along pred_class because it was never fit on it)."""
+    df = _numeric_response(df, response_col)
     categories = sorted(df["category_pred"].unique())
     term = _category_term(categories)
     formula = f"{response_col} ~ {term} + log_bpp + {term}:log_bpp"
-    res, backend = _fit_with_fallback(formula, df, force_fallback)
+    res, backend = _fit_with_fallback(formula, df, response_col, force_fallback)
     return res, backend, categories
 
 
