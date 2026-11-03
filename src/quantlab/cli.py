@@ -225,6 +225,18 @@ def _cmd_bench(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_kl(args: argparse.Namespace) -> int:
+    from .kl import KLError, run_kl
+
+    try:
+        result = run_kl(out_path=args.out)
+    except KLError as exc:
+        print(f"kl failed: {exc}", file=sys.stderr)
+        return 1
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+    return 0
+
+
 def _cmd_verify_models(args: argparse.Namespace) -> int:
     from .quants import LADDER, QuantsError, verify
 
@@ -291,6 +303,11 @@ def main(argv: list[str] | None = None) -> int:
                          help="stop after this many new rows (for testing resume)")
     p_bench.add_argument("--out", default="results/raw/grid.jsonl")
     p_bench.set_defaults(func=_cmd_bench)
+
+    p_kl = subparsers.add_parser(
+        "kl", help="measure corpus KL-divergence of every rung against F16 on WikiText-2")
+    p_kl.add_argument("--out", default="results/kl.json")
+    p_kl.set_defaults(func=_cmd_kl)
 
     p_verify = subparsers.add_parser(
         "verify-models", help="verify downloaded GGUF rungs against their pinned hashes")

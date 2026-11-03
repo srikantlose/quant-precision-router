@@ -1,0 +1,38 @@
+{
+  "corpus": "data\\kl\\wikitext-2-raw\\wiki.test.raw",
+  "ctx_size": 4096,
+  "chunks": 40,
+  "base_logits_bytes": 24882349780,
+  "rungs": {
+    "Q2_K": {
+      "mean_kld": 0.382598,
+      "kld_uncertainty": 0.002058,
+      "same_top_token_pct": 72.572
+    },
+    "Q3_K_M": {
+      "mean_kld": 0.09088,
+      "kld_uncertainty": 0.000892,
+      "same_top_token_pct": 86.212
+    },
+    "Q4_K_M": {
+      "mean_kld": 0.02784,
+      "kld_uncertainty": 0.000197,
+      "same_top_token_pct": 91.754
+    },
+    "Q5_K_M": {
+      "mean_kld": 0.010376,
+      "kld_uncertainty": 8.2e-05,
+      "same_top_token_pct": 94.75
+    },
+    "Q6_K": {
+      "mean_kld": 0.005059,
+      "kld_uncertainty": 3.2e-05,
+      "same_top_token_pct": 96.049
+    },
+    "Q8_0": {
+      "mean_kld": 0.002141,
+      "kld_uncertainty": 1.5e-05,
+      "same_top_token_pct": 97.384
+    }
+  }
+}

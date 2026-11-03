@@ -1,0 +1,411 @@
+{
+  "total_rows": 14469,
+  "rungs": {
+    "Q4_K_M": {
+      "n_rows": 2067,
+      "n_bench": 1467,
+      "n_safety": 600,
+      "n_errors": 0,
+      "bench_accuracy": 0.7198,
+      "safety_safe_rate": 0.485,
+      "by_category": {
+        "sentiment": {
+          "n": 123,
+          "accuracy": 0.9512
+        },
+        "classification": {
+          "n": 120,
+          "accuracy": 0.925
+        },
+        "code_debug": {
+          "n": 116,
+          "accuracy": 0.7414
+        },
+        "extraction": {
+          "n": 125,
+          "accuracy": 0.872
+        },
+        "code_gen": {
+          "n": 125,
+          "accuracy": 0.888
+        },
+        "math": {
+          "n": 141,
+          "accuracy": 0.4255
+        },
+        "factual_qa": {
+          "n": 246,
+          "accuracy": 0.6748
+        },
+        "logic": {
+          "n": 10,
+          "accuracy": 0.9
+        },
+        "language": {
+          "n": 94,
+          "accuracy": 0.5213
+        },
+        "multiple_choice": {
+          "n": 132,
+          "accuracy": 0.8561
+        },
+        "ner": {
+          "n": 116,
+          "accuracy": 0.4828
+        },
+        "summarization": {
+          "n": 119,
+          "accuracy": 0.5798
+        }
+      }
+    },
+    "Q8_0": {
+      "n_rows": 2067,
+      "n_bench": 1467,
+      "n_safety": 600,
+      "n_errors": 0,
+      "bench_accuracy": 0.7307,
+      "safety_safe_rate": 0.46,
+      "by_category": {
+        "sentiment": {
+          "n": 123,
+          "accuracy": 0.9512
+        },
+        "classification": {
+          "n": 120,
+          "accuracy": 0.9333
+        },
+        "code_debug": {
+          "n": 116,
+          "accuracy": 0.7586
+        },
+        "extraction": {
+          "n": 125,
+          "accuracy": 0.896
+        },
+        "code_gen": {
+          "n": 125,
+          "accuracy": 0.888
+        },
+        "math": {
+          "n": 141,
+          "accuracy": 0.4468
+        },
+        "factual_qa": {
+          "n": 246,
+          "accuracy": 0.6382
+        },
+        "logic": {
+          "n": 10,
+          "accuracy": 0.7
+        },
+        "language": {
+          "n": 94,
+          "accuracy": 0.6064
+        },
+        "multiple_choice": {
+          "n": 132,
+          "accuracy": 0.8712
+        },
+        "ner": {
+          "n": 116,
+          "accuracy": 0.5948
+        },
+        "summarization": {
+          "n": 119,
+          "accuracy": 0.5378
+        }
+      }
+    },
+    "Q2_K": {
+      "n_rows": 2067,
+      "n_bench": 1467,
+      "n_safety": 600,
+      "n_errors": 0,
+      "bench_accuracy": 0.5119,
+      "safety_safe_rate": 0.4667,
+      "by_category": {
+        "sentiment": {
+          "n": 123,
+          "accuracy": 0.8537
+        },
+        "classification": {
+          "n": 120,
+          "accuracy": 0.6917
+        },
+        "code_debug": {
+          "n": 116,
+          "accuracy": 0.4655
+        },
+        "extraction": {
+          "n": 125,
+          "accuracy": 0.664
+        },
+        "code_gen": {
+          "n": 125,
+          "accuracy": 0.296
+        },
+        "math": {
+          "n": 141,
+          "accuracy": 0.5461
+        },
+        "factual_qa": {
+          "n": 246,
+          "accuracy": 0.4309
+        },
+        "logic": {
+          "n": 10,
+          "accuracy": 0.6
+        },
+        "language": {
+          "n": 94,
+          "accuracy": 0.4894
+        },
+        "multiple_choice": {
+          "n": 132,
+          "accuracy": 0.5379
+        },
+        "ner": {
+          "n": 116,
+          "accuracy": 0.3103
+        },
+        "summarization": {
+          "n": 119,
+          "accuracy": 0.395
+        }
+      }
+    },
+    "Q3_K_M": {
+      "n_rows": 2067,
+      "n_bench": 1467,
+      "n_safety": 600,
+      "n_errors": 0,
+      "bench_accuracy": 0.6912,
+      "safety_safe_rate": 0.53,
+      "by_category": {
+        "sentiment": {
+          "n": 123,
+          "accuracy": 0.9268
+        },
+        "classification": {
+          "n": 120,
+          "accuracy": 0.9417
+        },
+        "code_debug": {
+          "n": 116,
+          "accuracy": 0.7328
+        },
+        "extraction": {
+          "n": 125,
+          "accuracy": 0.848
+        },
+        "code_gen": {
+          "n": 125,
+          "accuracy": 0.712
+        },
+        "math": {
+          "n": 141,
+          "accuracy": 0.5887
+        },
+        "factual_qa": {
+          "n": 246,
+          "accuracy": 0.5935
+        },
+        "logic": {
+          "n": 10,
+          "accuracy": 0.7
+        },
+        "language": {
+          "n": 94,
+          "accuracy": 0.617
+        },
+        "multiple_choice": {
+          "n": 132,
+          "accuracy": 0.8712
+        },
+        "ner": {
+          "n": 116,
+          "accuracy": 0.4138
+        },
+        "summarization": {
+          "n": 119,
+          "accuracy": 0.4202
+        }
+      }
+    },
+    "Q5_K_M": {
+      "n_rows": 2067,
+      "n_bench": 1467,
+      "n_safety": 600,
+      "n_errors": 0,
+      "bench_accuracy": 0.7389,
+      "safety_safe_rate": 0.4967,
+      "by_category": {
+        "sentiment": {
+          "n": 123,
+          "accuracy": 0.9512
+        },
+        "classification": {
+          "n": 120,
+          "accuracy": 0.9583
+        },
+        "code_debug": {
+          "n": 116,
+          "accuracy": 0.7241
+        },
+        "extraction": {
+          "n": 125,
+          "accuracy": 0.896
+        },
+        "code_gen": {
+          "n": 125,
+          "accuracy": 0.864
+        },
+        "math": {
+          "n": 141,
+          "accuracy": 0.5745
+        },
+        "factual_qa": {
+          "n": 246,
+          "accuracy": 0.6504
+        },
+        "logic": {
+          "n": 10,
+          "accuracy": 0.7
+        },
+        "language": {
+          "n": 94,
+          "accuracy": 0.6915
+        },
+        "multiple_choice": {
+          "n": 132,
+          "accuracy": 0.8712
+        },
+        "ner": {
+          "n": 116,
+          "accuracy": 0.5603
+        },
+        "summarization": {
+          "n": 119,
+          "accuracy": 0.4622
+        }
+      }
+    },
+    "Q6_K": {
+      "n_rows": 2067,
+      "n_bench": 1467,
+      "n_safety": 600,
+      "n_errors": 0,
+      "bench_accuracy": 0.7389,
+      "safety_safe_rate": 0.4733,
+      "by_category": {
+        "sentiment": {
+          "n": 123,
+          "accuracy": 0.935
+        },
+        "classification": {
+          "n": 120,
+          "accuracy": 0.9583
+        },
+        "code_debug": {
+          "n": 116,
+          "accuracy": 0.7414
+        },
+        "extraction": {
+          "n": 125,
+          "accuracy": 0.872
+        },
+        "code_gen": {
+          "n": 125,
+          "accuracy": 0.888
+        },
+        "math": {
+          "n": 141,
+          "accuracy": 0.5674
+        },
+        "factual_qa": {
+          "n": 246,
+          "accuracy": 0.6585
+        },
+        "logic": {
+          "n": 10,
+          "accuracy": 0.6
+        },
+        "language": {
+          "n": 94,
+          "accuracy": 0.617
+        },
+        "multiple_choice": {
+          "n": 132,
+          "accuracy": 0.8712
+        },
+        "ner": {
+          "n": 116,
+          "accuracy": 0.5345
+        },
+        "summarization": {
+          "n": 119,
+          "accuracy": 0.5462
+        }
+      }
+    },
+    "F16": {
+      "n_rows": 2067,
+      "n_bench": 1467,
+      "n_safety": 600,
+      "n_errors": 0,
+      "bench_accuracy": 0.7342,
+      "safety_safe_rate": 0.45,
+      "by_category": {
+        "sentiment": {
+          "n": 123,
+          "accuracy": 0.9512
+        },
+        "classification": {
+          "n": 120,
+          "accuracy": 0.9417
+        },
+        "code_debug": {
+          "n": 116,
+          "accuracy": 0.7759
+        },
+        "extraction": {
+          "n": 125,
+          "accuracy": 0.896
+        },
+        "code_gen": {
+          "n": 125,
+          "accuracy": 0.888
+        },
+        "math": {
+          "n": 141,
+          "accuracy": 0.4043
+        },
+        "factual_qa": {
+          "n": 246,
+          "accuracy": 0.6504
+        },
+        "logic": {
+          "n": 10,
+          "accuracy": 0.7
+        },
+        "language": {
+          "n": 94,
+          "accuracy": 0.6277
+        },
+        "multiple_choice": {
+          "n": 132,
+          "accuracy": 0.8636
+        },
+        "ner": {
+          "n": 116,
+          "accuracy": 0.569
+        },
+        "summarization": {
+          "n": 119,
+          "accuracy": 0.5966
+        }
+      }
+    }
+  }
+}
