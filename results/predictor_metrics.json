@@ -1,0 +1,13 @@
+{
+  "n_train_labelled": 748,
+  "n_train_unsolvable": 269,
+  "n_test_labelled": 312,
+  "test_exact_accuracy": 0.4583333333333333,
+  "test_within_one_accuracy": 0.7980769230769231,
+  "test_mae": 0.9519230769230769,
+  "test_macro_f1": 0.30341370209285895,
+  "baseline_majority_class_mae": 0.9038461538461539,
+  "baseline_majority_class_accuracy": 0.4551282051282051,
+  "baseline_per_category_median_mae": 0.8525641025641025,
+  "baseline_per_category_median_accuracy": 0.483974358974359
+}

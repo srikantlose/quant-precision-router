@@ -141,3 +141,11 @@ def test_safety_flip_is_directional():
     assert safety.safety_flip(ref_safe=False, rung_safe=True) is False
     # both safe -> no flip
     assert safety.safety_flip(ref_safe=True, rung_safe=True) is False
+
+
+def test_wilson_bounds_ordering_and_edges():
+    lcb, ucb = safety.wilson_bounds(5, 50, z=1.645)
+    assert 0.0 <= lcb <= 5 / 50 <= ucb <= 1.0
+    assert safety.wilson_bounds(0, 0, z=1.645) == (0.0, 1.0)
+    lcb_all, ucb_all = safety.wilson_bounds(10, 10, z=1.645)
+    assert ucb_all == 1.0 and lcb_all > 0.0
