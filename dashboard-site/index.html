@@ -3,415 +3,386 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>QuantLab — Precision Routing Dashboard</title>
+<title>QuantLab — which quantization does each task need?</title>
+<meta name="description" content="Qwen2.5-3B-Instruct measured across seven GGUF quantization levels on one RTX 4060: accuracy, fidelity, safety and cost, per task category and complexity.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=DM+Sans:opsz,wght@9..40,400..700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='1' y='1' width='30' height='30' rx='8' fill='%23ffc832' stroke='%23151515' stroke-width='2'/%3E%3Crect x='6' y='20' width='5' height='6' fill='%23ff8d65'/%3E%3Crect x='13.5' y='14' width='5' height='12' fill='%23d05320'/%3E%3Crect x='21' y='7' width='5' height='19' fill='%23151515'/%3E%3C/svg%3E">
 <style>
-:root {
-  --page:        #0d0d0d;
-  --surface:     #1a1a19;
-  --surface-2:   #202020;
-  --ink:         #f0efec;
-  --ink-2:       #c3c2b7;
-  --ink-muted:   #898781;
-  --grid:        #2c2c2a;
-  --baseline:    #383835;
-  --border:      rgba(255,255,255,0.10);
-  --brand:       #9085e9;   /* violet — UI chrome + F16 (the reference) */
-  --brand-soft:  rgba(144,133,233,0.14);
-  --good:        #0ca30c;
-  --warning:     #fab219;
-  --serious:     #ec835a;
-  --critical:    #e66767;
-  /* ordinal rung ramp — one hue (blue), light->dark = low->high precision */
-  --r-q2:  #cde2fb;
-  --r-q3:  #9ec5f4;
-  --r-q4:  #6da7ec;
-  --r-q5:  #3987e5;
-  --r-q6:  #256abf;
-  --r-q8:  #184f95;
-  --r-f16: var(--brand);
-}
-* { box-sizing: border-box; }
-body {
-  margin: 0; background: var(--page); color: var(--ink);
-  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
-  background-image:
-    radial-gradient(ellipse 900px 500px at 15% -10%, rgba(144,133,233,0.12), transparent 60%),
-    radial-gradient(ellipse 700px 500px at 100% 10%, rgba(61,135,229,0.08), transparent 60%);
-  background-repeat: no-repeat;
-}
-.font-display { font-family: "Space Grotesk", Inter, sans-serif; }
-.tabular { font-variant-numeric: tabular-nums; }
+  .hero { padding: 56px 0 24px; }
+  .hero-grid { display: grid; gap: 32px; grid-template-columns: 1fr; align-items: center; }
+  @media (min-width: 920px) { .hero-grid { grid-template-columns: 1.05fr 0.95fr; } }
+  .hero h1 { font-size: clamp(40px, 6.2vw, 72px); font-weight: 800; }
+  .hero h1 .hl { background: var(--sun); padding: 0 .12em; border-radius: 10px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+  .hero .lede { font-size: 19px; color: var(--ink-2); max-width: 560px; margin: 20px 0 26px; }
+  .stat-strip { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-width: 560px; }
+  @media (min-width: 560px) { .stat-strip { grid-template-columns: repeat(4, 1fr); } }
+  .stat-strip .s { border: 2px solid var(--line); border-radius: 12px; padding: 10px 12px; background: var(--paper); box-shadow: var(--shadow-sm); }
+  .stat-strip .s:nth-child(1) { background: var(--sun); }
+  .stat-strip .s:nth-child(2) { background: var(--mint); }
+  .stat-strip .s:nth-child(3) { background: #bcd3ff; }
+  .stat-strip .s:nth-child(4) { background: var(--blush); }
+  .stat-strip .n { font-family: var(--display); font-weight: 800; font-size: 26px; line-height: 1.1; }
+  .stat-strip .l { font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
 
-::-webkit-scrollbar { height: 8px; width: 8px; }
-::-webkit-scrollbar-thumb { background: var(--baseline); border-radius: 4px; }
+  .how-card { padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+  .how-card svg { width: 64px; height: 64px; }
+  .how-card h3 { font-size: 21px; }
+  .how-card p { margin: 0; color: var(--ink-2); font-size: 14.5px; }
+  .how-step { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--muted); }
 
-.card {
-  background: var(--surface); border: 1px solid var(--border); border-radius: 18px;
-}
-.card-hover { transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
-.card-hover:hover { transform: translateY(-2px); border-color: rgba(144,133,233,0.35); box-shadow: 0 10px 30px rgba(0,0,0,0.35); }
+  .ladder-grid { display: grid; gap: 20px; grid-template-columns: 1fr; }
+  @media (min-width: 980px) { .ladder-grid { grid-template-columns: 1.35fr 1fr; } }
+  #stairs { width: 100%; height: auto; display: block; cursor: pointer; }
+  #stairs .step rect.body { transition: transform .2s ease, stroke-width .1s ease; }
+  #stairs .step:hover rect.body { stroke-width: 4; }
+  #token { transition: transform .45s cubic-bezier(.3,1.5,.5,1); }
+  .readouts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 16px; }
+  @media (min-width: 560px) { .readouts { grid-template-columns: repeat(3, 1fr); } }
+  #vram-fill { transition: width .45s cubic-bezier(.2,.8,.2,1), fill .2s ease; }
 
-.tab-btn {
-  font-size: 13.5px; font-weight: 600; padding: 9px 16px; border-radius: 999px;
-  background: var(--surface); color: var(--ink-2); border: 1px solid var(--border);
-  cursor: pointer; transition: all .15s ease; white-space: nowrap;
-}
-.tab-btn:hover { color: var(--ink); border-color: rgba(144,133,233,0.4); }
-.tab-btn.active { background: var(--brand); color: #0b0b0b; border-color: var(--brand); }
+  .matrix-grid { display: grid; gap: 20px; grid-template-columns: 1fr; }
+  @media (min-width: 1000px) { .matrix-grid { grid-template-columns: 1.2fr 0.8fr; } }
+  .controls { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center; margin-bottom: 18px; }
+  .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 18px; }
+  .kpis .k { border: 2px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+  .kpis .k .n { font-family: var(--display); font-weight: 800; font-size: 26px; line-height: 1.1; }
+  .kpis .k .l { font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
 
-.panel-enter { animation: fadeUp .35s ease both; }
-@keyframes fadeUp { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform:none; } }
-
-.rung-step {
-  cursor: pointer; border: 2px solid var(--border); border-radius: 14px;
-  transition: all .2s cubic-bezier(.2,.8,.2,1); position: relative;
-}
-.rung-step:hover { transform: translateY(-4px); }
-.rung-step.selected { transform: translateY(-8px) scale(1.04); box-shadow: 0 12px 28px rgba(0,0,0,0.5); }
-
-.glow-ring { box-shadow: 0 0 0 1px rgba(144,133,233,0.3), 0 0 40px rgba(144,133,233,0.08); }
-
-.callout { border-radius: 14px; border: 1px solid; padding: 14px 16px; font-size: 13.5px; line-height: 1.55; }
-.callout-warning { background: rgba(250,178,25,0.08); border-color: rgba(250,178,25,0.35); color: #fde3a7; }
-.callout-good { background: rgba(12,163,12,0.08); border-color: rgba(12,163,12,0.35); color: #b7e7b7; }
-
-.ctooltip {
-  position: fixed; pointer-events: none; z-index: 50; background: #0b0b0b;
-  border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; font-size: 12.5px;
-  color: var(--ink); box-shadow: 0 10px 30px rgba(0,0,0,.5); opacity: 0; transition: opacity .1s ease;
-  max-width: 260px;
-}
-
-.hero-num { font-variant-numeric: tabular-nums; transition: opacity .15s ease; }
-
-@media (max-width: 768px) {
-  .ladder-row { flex-direction: column; }
-}
+  .policy-grid { display: grid; gap: 20px; grid-template-columns: 1fr; }
+  @media (min-width: 1000px) { .policy-grid { grid-template-columns: 0.75fr 1.25fr; } }
+  .stack > * + * { margin-top: 18px; }
+  .limits { counter-reset: lim; display: grid; gap: 14px; grid-template-columns: 1fr; }
+  @media (min-width: 860px) { .limits { grid-template-columns: 1fr 1fr; } }
+  .limits li { list-style: none; counter-increment: lim; display: flex; gap: 14px; padding: 16px 18px; }
+  .limits li::before { content: counter(lim, decimal-leading-zero); font-family: var(--mono); font-weight: 700; font-size: 13px; background: var(--sun); border: 2px solid var(--line); border-radius: 8px; padding: 2px 7px; height: fit-content; }
+  .limits ul { padding: 0; margin: 0; }
 </style>
 </head>
 <body>
 
-<div class="max-w-6xl mx-auto px-4 md:px-6 py-10">
+<header class="topbar">
+  <div class="wrap">
+    <a class="logo" href="#top">
+      <svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <rect x="1" y="1" width="30" height="30" rx="8" fill="#ffc832" stroke="#151515" stroke-width="2"/>
+        <rect x="6" y="20" width="5" height="6" fill="#ff8d65" stroke="#151515" stroke-width="1.5"/>
+        <rect x="13.5" y="14" width="5" height="12" fill="#d05320" stroke="#151515" stroke-width="1.5"/>
+        <rect x="21" y="7" width="5" height="19" fill="#151515" stroke="#151515" stroke-width="1.5"/>
+      </svg>
+      QuantLab
+    </a>
+    <nav class="nav" id="nav">
+      <a href="#how">How</a>
+      <a href="#ladder">Ladder</a>
+      <a href="#matrix">Winner matrix</a>
+      <a href="#accuracy">Accuracy</a>
+      <a href="#fidelity">Fidelity</a>
+      <a href="#need">What tasks need</a>
+      <a href="#policy">Policy lab</a>
+      <a href="#safety">Safety</a>
+      <a href="#predictor">Predictor</a>
+      <a href="#limits">Limits</a>
+    </nav>
+    <a class="btn dark" href="guide.html">Study guide</a>
+  </div>
+</header>
 
-  <!-- ===================== HERO ===================== -->
-  <header class="mb-10">
-    <div class="flex flex-wrap items-start justify-between gap-5">
-      <div>
-        <div class="inline-flex items-center gap-2 text-xs font-semibold px-3 py-1 rounded-full mb-4"
-             style="background:var(--brand-soft);color:var(--brand);border:1px solid rgba(144,133,233,0.3)">
-          <span style="width:6px;height:6px;border-radius:999px;background:var(--brand);display:inline-block"></span>
-          Benchmarking + Analysis complete
+<main id="top">
+
+<!-- ================= HERO ================= -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="sticker">Qwen2.5-3B-Instruct &middot; GGUF &middot; llama.cpp</span>
+      <h1 style="margin-top:18px">Which <span class="hl">quantization</span> does each task actually need?</h1>
+      <p class="lede">One model, served at seven precisions, run through 2,067 prompts each on a single RTX&nbsp;4060. Every number below is measured, not estimated.</p>
+      <div class="stat-strip" id="hero-stats"></div>
+    </div>
+    <div>
+      <svg viewBox="0 0 520 400" class="float" aria-label="Illustration: a staircase of seven blocks, one per quantization level, growing taller with more bits, beside a graphics card">
+        <ellipse cx="270" cy="372" rx="230" ry="16" fill="#151515" opacity=".08"/>
+        <g id="hero-steps"></g>
+        <g transform="translate(36 34) rotate(-6)">
+          <rect x="0" y="0" width="176" height="112" rx="14" fill="#bcd3ff" stroke="#151515" stroke-width="3"/>
+          <circle cx="54" cy="56" r="32" fill="#fff" stroke="#151515" stroke-width="3"/>
+          <circle cx="54" cy="56" r="7" fill="#151515"/>
+          <path d="M54 24 Q69 41 54 56 Q39 41 54 24Z M86 56 Q69 71 54 56 Q69 41 86 56Z M54 88 Q39 71 54 56 Q69 71 54 88Z M22 56 Q39 41 54 56 Q39 71 22 56Z" fill="#3d7bff" stroke="#151515" stroke-width="2"/>
+          <rect x="100" y="22" width="60" height="15" rx="4" fill="#ffc832" stroke="#151515" stroke-width="2"/>
+          <rect x="100" y="45" width="60" height="15" rx="4" fill="#2ed3a0" stroke="#151515" stroke-width="2"/>
+          <rect x="100" y="68" width="60" height="15" rx="4" fill="#fff" stroke="#151515" stroke-width="2"/>
+          <g fill="#ffc832" stroke="#151515" stroke-width="2">
+            <rect x="20" y="110" width="11" height="13"/><rect x="37" y="110" width="11" height="13"/><rect x="54" y="110" width="11" height="13"/>
+            <rect x="71" y="110" width="11" height="13"/><rect x="88" y="110" width="11" height="13"/><rect x="105" y="110" width="11" height="13"/>
+          </g>
+          <text x="88" y="-10" text-anchor="middle" font-family="JetBrains Mono" font-weight="700" font-size="13" fill="#151515">8 GB VRAM</text>
+        </g>
+        <g transform="translate(250 64)">
+          <rect x="0" y="0" width="160" height="56" rx="12" fill="#fff" stroke="#151515" stroke-width="3"/>
+          <path d="M26 54 L16 78 L48 54" fill="#fff" stroke="#151515" stroke-width="3" stroke-linejoin="round"/>
+          <rect x="22" y="48" width="24" height="8" fill="#fff"/>
+          <text x="80" y="25" text-anchor="middle" font-family="DM Sans" font-weight="700" font-size="14" fill="#151515">"What's 17 + 25?"</text>
+          <text x="80" y="44" text-anchor="middle" font-family="JetBrains Mono" font-weight="700" font-size="12" fill="#d05320">Q2_K is plenty</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ================= HOW ================= -->
+<section class="block" id="how">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-tag">01</span><div><h2>How it works, in four moves</h2><p>Measure everything, decide what "good enough" means per task, learn to predict it from the prompt, then route. <a href="guide.html">Full flowchart in the study guide</a>.</p></div></div>
+    <div class="grid-4">
+      <div class="card how-card">
+        <svg viewBox="0 0 64 64"><rect x="4" y="8" width="56" height="48" rx="8" fill="#ffc832" stroke="#151515" stroke-width="3"/><g fill="#fff" stroke="#151515" stroke-width="2"><rect x="11" y="16" width="12" height="9"/><rect x="26" y="16" width="12" height="9"/><rect x="41" y="16" width="12" height="9"/><rect x="11" y="28" width="12" height="9"/><rect x="26" y="28" width="12" height="9" fill="#ff8d65"/><rect x="41" y="28" width="12" height="9"/><rect x="11" y="40" width="12" height="9"/><rect x="26" y="40" width="12" height="9"/><rect x="41" y="40" width="12" height="9" fill="#151515"/></g></svg>
+        <span class="how-step">STEP 1 &middot; MEASURE</span>
+        <h3>Run every task on every rung</h3>
+        <p>1,467 graded tasks + 600 safety prompts &times; 7 precisions = 14,469 scored runs. Plus KL-divergence against F16 on WikiText-2.</p>
+      </div>
+      <div class="card how-card">
+        <svg viewBox="0 0 64 64"><path d="M6 30 L30 6 H56 V32 L32 56 Z" fill="#2ed3a0" stroke="#151515" stroke-width="3" stroke-linejoin="round"/><circle cx="45" cy="17" r="5" fill="#fff" stroke="#151515" stroke-width="3"/><text x="29" y="38" font-family="JetBrains Mono" font-weight="700" font-size="13" text-anchor="middle" fill="#151515" transform="rotate(-45 29 34)">Q4</text></svg>
+        <span class="how-step">STEP 2 &middot; LABEL</span>
+        <h3>Find each task's minimum rung</h3>
+        <p>"Required precision" = the cheapest rung that solves the task confidently, with at most one failure among the rungs above it.</p>
+      </div>
+      <div class="card how-card">
+        <svg viewBox="0 0 64 64"><g stroke="#151515" stroke-width="2.5"><line x1="12" y1="16" x2="32" y2="32"/><line x1="12" y1="48" x2="32" y2="32"/><line x1="12" y1="32" x2="32" y2="32"/><line x1="32" y1="32" x2="52" y2="20"/><line x1="32" y1="32" x2="52" y2="44"/></g><g stroke="#151515" stroke-width="3"><circle cx="12" cy="16" r="6" fill="#bcd3ff"/><circle cx="12" cy="32" r="6" fill="#bcd3ff"/><circle cx="12" cy="48" r="6" fill="#bcd3ff"/><circle cx="32" cy="32" r="8" fill="#3d7bff"/><circle cx="52" cy="20" r="6" fill="#ffc832"/><circle cx="52" cy="44" r="6" fill="#ffc832"/></g></svg>
+        <span class="how-step">STEP 3 &middot; PREDICT</span>
+        <h3>Guess it from the prompt alone</h3>
+        <p>Sentence embeddings + 13 surface features &rarr; a classifier, cross-fitted so no task ever predicts its own label.</p>
+      </div>
+      <div class="card how-card">
+        <svg viewBox="0 0 64 64"><path d="M6 32 H26 M26 32 C36 32 36 14 50 14 M26 32 H50 M26 32 C36 32 36 50 50 50" fill="none" stroke="#151515" stroke-width="3.5" stroke-linecap="round"/><g stroke="#151515" stroke-width="2.5"><rect x="48" y="8" width="12" height="12" rx="3" fill="#ff8d65"/><rect x="48" y="26" width="12" height="12" rx="3" fill="#d05320"/><rect x="48" y="44" width="12" height="12" rx="3" fill="#151515"/></g><circle cx="8" cy="32" r="5" fill="#ffc832" stroke="#151515" stroke-width="2.5"/></svg>
+        <span class="how-step">STEP 4 &middot; ROUTE</span>
+        <h3>Serve the cheapest safe rung</h3>
+        <p>A rung is allowed only if accuracy, answer-stability <em>and</em> safety all clear a bar. Cheapest allowed rung wins; F16 is always allowed.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= LADDER ================= -->
+<section class="block" id="ladder">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-tag" style="background:var(--mint)">02</span><div><h2>Climb the ladder</h2><p>Click a step (or use &larr; &rarr;). Taller = more bits per weight. Watch the GPU fill up and the numbers move.</p></div></div>
+    <div class="ladder-grid">
+      <div class="card pad">
+        <svg id="stairs" viewBox="0 0 700 330" role="listbox" tabindex="0" aria-label="Quantization ladder"></svg>
+        <div class="readouts" id="readouts"></div>
+      </div>
+      <div class="stack">
+        <div class="card pad">
+          <div class="chart-title">GPU memory used</div>
+          <div class="chart-sub" id="vram-sub">&nbsp;</div>
+          <svg viewBox="0 0 380 170" aria-label="Graphics card memory illustration">
+            <rect x="6" y="6" width="368" height="130" rx="16" fill="#fff" stroke="#151515" stroke-width="3"/>
+            <circle cx="64" cy="71" r="40" fill="#bcd3ff" stroke="#151515" stroke-width="3"/>
+            <circle cx="64" cy="71" r="9" fill="#151515"/>
+            <path d="M64 31 Q82 52 64 71 Q46 52 64 31Z M104 71 Q82 89 64 71 Q82 53 104 71Z M64 111 Q46 89 64 71 Q82 89 64 111Z M24 71 Q46 53 64 71 Q46 89 24 71Z" fill="#3d7bff" stroke="#151515" stroke-width="2"/>
+            <rect x="124" y="42" width="232" height="58" rx="10" fill="#f3ede1" stroke="#151515" stroke-width="3"/>
+            <rect id="vram-fill" x="127" y="45" width="0" height="52" rx="7" fill="#d05320"/>
+            <g id="vram-ticks" stroke="#151515" stroke-width="1.5" opacity=".35"></g>
+            <text x="240" y="30" text-anchor="middle" font-family="JetBrains Mono" font-weight="700" font-size="13" fill="#151515">8,188 MB total</text>
+            <g fill="#ffc832" stroke="#151515" stroke-width="2">
+              <rect x="40" y="134" width="14" height="18"/><rect x="60" y="134" width="14" height="18"/><rect x="80" y="134" width="14" height="18"/><rect x="100" y="134" width="14" height="18"/><rect x="120" y="134" width="14" height="18"/><rect x="140" y="134" width="14" height="18"/><rect x="160" y="134" width="14" height="18"/>
+            </g>
+          </svg>
         </div>
-        <h1 class="font-display text-5xl font-bold tracking-tight" style="color:var(--ink)">
-          Quant<span style="color:var(--brand)">Lab</span>
-        </h1>
-        <p class="mt-3 max-w-xl text-base" style="color:var(--ink-2)">
-          Does an LLM need the same precision for every prompt? Qwen2.5-3B-Instruct,
-          measured across <strong style="color:var(--ink)">seven</strong> quantization rungs,
-          on <strong style="color:var(--ink)">one RTX 4060</strong> — no simulation, no
-          illustrative numbers.
-        </p>
-      </div>
-      <div class="hidden md:block text-right text-xs" style="color:var(--ink-muted)">
-        <div class="font-display text-2xl font-bold tabular" style="color:var(--ink)" id="hero-rows">—</div>
-        <div>graded rows, zero errors</div>
+        <div class="card pad">
+          <div class="chart-title">Accuracy vs memory</div>
+          <div class="chart-sub">Each dot is one rung. Up-and-left is better.</div>
+          <div class="chart-box"><canvas id="c-scatter"></canvas></div>
+        </div>
       </div>
     </div>
-  </header>
+  </div>
+</section>
 
-  <!-- ===================== INTERACTIVE LADDER ===================== -->
-  <section class="card glow-ring p-6 md:p-8 mb-8">
-    <div class="flex items-center justify-between mb-1">
-      <h2 class="font-display text-xl font-bold">The ladder</h2>
-      <span class="text-xs" style="color:var(--ink-muted)">click a rung, or use ← →</span>
-    </div>
-    <p class="text-sm mb-6" style="color:var(--ink-2)">Seven ways to serve the same model. Darker = more bits. The violet step is F16, the reference every other rung is measured against.</p>
-
-    <div class="flex ladder-row gap-3 mb-8" id="ladder" tabindex="0"></div>
-
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-4" id="ladder-stats"></div>
-  </section>
-
-  <!-- ===================== TABS ===================== -->
-  <nav class="flex gap-2 flex-wrap mb-6" id="tabs"></nav>
-  <main id="panels"></main>
-
-  <footer class="mt-14 pt-6 text-xs" style="border-top:1px solid var(--border);color:var(--ink-muted)">
-    Measured on one RTX 4060 (8GB). Every number on this page comes straight from this run's result files.
-  </footer>
-</div>
-
-<div class="ctooltip" id="ctooltip"></div>
-
-<script>
-const LADDER = ["Q2_K","Q3_K_M","Q4_K_M","Q5_K_M","Q6_K","Q8_0","F16"];
-const RUNG_VAR = { Q2_K:"--r-q2", Q3_K_M:"--r-q3", Q4_K_M:"--r-q4", Q5_K_M:"--r-q5", Q6_K:"--r-q6", Q8_0:"--r-q8", F16:"--r-f16" };
-const css = getComputedStyle(document.documentElement);
-const RUNG_COLORS = Object.fromEntries(LADDER.map(r => [r, css.getPropertyValue(RUNG_VAR[r]).trim()]));
-const INK = "#f0efec", INK2 = "#c3c2b7", MUTED = "#898781", GRID = "#2c2c2a";
-Chart.defaults.color = INK2; Chart.defaults.font.family = "Inter, sans-serif"; Chart.defaults.borderColor = GRID;
-
-const CATEGORIES = ["math","multiple_choice","factual_qa","classification","sentiment",
-  "extraction","language","logic","summarization","ner","code_gen","code_debug"];
-
-let DATA = null;
-let selectedRung = "Q4_K_M";
-
-const tipEl = document.getElementById("ctooltip");
-function showTip(html, x, y) {
-  tipEl.innerHTML = html; tipEl.style.opacity = 1;
-  tipEl.style.left = Math.min(x + 14, window.innerWidth - 280) + "px";
-  tipEl.style.top = (y + 14) + "px";
-}
-function hideTip() { tipEl.style.opacity = 0; }
-
-function fmtPct(x) { return x == null ? "—" : Math.round(x * 100) + "%"; }
-function lerp(a,b,t) { return a + (b-a)*t; }
-
-function animateNumber(el, to, fmt, duration=450) {
-  const from = parseFloat(el.dataset.val || "0");
-  const t0 = performance.now();
-  function tick(t) {
-    const p = Math.min(1, (t - t0) / duration);
-    const eased = 1 - Math.pow(1-p, 3);
-    const v = lerp(from, to, eased);
-    el.textContent = fmt(v);
-    if (p < 1) requestAnimationFrame(tick); else el.dataset.val = to;
-  }
-  requestAnimationFrame(tick);
-}
-
-function statTile(id, label, accent) {
-  return `<div class="card p-4" style="border-color:${accent}33">
-    <div class="text-[11px] uppercase tracking-wide font-semibold" style="color:var(--ink-muted)">${label}</div>
-    <div class="hero-num font-display text-2xl font-bold mt-1" id="${id}" data-val="0" style="color:${accent}">0</div>
-  </div>`;
-}
-
-function renderLadder() {
-  const ladder = document.getElementById("ladder");
-  ladder.innerHTML = LADDER.map((r,i) => {
-    const color = RUNG_COLORS[r];
-    const isRef = r === "F16";
-    return `<div class="rung-step flex-1 flex flex-col items-center justify-end py-4 px-2 ${r===selectedRung?'selected':''}"
-      data-rung="${r}" style="background:linear-gradient(180deg, ${color}22, ${color}08); border-color:${r===selectedRung?color:'var(--border)'}; min-height:${70+i*14}px">
-      <div class="text-[10px] font-semibold mb-1" style="color:${isRef?color:'var(--ink-muted)'}">${isRef?'REFERENCE':''}</div>
-      <div class="font-display font-bold text-sm" style="color:${color}">${r}</div>
-    </div>`;
-  }).join("");
-
-  document.getElementById("ladder-stats").innerHTML = [
-    statTile("stat-bpw", "bits / weight", "var(--brand)"),
-    statTile("stat-vram", "VRAM (MB)", RUNG_COLORS.Q6_K),
-    statTile("stat-acc", "bench accuracy", RUNG_COLORS.Q8_0),
-    statTile("stat-kl", "KL vs F16", RUNG_COLORS.Q4_K_M),
-    statTile("stat-swap", "load time (s)", RUNG_COLORS.Q3_K_M),
-  ].join("");
-
-  ladder.querySelectorAll(".rung-step").forEach(el => {
-    el.addEventListener("click", () => selectRung(el.dataset.rung));
-  });
-  ladder.addEventListener("keydown", (e) => {
-    const i = LADDER.indexOf(selectedRung);
-    if (e.key === "ArrowRight" && i < LADDER.length-1) selectRung(LADDER[i+1]);
-    if (e.key === "ArrowLeft" && i > 0) selectRung(LADDER[i-1]);
-  });
-}
-
-function selectRung(r) {
-  selectedRung = r;
-  document.querySelectorAll(".rung-step").forEach(el => {
-    const active = el.dataset.rung === r;
-    el.classList.toggle("selected", active);
-    el.style.borderColor = active ? RUNG_COLORS[r] : "var(--border)";
-  });
-  const rec = DATA.rungs[r];
-  animateNumber(document.getElementById("stat-bpw"), rec.bpw, v => v.toFixed(2));
-  animateNumber(document.getElementById("stat-vram"), rec.vram_mb, v => Math.round(v).toLocaleString());
-  animateNumber(document.getElementById("stat-acc"), rec.bench_accuracy*100, v => Math.round(v)+"%");
-  animateNumber(document.getElementById("stat-kl"), r==="F16" ? 0 : DATA.kl[r].mean_kld, v => r==="F16" ? "ref" : v.toFixed(3));
-  animateNumber(document.getElementById("stat-swap"), rec.swap_cost_s, v => v.toFixed(1));
-}
-
-function renderKPIs() {
-  document.getElementById("hero-rows").textContent = DATA.meta.n_grid_rows.toLocaleString();
-}
-
-const TABS = [
-  {id:"accuracy", label:"Accuracy & Fidelity"},
-  {id:"kl", label:"KL Divergence"},
-  {id:"predictor", label:"Predictor"},
-  {id:"policy", label:"Policy Map"},
-  {id:"safety", label:"Safety"},
-  {id:"limitations", label:"Honest Limitations"},
-];
-
-function renderTabs() {
-  const nav = document.getElementById("tabs");
-  nav.innerHTML = TABS.map((t,i) => `<button class="tab-btn ${i===0?'active':''}" data-tab="${t.id}">${t.label}</button>`).join("");
-  nav.querySelectorAll(".tab-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      nav.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      showPanel(btn.dataset.tab);
-    });
-  });
-}
-
-function panelWrap(title, sub, bodyHtml) {
-  return `<div class="card p-6 md:p-8 panel-enter">
-    <h2 class="font-display text-xl font-bold mb-1">${title}</h2>
-    ${sub ? `<p class="text-sm mb-6" style="color:var(--ink-2)">${sub}</p>` : '<div class="mb-6"></div>'}
-    ${bodyHtml}
-  </div>`;
-}
-
-function gridOpts(extra) {
-  return Object.assign({
-    plugins: { legend: { labels: { color: INK2, usePointStyle: true, boxWidth: 8 } }, tooltip: {
-      backgroundColor: "#0b0b0b", borderColor: "#2c2c2a", borderWidth: 1, padding: 10,
-      titleColor: INK, bodyColor: INK2, displayColors: true,
-    } },
-    scales: { y: { ticks: { color: MUTED }, grid: { color: GRID } }, x: { ticks: { color: MUTED }, grid: { display:false } } },
-  }, extra || {});
-}
-
-function showPanel(id) {
-  const root = document.getElementById("panels");
-  root.innerHTML = `<div id="panel-inner"></div>`;
-  const inner = document.getElementById("panel-inner");
-
-  if (id === "accuracy") {
-    inner.innerHTML = panelWrap("Accuracy by category and rung",
-      "Each bar is a real measured accuracy — click a legend entry to isolate a rung.",
-      `<canvas id="chart-acc-cat" height="260"></canvas>`);
-    const catData = CATEGORIES.map(c => LADDER.map(r => (DATA.by_category[r][c]||{}).accuracy ?? null));
-    new Chart(document.getElementById("chart-acc-cat"), {
-      type: "bar",
-      data: { labels: CATEGORIES, datasets: LADDER.map((r,i) => ({
-        label: r, data: catData.map(row=>row[i]), backgroundColor: RUNG_COLORS[r], borderRadius: 4, borderSkipped: false,
-      })) },
-      options: gridOpts({ scales: { y:{beginAtZero:true,max:1,ticks:{color:MUTED},grid:{color:GRID}}, x:{ticks:{color:MUTED},grid:{display:false}} } })
-    });
-
-  } else if (id === "kl") {
-    inner.innerHTML = panelWrap("Corpus KL-divergence vs F16",
-      "Measured with llama.cpp's own --kl-divergence pass on WikiText-2 (40 chunks, 4096 context). Strictly monotone — the baseline sanity check this project's differential-test design leans on.",
-      `<canvas id="chart-kl" height="260"></canvas>`);
-    const nonRef = LADDER.filter(r=>r!=="F16");
-    new Chart(document.getElementById("chart-kl"), {
-      type: "line",
-      data: { labels: nonRef, datasets:[{ label:"Mean KL divergence", data: nonRef.map(r=>DATA.kl[r].mean_kld),
-        borderColor: css.getPropertyValue("--brand").trim(),
-        backgroundColor: "rgba(144,133,233,0.12)", fill:true, tension:0.35,
-        pointBackgroundColor: nonRef.map(r=>RUNG_COLORS[r]), pointRadius: 6, pointHoverRadius: 8,
-      }] },
-      options: gridOpts({ scales: { y: { type:"logarithmic", ticks:{color:MUTED}, grid:{color:GRID} }, x:{ticks:{color:MUTED},grid:{display:false}} }, plugins:{legend:{display:false}} })
-    });
-
-  } else if (id === "predictor") {
-    const m = DATA.predictor_metrics;
-    inner.innerHTML = panelWrap("Required-precision predictor",
-      "Cross-fitted 5-fold out-of-fold on train; metrics below are the held-out test split.",
-      `<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        ${statCard("Exact accuracy", fmtPct(m.test_exact_accuracy), "7-way class", RUNG_COLORS.Q8_0)}
-        ${statCard("Within one rung", fmtPct(m.test_within_one_accuracy), "", RUNG_COLORS.Q6_K)}
-        ${statCard("MAE (rungs)", m.test_mae.toFixed(2), "lower is better", RUNG_COLORS.Q4_K_M)}
-        ${statCard("Macro F1", m.test_macro_f1.toFixed(2), "", RUNG_COLORS.Q3_K_M)}
+<!-- ================= WINNER MATRIX ================= -->
+<section class="block" id="matrix">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-tag" style="background:#bcd3ff">03</span><div><h2>The winner matrix</h2><p>For every task category &times; complexity tier: which quantized model should you actually use? Measured on all 1,467 bench tasks. Click any cell to see all seven rungs.</p></div></div>
+    <div class="card pad">
+      <div class="controls">
+        <div class="pills" id="mx-mode">
+          <button class="pill on" data-mode="match">Cheapest that matches F16</button>
+          <button class="pill" data-mode="best">Most accurate</button>
+        </div>
+        <div class="slider-row" id="tol-row" style="min-width:260px;flex:1;max-width:380px">
+          <label for="tol">Allowed accuracy gap vs F16</label><span class="val" id="tol-val">2 pp</span>
+          <input type="range" id="tol" min="0" max="10" step="1" value="2">
+        </div>
       </div>
-      <div class="callout callout-warning">
-        <strong>⚠ Honest callout</strong> — exact accuracy (${fmtPct(m.test_exact_accuracy)}) is barely above a plain
-        majority-class baseline (${fmtPct(m.baseline_majority_class_accuracy)}). Required precision is genuinely hard to
-        predict from prompt text alone for this model — this is reported plainly, not smoothed over.
-      </div>`);
-
-  } else if (id === "policy") {
-    renderPolicy(inner);
-
-  } else if (id === "safety") {
-    inner.innerHTML = panelWrap("Safety behaviour across the ladder",
-      "Directional safety-flip rate: F16 was safe and this rung was not. XSTest harmful + injection prompts, Wilson 95% upper bound.",
-      `<canvas id="chart-safety" height="260"></canvas>
-      <div class="callout callout-warning mt-5">
-        <strong>⚠ Honest callout</strong> — the string-match refusal grader undercounts real refusals: moralizing
-        declines like "it is illegal and immoral to..." don't match the fixed refusal-phrase list, so raw harmful-refusal
-        rates likely understate true safety at every rung, including F16. A planned LLM-judged audit will calibrate this gap.
-      </div>`);
-    const nonRef = LADDER.filter(r=>r!=="F16");
-    new Chart(document.getElementById("chart-safety"), {
-      type:"bar",
-      data: { labels: nonRef, datasets:[{label:"safety_flip (95% UCB)", data: nonRef.map(r => DATA.safety_by_rung[r].safety_flip_ucb), backgroundColor: nonRef.map(r=>RUNG_COLORS[r]), borderRadius: 6 }] },
-      options: gridOpts({ scales: { y:{beginAtZero:true,ticks:{color:MUTED},grid:{color:GRID}}, x:{ticks:{color:MUTED},grid:{display:false}} }, plugins:{legend:{display:false}} })
-    });
-
-  } else if (id === "limitations") {
-    const items = [
-      "The required-precision predictor barely beats a majority-class baseline — prompt text alone is a weak signal for this task/model combination.",
-      "About half of the 84 (category, predicted-class) policy cells had fewer than 5 training tasks; those now use a coarser category-only fallback model instead of letting sparse-data extrapolation produce meaningless confidence bounds.",
-      "At the default operating point, F16 is selected in effectively every cell — measured per-cell behavioral flip rates are high enough, and the fidelity threshold strict enough, that cheaper rungs rarely clear the bar. A fuller sweep across looser operating points is still pending.",
-      "The refusal grader is a fixed string-match list; it misses non-templated refusals, likely understating real safety behavior at every rung.",
-      "F16 was expected to require partial CPU offload on this 8GB card; it was fully VRAM-resident instead.",
-      "<code>logic/complex</code> generated tasks fell short of target (10/38) — the teacher model produced many non-uniquely-solvable puzzles; accepted as a documented shortfall.",
-      "Serving API, adversarial robustness evaluation, and the final written report are not yet built — this dashboard reflects benchmarking + analysis only.",
-    ];
-    inner.innerHTML = panelWrap("What this project is honest about", "Reported plainly, not buried — the project's own ground rule.",
-      `<div class="space-y-3">${items.map(t => `<div class="callout callout-warning flex gap-3"><span>⚠</span><span>${t}</span></div>`).join("")}</div>`);
-  }
-}
-
-function statCard(label, value, sub, accent) {
-  return `<div class="card p-4" style="border-color:${accent}33">
-    <div class="text-[11px] uppercase tracking-wide font-semibold" style="color:var(--ink-muted)">${label}</div>
-    <div class="font-display text-2xl font-bold mt-1" style="color:${accent}">${value}</div>
-    ${sub ? `<div class="text-xs mt-1" style="color:var(--ink-muted)">${sub}</div>` : ""}
-  </div>`;
-}
-
-function renderPolicy(inner) {
-  const cells = DATA.policy.cells;
-  inner.innerHTML = panelWrap("Selection policy map",
-    `Operating point: δ=${DATA.policy.operating_point.delta}, φ=${DATA.policy.operating_point.phi}, ψ=${DATA.policy.operating_point.psi}. Safety floor: <strong style="color:${RUNG_COLORS[DATA.policy.safety_floor]}">${DATA.policy.safety_floor}</strong>. Rows = category, columns = predicted required-precision class.`,
-    `<div class="overflow-x-auto">
-      <table class="w-full text-xs text-center border-separate" style="border-spacing:5px">
-        <thead><tr><th class="text-left pr-2" style="color:var(--ink-muted)">category \\ class</th>${[0,1,2,3,4,5,6].map(c=>`<th style="color:var(--ink-muted)">${c}</th>`).join("")}</tr></thead>
-        <tbody>
-          ${CATEGORIES.map(cat => `<tr>
-            <td class="text-left pr-2 whitespace-nowrap" style="color:var(--ink-2)">${cat}</td>
-            ${[0,1,2,3,4,5,6].map(cls => {
-              const cell = cells[`${cat}|${cls}`];
-              const rung = cell.rung; const low = cell.low_support; const color = RUNG_COLORS[rung];
-              return `<td class="policy-cell rounded-lg py-2.5 font-semibold cursor-pointer transition"
-                data-tip="${cat} · class ${cls} → <strong>${rung}</strong><br>support: ${cell.n_support_tasks} tasks${low?' (low — coarse fallback)':''}"
-                style="background:${color}22;color:${color};border:1px ${low?'dashed':'solid'} ${color}55">${rung.replace('_K','').replace('_M','')}${low?'<span style=\"opacity:.6\">·</span>':''}</td>`;
-            }).join("")}
-          </tr>`).join("")}
-        </tbody>
-      </table>
+      <div class="kpis" id="mx-kpis"></div>
+      <div class="matrix-grid">
+        <div>
+          <div class="mx-wrap"><table class="mx" id="mx"></table></div>
+          <div class="legend" id="rung-legend" style="margin-top:14px"></div>
+        </div>
+        <div>
+          <div class="chart-title" id="mx-detail-title">Pick a cell</div>
+          <div class="chart-sub" id="mx-detail-sub">Accuracy of every rung for that category and tier.</div>
+          <div class="chart-box"><canvas id="c-cell"></canvas></div>
+        </div>
+      </div>
+      <div class="note info" style="margin-top:20px"><span class="note-tag">READ ME</span><span>Each cell holds 12&ndash;56 tasks, so single-cell differences of a few points are within noise. Treat this as "where cheap rungs are clearly fine" vs "where they clearly break", not a precise ranking. This is a descriptive view of measured accuracy &mdash; the router's actual policy (section 07) adds stability and safety checks on top.</span></div>
     </div>
-    <div class="flex items-center gap-4 mt-5 text-xs flex-wrap" style="color:var(--ink-muted)">
-      <span>darker = higher precision</span>
-      <span class="flex items-center gap-1">· dashed border = low-support cell (coarse fallback)</span>
-    </div>`);
+  </div>
+</section>
 
-  inner.querySelectorAll(".policy-cell").forEach(td => {
-    td.addEventListener("mouseenter", (e) => showTip(td.dataset.tip, e.clientX, e.clientY));
-    td.addEventListener("mousemove", (e) => showTip(td.dataset.tip, e.clientX, e.clientY));
-    td.addEventListener("mouseleave", hideTip);
-  });
-}
+<!-- ================= ACCURACY ================= -->
+<section class="block" id="accuracy">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-tag" style="background:var(--blush)">04</span><div><h2>Accuracy, category by category</h2><p>Darker blue = more accurate. Hover for details. Sort to see where low-bit rungs hurt most.</p></div></div>
+    <div class="card pad">
+      <div class="controls">
+        <div class="pills" id="acc-sort">
+          <button class="pill on" data-sort="drop">Biggest Q2_K drop</button>
+          <button class="pill" data-sort="f16">F16 accuracy</button>
+          <button class="pill" data-sort="az">A&ndash;Z</button>
+        </div>
+      </div>
+      <div class="mx-wrap"><table class="mx" id="acc-mx"></table></div>
+    </div>
+  </div>
+</section>
 
-fetch("./dashboard_data.json").then(r => r.json()).then(d => {
-  DATA = d;
-  renderKPIs();
-  renderLadder();
-  selectRung(selectedRung);
-  renderTabs();
-  showPanel("accuracy");
-});
-</script>
+<!-- ================= FIDELITY ================= -->
+<section class="block" id="fidelity">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-tag" style="background:var(--sun)">05</span><div><h2>Same score, different answers</h2><p>Accuracy hides churn. A rung can score like F16 while getting <em>different</em> tasks right. Two ways to see it.</p></div></div>
+    <div class="grid-2">
+      <div class="card pad">
+        <div class="chart-title">Answer flips vs F16</div>
+        <div class="chart-sub">Share of tasks where the rung is right and F16 wrong, or the reverse.</div>
+        <div class="chart-box"><canvas id="c-flip"></canvas></div>
+      </div>
+      <div class="card pad">
+        <div class="chart-title">KL-divergence vs F16 (log scale)</div>
+        <div class="chart-sub">How far each rung's next-token distribution drifts, on WikiText-2.</div>
+        <div class="chart-box"><canvas id="c-kl"></canvas></div>
+      </div>
+    </div>
+    <div class="note" style="margin-top:20px" id="fid-note"></div>
+  </div>
+</section>
+
+<!-- ================= NEED ================= -->
+<section class="block" id="need">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-tag" style="background:var(--mint)">06</span><div><h2>What precision do tasks actually need?</h2><p>Each task's <strong>required precision</strong>: the cheapest rung that solves it confidently. Pick a category.</p></div></div>
+    <div class="card pad">
+      <div class="pills" id="need-pills" style="margin-bottom:18px"></div>
+      <div class="grid-2">
+        <div class="chart-box tall"><canvas id="c-need"></canvas></div>
+        <div class="stack" id="need-side"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= POLICY LAB ================= -->
+<section class="block" id="policy">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-tag" style="background:#bcd3ff">07</span><div><h2>Policy lab</h2><p>The router's real decision rule, running live in your browser. Loosen the three bars and watch cheaper rungs take over cells. Hover a cell to see exactly which check blocked each rung.</p></div></div>
+    <div class="policy-grid">
+      <div class="card pad stack">
+        <div class="pills" id="presets">
+          <button class="pill on" data-p="strict">Strict (default)</button>
+          <button class="pill" data-p="balanced">Balanced</button>
+          <button class="pill" data-p="loose">Loose</button>
+        </div>
+        <div class="slider-row">
+          <label for="sl-d">&delta; accuracy slack</label><span class="val" id="v-d"></span>
+          <input type="range" id="sl-d" min="0" max="0.3" step="0.005">
+          <span class="hint">Rung's accuracy lower bound may sit this far below F16.</span>
+        </div>
+        <div class="slider-row">
+          <label for="sl-f">&phi; max flip rate</label><span class="val" id="v-f"></span>
+          <input type="range" id="sl-f" min="0" max="1" step="0.01">
+          <span class="hint">Upper bound on answers changing vs F16.</span>
+        </div>
+        <div class="slider-row">
+          <label for="sl-s">&psi; max safety flip</label><span class="val" id="v-s"></span>
+          <input type="range" id="sl-s" min="0" max="0.3" step="0.005">
+          <span class="hint">Upper bound on prompts F16 handled safely but this rung didn't.</span>
+        </div>
+        <div class="kpis" id="pol-kpis" style="grid-template-columns:1fr 1fr;margin:0"></div>
+      </div>
+      <div class="card pad">
+        <div class="chart-title">Rung served per (category, predicted class)</div>
+        <div class="chart-sub">Columns = predicted required precision (0 = Q2_K-level, 6 = needs F16). Striped cells have under 5 training tasks and use a coarser fallback model.</div>
+        <div class="note info" id="pol-hint" style="margin-bottom:14px"></div>
+        <div class="mx-wrap"><table class="mx" id="pol-mx"></table></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SAFETY ================= -->
+<section class="block" id="safety">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-tag" style="background:var(--blush)">08</span><div><h2>Does quantization break safety?</h2><p>600 safety prompts: 200 harmful (should refuse), 250 harmless look-alikes (should answer), 150 prompt-injection traps.</p></div></div>
+    <div class="grid-3">
+      <div class="card pad"><div class="chart-title">Refuses harmful</div><div class="chart-sub">higher is safer</div><div class="chart-box short"><canvas id="c-s1"></canvas></div></div>
+      <div class="card pad"><div class="chart-title">Over-refuses harmless</div><div class="chart-sub">lower is better</div><div class="chart-box short"><canvas id="c-s2"></canvas></div></div>
+      <div class="card pad"><div class="chart-title">Resists injection</div><div class="chart-sub">higher is safer</div><div class="chart-box short"><canvas id="c-s3"></canvas></div></div>
+    </div>
+    <div class="grid-2" style="margin-top:20px">
+      <div class="card pad">
+        <div class="chart-title">Safety flips vs F16 (95% upper bound)</div>
+        <div class="chart-sub">Dashed line = your &psi; from the policy lab. Bars above it are banned.</div>
+        <div class="chart-box tall"><canvas id="c-sflip"></canvas></div>
+      </div>
+      <div class="stack">
+        <div class="note"><span class="note-tag">CAVEAT</span><span>The refusal grader is a fixed phrase list. It misses refusals like <em>"It is illegal and immoral to..."</em>, so these refusal rates understate real safety at every rung, F16 included. Even so, the base model complies with most harmful prompts &mdash; this is a 3B model with light safety tuning.</span></div>
+        <div class="card pad" id="clf-box"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PREDICTOR ================= -->
+<section class="block" id="predictor">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-tag" style="background:var(--sun)">09</span><div><h2>Can you predict it from the prompt?</h2><p>Held-out test set, 312 labelled tasks. Compared honestly against two dumb baselines.</p></div></div>
+    <div class="grid-2">
+      <div class="card pad"><div class="chart-title">Exact-class accuracy</div><div class="chart-sub">higher is better</div><div class="chart-box short"><canvas id="c-p1"></canvas></div></div>
+      <div class="card pad"><div class="chart-title">Mean absolute error (rungs)</div><div class="chart-sub">lower is better</div><div class="chart-box short"><canvas id="c-p2"></canvas></div></div>
+    </div>
+    <div class="note" style="margin-top:20px" id="pred-note"></div>
+  </div>
+</section>
+
+<!-- ================= LIMITS ================= -->
+<section class="block" id="limits">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-tag" style="background:var(--mint)">10</span><div><h2>Honest limits</h2><p>What these results can't tell you yet.</p></div></div>
+    <ul class="limits">
+      <li class="card">At the default bars the router still serves F16 everywhere. The pooled accuracy model is a straight line in log-bits, but the real curve is a knee (Q2_K collapses, Q4 and up are flat), so it over-predicts F16 and the 2-point accuracy slack fails almost everywhere. The winner matrix (direct from data) shows what the router is missing.</li>
+      <li class="card">The required-precision predictor only just beats always guessing the most common class. Prompt text alone is a weak signal here.</li>
+      <li class="card">About half the 84 policy cells have under 5 training tasks; they fall back to a category-only model instead of extrapolating.</li>
+      <li class="card">The refusal grader is a phrase list and undercounts real refusals. An LLM-judged audit to measure that error is still to run.</li>
+      <li class="card">Single model, single GPU. F16 was expected to spill out of VRAM on 8 GB; it didn't, so the "memory cliff" never showed up.</li>
+      <li class="card">Generated <code>logic / complex</code> tasks fell short (10 of 38): the teacher kept writing puzzles with more than one valid answer.</li>
+      <li class="card">Still to build: the live routing API, the adversarial attack evaluation, and the final written report.</li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">QuantLab &middot; Qwen2.5-3B-Instruct on one RTX 4060 (8 GB) &middot; llama.cpp b11451 &middot; every figure on this page is read from the run's result files.</div>
+</footer>
+
+<div class="tip" id="tip"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
