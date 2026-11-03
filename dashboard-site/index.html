@@ -362,7 +362,7 @@
   <div class="wrap">
     <div class="sec-head"><span class="sec-tag" style="background:var(--mint)">10</span><div><h2>Honest limits</h2><p>What these results can't tell you yet.</p></div></div>
     <ul class="limits">
-      <li class="card">At the default bars the router still serves F16 everywhere. The pooled accuracy model is a straight line in log-bits, but the real curve is a knee (Q2_K collapses, Q4 and up are flat), so it over-predicts F16 and the 2-point accuracy slack fails almost everywhere. The winner matrix (direct from data) shows what the router is missing.</li>
+      <li class="card">At the default bars (&delta;&nbsp;=&nbsp;2&nbsp;pp, &phi;&nbsp;=&nbsp;10%) the router still serves F16 everywhere. That's a sample-size limit: with ~85 tasks per category, a 95% lower bound can't land within 2 points of F16. At &delta;&nbsp;=&nbsp;10% (the Balanced preset) most cells move to Q3&ndash;Q8.</li>
       <li class="card">The required-precision predictor only just beats always guessing the most common class. Prompt text alone is a weak signal here.</li>
       <li class="card">About half the 84 policy cells have under 5 training tasks; they fall back to a category-only model instead of extrapolating.</li>
       <li class="card">The refusal grader is a phrase list and undercounts real refusals. An LLM-judged audit to measure that error is still to run.</li>

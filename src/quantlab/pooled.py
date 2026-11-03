@@ -10,6 +10,15 @@ The complexity regressor is always the cross-fitted pred_class_oof. This
 function refuses to fit on anything else: the observed label or the
 heuristic tier would make a rung's own admissibility partly a function of
 whether it happened to get a task right, the circularity flagged in review.
+
+Deviation from Sec 9.5: the accuracy model gives each rung its own level
+(C(rung)) instead of a straight line in log_bpp. Measured accuracy is a
+knee -- Q2_K collapses, Q4_K_M and above are flat -- and the straight line
+over-predicted F16 (0.79 fitted vs 0.74 observed) while under-predicting
+Q5/Q6, so the accuracy condition rejected every cheaper rung. The flip
+model keeps log_bpp: flip rate falls smoothly with bits, the line fits it
+within two points at every rung, and per-rung levels would hit perfect
+separation (several category x rung cells have zero flips).
 """
 
 from __future__ import annotations
@@ -27,16 +36,38 @@ import statsmodels.formula.api as smf
 from scipy.special import expit
 from statsmodels.tools.sm_exceptions import ConvergenceWarning
 
+from .quants import LADDER
+
 ALLOWED_COMPLEXITY_COL = "pred_class_oof"
 
 
-def _category_term(categories: list[str]) -> str:
-    return f"C(category_pred, levels={list(categories)!r})"
+def _category_term(levels: dict) -> str:
+    return f"C(category_pred, levels={list(levels['categories'])!r})"
 
 
-def _rhs_formula(categories: list[str], complexity: str) -> str:
-    term = _category_term(categories)
-    return f"{term} + {complexity} + log_bpp + {term}:log_bpp + {complexity}:log_bpp"
+def _bits_term(levels: dict) -> str:
+    rungs = levels.get("rungs")
+    return f"C(rung, levels={list(rungs)!r})" if rungs else "log_bpp"
+
+
+def _rhs_formula(levels: dict, complexity: str) -> str:
+    cat, bits = _category_term(levels), _bits_term(levels)
+    return f"{cat} + {complexity} + {bits} + {cat}:{bits} + {complexity}:{bits}"
+
+
+def _coarse_rhs(levels: dict) -> str:
+    cat, bits = _category_term(levels), _bits_term(levels)
+    return f"{cat} + {bits} + {cat}:{bits}"
+
+
+def _levels(df: pd.DataFrame, by_rung: bool) -> dict:
+    """The exact factor levels seen at fit time; persisted alongside the model
+    so prediction can rebuild an identical design matrix."""
+    present = set(df["rung"]) if by_rung else set()
+    return {
+        "categories": sorted(df["category_pred"].unique()),
+        "rungs": [r for r in LADDER if r in present] if by_rung else None,
+    }
 
 
 class PooledModelError(Exception):
@@ -107,8 +138,8 @@ def _fit_with_fallback(
 
 def fit_pooled_model(
     df: pd.DataFrame, response_col: str, complexity_col: str = ALLOWED_COMPLEXITY_COL,
-    force_fallback: bool = False,
-) -> tuple[Any, str, list[str]]:
+    force_fallback: bool = False, by_rung: bool = False,
+) -> tuple[Any, str, dict]:
     if complexity_col != ALLOWED_COMPLEXITY_COL:
         raise ValueError(
             f"complexity_col must be {ALLOWED_COMPLEXITY_COL!r}; got {complexity_col!r} -- "
@@ -117,49 +148,44 @@ def fit_pooled_model(
         )
 
     df = _numeric_response(df, response_col)
-    categories = sorted(df["category_pred"].unique())
-    formula = f"{response_col} ~ " + _rhs_formula(categories, complexity_col)
+    levels = _levels(df, by_rung)
+    formula = f"{response_col} ~ " + _rhs_formula(levels, complexity_col)
     res, backend = _fit_with_fallback(formula, df, response_col, force_fallback)
-    return res, backend, categories
+    return res, backend, levels
 
 
 def fit_coarse_pooled_model(
-    df: pd.DataFrame, response_col: str, force_fallback: bool = False,
-) -> tuple[Any, str, list[str]]:
+    df: pd.DataFrame, response_col: str, force_fallback: bool = False, by_rung: bool = False,
+) -> tuple[Any, str, dict]:
     """Same response, but no pred_class_oof term at all -- used only as a
     fallback for (category, pred_class) cells with too few tasks to support
-    the fully-interacted model (Sec 9.5's formula extrapolates wildly past
-    the edge of its data in those cells; this model never extrapolates
-    along pred_class because it was never fit on it)."""
+    the fully-interacted model, so it never extrapolates along pred_class
+    into cells it has no data for."""
     df = _numeric_response(df, response_col)
-    categories = sorted(df["category_pred"].unique())
-    term = _category_term(categories)
-    formula = f"{response_col} ~ {term} + log_bpp + {term}:log_bpp"
+    levels = _levels(df, by_rung)
+    formula = f"{response_col} ~ " + _coarse_rhs(levels)
     res, backend = _fit_with_fallback(formula, df, response_col, force_fallback)
-    return res, backend, categories
+    return res, backend, levels
 
 
 def predict_with_bounds(
-    res, newdata: pd.DataFrame, z: float, categories: list[str],
+    res, newdata: pd.DataFrame, z: float, levels: dict,
     complexity_col: str = ALLOWED_COMPLEXITY_COL,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Rebuilds the model matrix for newdata from the RHS formula, with
-    categorical levels pinned to exactly the categories seen at fit time,
-    rather than reusing the fitted model's patsy design_info object --
-    patsy's DesignInfo explicitly refuses to pickle, so a design_info
-    captured at fit time cannot survive a joblib round trip into another
-    process. A freshly parsed formula with the same pinned levels
-    reproduces the identical columns deterministically instead."""
-    rhs = _rhs_formula(categories, complexity_col)
-    return _predict_with_rhs(res, newdata, z, rhs)
+    factor levels pinned to exactly those seen at fit time, rather than
+    reusing the fitted model's patsy design_info object -- patsy's
+    DesignInfo explicitly refuses to pickle, so a design_info captured at
+    fit time cannot survive a joblib round trip into another process. A
+    freshly parsed formula with the same pinned levels reproduces the
+    identical columns deterministically instead."""
+    return _predict_with_rhs(res, newdata, z, _rhs_formula(levels, complexity_col))
 
 
 def predict_with_bounds_coarse(
-    res, newdata: pd.DataFrame, z: float, categories: list[str],
+    res, newdata: pd.DataFrame, z: float, levels: dict,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    term = _category_term(categories)
-    rhs = f"{term} + log_bpp + {term}:log_bpp"
-    return _predict_with_rhs(res, newdata, z, rhs)
+    return _predict_with_rhs(res, newdata, z, _coarse_rhs(levels))
 
 
 def _predict_with_rhs(res, newdata: pd.DataFrame, z: float, rhs: str) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -276,10 +302,10 @@ def fit_pooled_models(
     acc_df = build_accuracy_df(grid_path, tasks_path, pred_path, bpp)
     flip_df = build_flip_df(grid_path, tasks_path, pred_path, bpp)
 
-    acc_res, acc_backend, acc_categories = fit_pooled_model(acc_df, response_col="correct")
-    flip_res, flip_backend, flip_categories = fit_pooled_model(flip_df, response_col="flipped")
+    acc_res, acc_backend, acc_levels = fit_pooled_model(acc_df, response_col="correct", by_rung=True)
+    flip_res, flip_backend, flip_levels = fit_pooled_model(flip_df, response_col="flipped")
 
-    acc_coarse_res, acc_coarse_backend, _ = fit_coarse_pooled_model(acc_df, response_col="correct")
+    acc_coarse_res, acc_coarse_backend, _ = fit_coarse_pooled_model(acc_df, response_col="correct", by_rung=True)
     flip_coarse_res, flip_coarse_backend, _ = fit_coarse_pooled_model(flip_df, response_col="flipped")
 
     support = (
@@ -291,7 +317,7 @@ def fit_pooled_models(
     joblib.dump({
         "acc_res": acc_res, "flip_res": flip_res,
         "acc_backend": acc_backend, "flip_backend": flip_backend,
-        "acc_categories": acc_categories, "flip_categories": flip_categories,
+        "acc_levels": acc_levels, "flip_levels": flip_levels,
         "acc_coarse_res": acc_coarse_res, "flip_coarse_res": flip_coarse_res,
         "acc_coarse_backend": acc_coarse_backend, "flip_coarse_backend": flip_coarse_backend,
         "cell_support": support,
@@ -299,13 +325,13 @@ def fit_pooled_models(
 
     result = {
         "accuracy_model": {
-            "backend": acc_backend, "n_rows": len(acc_df),
+            "backend": acc_backend, "bits_term": "C(rung)", "n_rows": len(acc_df),
             "n_tasks": acc_df["task_id"].nunique(),
             "params": {k: float(v) for k, v in zip(acc_res.model.exog_names, acc_res.params)},
             "bse": {k: float(v) for k, v in zip(acc_res.model.exog_names, acc_res.bse)},
         },
         "flip_model": {
-            "backend": flip_backend, "n_rows": len(flip_df),
+            "backend": flip_backend, "bits_term": "log_bpp", "n_rows": len(flip_df),
             "n_tasks": flip_df["task_id"].nunique(),
             "params": {k: float(v) for k, v in zip(flip_res.model.exog_names, flip_res.params)},
             "bse": {k: float(v) for k, v in zip(flip_res.model.exog_names, flip_res.bse)},

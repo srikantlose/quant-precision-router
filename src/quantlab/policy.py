@@ -119,7 +119,7 @@ def fit_policy(
 
     models = joblib.load(pooled_models_path)
     acc_res, flip_res = models["acc_res"], models["flip_res"]
-    acc_categories, flip_categories = models["acc_categories"], models["flip_categories"]
+    acc_levels, flip_levels = models["acc_levels"], models["flip_levels"]
     acc_coarse_res, flip_coarse_res = models["acc_coarse_res"], models["flip_coarse_res"]
     cell_support = models["cell_support"]
 
@@ -150,20 +150,20 @@ def fit_policy(
             low_support = n_support < MIN_SUPPORT_TASKS
 
             acc_newdata = pd.DataFrame([
-                {"category_pred": category, "pred_class_oof": pred_class, "log_bpp": log_bpp[rung]}
+                {"category_pred": category, "pred_class_oof": pred_class, "rung": rung, "log_bpp": log_bpp[rung]}
                 for rung in LADDER
             ])
             flip_newdata = pd.DataFrame([
-                {"category_pred": category, "pred_class_oof": pred_class, "log_bpp": log_bpp[rung]}
+                {"category_pred": category, "pred_class_oof": pred_class, "rung": rung, "log_bpp": log_bpp[rung]}
                 for rung in NON_REFERENCE
             ])
 
             if low_support:
-                acc_point, acc_lcb_arr, _ = predict_with_bounds_coarse(acc_coarse_res, acc_newdata, z, acc_categories)
-                _, _, flip_ucb_arr = predict_with_bounds_coarse(flip_coarse_res, flip_newdata, z, flip_categories)
+                acc_point, acc_lcb_arr, _ = predict_with_bounds_coarse(acc_coarse_res, acc_newdata, z, acc_levels)
+                _, _, flip_ucb_arr = predict_with_bounds_coarse(flip_coarse_res, flip_newdata, z, flip_levels)
             else:
-                acc_point, acc_lcb_arr, _ = predict_with_bounds(acc_res, acc_newdata, z, acc_categories)
-                _, _, flip_ucb_arr = predict_with_bounds(flip_res, flip_newdata, z, flip_categories)
+                acc_point, acc_lcb_arr, _ = predict_with_bounds(acc_res, acc_newdata, z, acc_levels)
+                _, _, flip_ucb_arr = predict_with_bounds(flip_res, flip_newdata, z, flip_levels)
 
             acc_by_rung = {rung: float(acc_point[i]) for i, rung in enumerate(LADDER)}
             acc_lcb_by_rung = {rung: float(acc_lcb_arr[i]) for i, rung in enumerate(LADDER)}

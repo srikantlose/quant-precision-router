@@ -40,23 +40,23 @@ def test_circularity_guard_rejects_label_columns():
 
 def test_accuracy_model_bounds_ordering():
     df = _synthetic_df()
-    res, backend, categories = fit_pooled_model(df, response_col="correct", complexity_col="pred_class_oof")
+    res, backend, levels = fit_pooled_model(df, response_col="correct", complexity_col="pred_class_oof")
     newdata = pd.DataFrame([
         {"category_pred": "math", "pred_class_oof": 3, "log_bpp": np.log(2.0)},
         {"category_pred": "code_gen", "pred_class_oof": 5, "log_bpp": np.log(8.0)},
     ])
-    point, lcb, ucb = predict_with_bounds(res, newdata, z=1.645, categories=categories)
+    point, lcb, ucb = predict_with_bounds(res, newdata, z=1.645, levels=levels)
     assert all(lcb <= point) and all(point <= ucb)
     assert backend in ("gee", "glm_cluster")
 
 
 def test_glm_fallback_path_produces_usable_bounds():
     df = _synthetic_df()
-    res, backend, categories = fit_pooled_model(df, response_col="correct", complexity_col="pred_class_oof",
+    res, backend, levels = fit_pooled_model(df, response_col="correct", complexity_col="pred_class_oof",
                                                 force_fallback=True)
     assert backend == "glm_cluster"
     newdata = pd.DataFrame([{"category_pred": "math", "pred_class_oof": 1, "log_bpp": np.log(1.0)}])
-    point, lcb, ucb = predict_with_bounds(res, newdata, z=1.645, categories=categories)
+    point, lcb, ucb = predict_with_bounds(res, newdata, z=1.645, levels=levels)
     assert lcb[0] <= point[0] <= ucb[0]
 
 
@@ -65,14 +65,37 @@ def test_boolean_response_is_not_inverted():
     # P(False); every pooled prediction once came out as its complement.
     df = _synthetic_df()
     assert df["correct"].dtype == bool
-    res, _, categories = fit_pooled_model(df, response_col="correct", complexity_col="pred_class_oof")
+    res, _, levels = fit_pooled_model(df, response_col="correct", complexity_col="pred_class_oof")
     lo = pd.DataFrame([{"category_pred": "math", "pred_class_oof": 3, "log_bpp": np.log(0.3)}])
     hi = pd.DataFrame([{"category_pred": "math", "pred_class_oof": 3, "log_bpp": np.log(16.0)}])
-    p_lo = predict_with_bounds(res, lo, z=1.645, categories=categories)[0][0]
-    p_hi = predict_with_bounds(res, hi, z=1.645, categories=categories)[0][0]
+    p_lo = predict_with_bounds(res, lo, z=1.645, levels=levels)[0][0]
+    p_hi = predict_with_bounds(res, hi, z=1.645, levels=levels)[0][0]
     assert p_hi > p_lo  # the synthetic truth: more bits -> more likely correct
     fitted = np.asarray(res.predict(df.assign(correct=df["correct"].astype(float))))
     assert abs(fitted.mean() - df["correct"].mean()) < 0.03
+
+
+def test_by_rung_model_fits_a_knee():
+    # Accuracy that collapses at the lowest rung and is flat above it: a
+    # straight line in log_bpp can't follow this; per-rung levels must.
+    rng = np.random.default_rng(7)
+    rungs = ["Q2_K", "Q4_K_M", "Q8_0", "F16"]
+    truth = {"Q2_K": 0.30, "Q4_K_M": 0.80, "Q8_0": 0.80, "F16": 0.80}
+    bpp = {"Q2_K": 0.45, "Q4_K_M": 0.70, "Q8_0": 1.17, "F16": 2.20}
+    rows = []
+    for i in range(400):
+        for r in rungs:
+            rows.append({"task_id": f"t{i}", "category_pred": ["math", "ner"][i % 2],
+                         "pred_class_oof": int(rng.integers(0, 7)), "rung": r,
+                         "log_bpp": np.log(bpp[r]), "correct": bool(rng.random() < truth[r])})
+    df = pd.DataFrame(rows)
+    res, _, levels = fit_pooled_model(df, response_col="correct", complexity_col="pred_class_oof", by_rung=True)
+    assert levels["rungs"] == rungs
+    newdata = pd.DataFrame([{"category_pred": "math", "pred_class_oof": 3, "rung": r,
+                             "log_bpp": np.log(bpp[r])} for r in rungs])
+    point = predict_with_bounds(res, newdata, z=1.645, levels=levels)[0]
+    for r, p in zip(rungs, point):
+        assert abs(p - truth[r]) < 0.08, (r, p)
 
 
 class _DivergedGEEResult:
