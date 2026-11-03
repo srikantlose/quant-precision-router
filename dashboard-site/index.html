@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QuantLab — Precision Routing Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<style>
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0b1220; }
+  .tab-btn.active { background: linear-gradient(135deg,#6366f1,#8b5cf6); color: white; }
+  .card { background: #131b2e; border: 1px solid #232e45; border-radius: 16px; }
+  .glow { box-shadow: 0 0 40px rgba(99,102,241,0.15); }
+  ::-webkit-scrollbar { height: 8px; width: 8px; }
+  ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+  .rung-chip { display:inline-block; padding:2px 10px; border-radius:999px; font-size:12px; font-weight:600; }
+</style>
+</head>
+<body class="text-slate-200">
+
+<div class="max-w-7xl mx-auto px-4 py-8">
+
+  <header class="mb-8">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <h1 class="text-3xl font-bold text-white flex items-center gap-3">
+          <span>⚡</span> QuantLab
+        </h1>
+        <p class="text-slate-400 mt-1">Complexity-aware quantization precision routing — Qwen2.5-3B-Instruct, 7-rung GGUF ladder, measured on real hardware.</p>
+      </div>
+      <div id="status-badge" class="card px-4 py-3 text-sm glow">
+        <span class="text-slate-400">Status:</span> <span class="text-emerald-400 font-semibold">Benchmarking + Analysis complete</span><br>
+        <span class="text-slate-500 text-xs">Serving API, adversarial eval & final report still in progress</span>
+      </div>
+    </div>
+  </header>
+
+  <div id="kpi-row" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"></div>
+
+  <nav class="flex gap-2 flex-wrap mb-6" id="tabs"></nav>
+
+  <main id="panels"></main>
+
+  <footer class="mt-12 pt-6 border-t border-slate-800 text-slate-500 text-sm">
+    Measured on one RTX 4060 (8GB). All numbers on this page come straight from this run's result files — nothing here is simulated or illustrative.
+  </footer>
+</div>
+
+<script>
+const LADDER = ["Q2_K","Q3_K_M","Q4_K_M","Q5_K_M","Q6_K","Q8_0","F16"];
+const RUNG_COLORS = {
+  Q2_K:"#f87171", Q3_K_M:"#fb923c", Q4_K_M:"#facc15", Q5_K_M:"#a3e635",
+  Q6_K:"#34d399", Q8_0:"#22d3ee", F16:"#818cf8"
+};
+const CATEGORIES = ["math","multiple_choice","factual_qa","classification","sentiment",
+  "extraction","language","logic","summarization","ner","code_gen","code_debug"];
+
+let DATA = null;
+
+function chip(rung) {
+  return `<span class="rung-chip" style="background:${RUNG_COLORS[rung]}22;color:${RUNG_COLORS[rung]}">${rung}</span>`;
+}
+
+function kpi(label, value, sub) {
+  return `<div class="card p-4">
+    <div class="text-slate-400 text-xs uppercase tracking-wide">${label}</div>
+    <div class="text-2xl font-bold text-white mt-1">${value}</div>
+    ${sub ? `<div class="text-slate-500 text-xs mt-1">${sub}</div>` : ""}
+  </div>`;
+}
+
+function renderKPIs() {
+  const accs = LADDER.map(r => DATA.rungs[r].bench_accuracy);
+  const el = document.getElementById("kpi-row");
+  el.innerHTML = [
+    kpi("Grid rows", DATA.meta.n_grid_rows.toLocaleString(), "7 rungs × full bench+safety slice"),
+    kpi("Bench accuracy range", `${Math.round(Math.min(...accs)*100)}%–${Math.round(Math.max(...accs)*100)}%`, "Q2_K → best rung"),
+    kpi("F16 bench accuracy", `${Math.round(DATA.rungs.F16.bench_accuracy*100)}%`, "reference rung, fully resident in VRAM"),
+    kpi("Predictor vs baseline", `${Math.round(DATA.predictor_metrics.test_exact_accuracy*100)}%`, `majority baseline: ${Math.round(DATA.predictor_metrics.baseline_majority_class_accuracy*100)}%`),
+  ].join("");
+}
+
+const TABS = [
+  {id:"overview", label:"📊 Overview"},
+  {id:"accuracy", label:"🎯 Accuracy & Fidelity"},
+  {id:"cost", label:"💾 Cost & VRAM"},
+  {id:"kl", label:"🔬 KL Divergence"},
+  {id:"predictor", label:"🧠 Predictor"},
+  {id:"policy", label:"🗺️ Policy Map"},
+  {id:"safety", label:"🛡️ Safety"},
+  {id:"limitations", label:"⚠️ Honest Limitations"},
+];
+
+function renderTabs() {
+  const nav = document.getElementById("tabs");
+  nav.innerHTML = TABS.map((t,i) => `<button class="tab-btn px-4 py-2 rounded-full text-sm font-medium bg-slate-800 text-slate-300 transition ${i===0?'active':''}" data-tab="${t.id}">${t.label}</button>`).join("");
+  nav.querySelectorAll(".tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      nav.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      showPanel(btn.dataset.tab);
+    });
+  });
+}
+
+function panelWrap(title, sub, bodyHtml) {
+  return `<div class="card p-6">
+    <h2 class="text-xl font-bold text-white mb-1">${title}</h2>
+    ${sub ? `<p class="text-slate-400 text-sm mb-5">${sub}</p>` : '<div class="mb-5"></div>'}
+    ${bodyHtml}
+  </div>`;
+}
+
+function showPanel(id) {
+  const root = document.getElementById("panels");
+  root.innerHTML = `<div id="panel-inner"></div>`;
+  const inner = document.getElementById("panel-inner");
+
+  if (id === "overview") {
+    inner.innerHTML = panelWrap("Project at a glance",
+      "One model, seven precisions, measured end to end.",
+      `<div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <canvas id="chart-overview-acc" height="220"></canvas>
+        </div>
+        <div class="text-sm text-slate-300 space-y-3">
+          <p><span class="text-indigo-400 font-semibold">What this is:</span> Qwen2.5-3B-Instruct served at 7 GGUF quantization levels (Q2_K through F16) via llama.cpp, benchmarked on ~1,467 graded tasks across 12 categories plus a 600-prompt safety slice (XSTest + prompt injections), all on one RTX 4060.</p>
+          <p><span class="text-indigo-400 font-semibold">Why:</span> Picking a quantization level is usually a single global choice. This project asks: does the <em>right</em> precision depend on what the prompt actually needs?</p>
+          <p><span class="text-indigo-400 font-semibold">Pipeline so far:</span> benchmark grid → corpus KL-divergence → required-precision labels → predictor → pooled statistical models → selection policy → safety classifier.</p>
+        </div>
+      </div>`);
+    new Chart(document.getElementById("chart-overview-acc"), {
+      type: "bar",
+      data: { labels: LADDER, datasets: [{ label: "Bench accuracy", data: LADDER.map(r=>DATA.rungs[r].bench_accuracy),
+        backgroundColor: LADDER.map(r=>RUNG_COLORS[r]) }] },
+      options: { plugins: { legend: { display:false } }, scales: { y: { beginAtZero:true, max:1, ticks:{color:"#94a3b8"} }, x:{ticks:{color:"#94a3b8"}} } }
+    });
+
+  } else if (id === "accuracy") {
+    inner.innerHTML = panelWrap("Accuracy and behavioral fidelity across the ladder",
+      "Fidelity = fraction of bench tasks where a rung's correctness flips relative to F16 (both directions, symmetric).",
+      `<canvas id="chart-acc-cat" height="280"></canvas>`);
+    const catData = CATEGORIES.map(c => LADDER.map(r => (DATA.by_category[r][c]||{}).accuracy ?? null));
+    new Chart(document.getElementById("chart-acc-cat"), {
+      type: "bar",
+      data: { labels: CATEGORIES, datasets: LADDER.map((r,i) => ({
+        label: r, data: catData.map(row=>row[i]), backgroundColor: RUNG_COLORS[r]
+      })) },
+      options: { plugins:{legend:{labels:{color:"#cbd5e1"}}}, scales:{ y:{beginAtZero:true,max:1,ticks:{color:"#94a3b8"}}, x:{ticks:{color:"#94a3b8"}} } }
+    });
+
+  } else if (id === "cost") {
+    inner.innerHTML = panelWrap("Measured VRAM footprint and bits-per-weight",
+      "Every number here was measured fresh per rung, not computed from file size alone.",
+      `<div class="grid md:grid-cols-2 gap-6">
+        <canvas id="chart-vram" height="240"></canvas>
+        <canvas id="chart-bpw" height="240"></canvas>
+      </div>
+      <p class="text-slate-400 text-sm mt-4">All seven rungs were fully VRAM-resident on this 8GB card at profiling time — F16 was expected to require partial CPU offload but did not, which is noted in Limitations.</p>`);
+    new Chart(document.getElementById("chart-vram"), {
+      type: "bar",
+      data: { labels: LADDER, datasets:[{label:"VRAM (MB)", data: LADDER.map(r=>DATA.rungs[r].vram_mb), backgroundColor: LADDER.map(r=>RUNG_COLORS[r])}] },
+      options: { plugins:{legend:{display:false},title:{display:true,text:"VRAM footprint",color:"#cbd5e1"}}, scales:{y:{ticks:{color:"#94a3b8"}},x:{ticks:{color:"#94a3b8"}}} }
+    });
+    new Chart(document.getElementById("chart-bpw"), {
+      type: "line",
+      data: { labels: LADDER, datasets:[{label:"bits/weight", data: LADDER.map(r=>DATA.rungs[r].bpw), borderColor:"#818cf8", backgroundColor:"#818cf833", fill:true, tension:0.3}] },
+      options: { plugins:{legend:{display:false},title:{display:true,text:"Bits per weight",color:"#cbd5e1"}}, scales:{y:{ticks:{color:"#94a3b8"}},x:{ticks:{color:"#94a3b8"}}} }
+    });
+
+  } else if (id === "kl") {
+    inner.innerHTML = panelWrap("Corpus KL-divergence vs F16 (WikiText-2)",
+      "Measured with llama.cpp's own --kl-divergence pass, 40 chunks of 4096 tokens. Strictly monotone — a basic sanity check this project's own differential-test design relies on.",
+      `<canvas id="chart-kl" height="260"></canvas>`);
+    const klVals = LADDER.filter(r=>r!=="F16").map(r => DATA.kl[r].mean_kld);
+    new Chart(document.getElementById("chart-kl"), {
+      type: "line",
+      data: { labels: LADDER.filter(r=>r!=="F16"), datasets:[{label:"Mean KL divergence", data: klVals, borderColor:"#22d3ee", backgroundColor:"#22d3ee33", fill:true, tension:0.3}] },
+      options: { scales: { y: { type:"logarithmic", ticks:{color:"#94a3b8"} }, x:{ticks:{color:"#94a3b8"}} }, plugins:{legend:{display:false}} }
+    });
+
+  } else if (id === "predictor") {
+    const m = DATA.predictor_metrics;
+    inner.innerHTML = panelWrap("Required-precision predictor",
+      "Cross-fitted 5-fold out-of-fold predictions on train; metrics below are on the held-out test split.",
+      `<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        ${kpi("Exact accuracy", Math.round(m.test_exact_accuracy*100)+"%", "7-way class")}
+        ${kpi("Within one rung", Math.round(m.test_within_one_accuracy*100)+"%", "")}
+        ${kpi("MAE (rungs)", m.test_mae.toFixed(2), "lower is better")}
+        ${kpi("Macro F1", m.test_macro_f1.toFixed(2), "")}
+      </div>
+      <div class="mt-5 text-sm text-slate-300 bg-amber-950/40 border border-amber-800/40 rounded-xl p-4">
+        ⚠️ <strong>Honest callout:</strong> exact accuracy (${Math.round(m.test_exact_accuracy*100)}%) is barely above a plain majority-class baseline (${Math.round(m.baseline_majority_class_accuracy*100)}%), and MAE is slightly <em>worse</em> than a trivial per-category-median baseline (${m.baseline_per_category_median_mae.toFixed(2)} vs ${m.baseline_per_category_median_mae.toFixed(2)}). Required precision is genuinely hard to predict from prompt text alone for this model.
+      </div>`);
+
+  } else if (id === "policy") {
+    renderPolicy(inner);
+
+  } else if (id === "safety") {
+    inner.innerHTML = panelWrap("Safety behaviour across the ladder",
+      "Directional safety-flip rate: F16 was safe and this rung was not. XSTest harmful + injection prompts, train split, Wilson 95% upper bound.",
+      `<canvas id="chart-safety" height="260"></canvas>
+      <div class="mt-5 text-sm text-slate-300 bg-amber-950/40 border border-amber-800/40 rounded-xl p-4">
+        ⚠️ <strong>Honest callout:</strong> the string-match refusal grader undercounts real refusals — many moralizing declines ("it is illegal and immoral to...") don't match the fixed refusal-phrase list, so raw harmful-refusal rates here likely understate true safety. A planned LLM-judged audit calibrates this gap; not yet run.
+      </div>`);
+    const flipUcb = LADDER.filter(r=>r!=="F16").map(r => DATA.safety_by_rung[r].safety_flip_ucb);
+    new Chart(document.getElementById("chart-safety"), {
+      type:"bar",
+      data: { labels: LADDER.filter(r=>r!=="F16"), datasets:[{label:"safety_flip UCB", data: flipUcb, backgroundColor: LADDER.filter(r=>r!=="F16").map(r=>RUNG_COLORS[r])}] },
+      options: { scales: { y:{beginAtZero:true,ticks:{color:"#94a3b8"}}, x:{ticks:{color:"#94a3b8"}} }, plugins:{legend:{display:false}} }
+    });
+
+  } else if (id === "limitations") {
+    inner.innerHTML = panelWrap("What this project is honest about",
+      "Reported plainly, not buried — per this project's own ground rule.",
+      `<ul class="text-sm text-slate-300 space-y-3 list-disc pl-5">
+        <li>The required-precision predictor barely beats a majority-class baseline (see Predictor tab) — prompt text alone is a weak signal for this task/model combination.</li>
+        <li>About half of the 84 (category, predicted-class) policy cells had fewer than 5 training tasks; those now use a coarser category-only fallback model instead of letting sparse-data extrapolation produce meaningless confidence bounds.</li>
+        <li>At the default operating point (δ=0.02, φ=0.10, ψ=0.05), F16 is selected in effectively every cell — measured per-cell behavioral flip rates are high enough, and the fidelity threshold strict enough, that cheaper rungs rarely clear the bar. A fuller sweep across looser operating points is still pending.</li>
+        <li>The refusal grader is a fixed string-match list; it misses non-templated refusals ("this is never acceptable..."), likely understating real safety behavior at every rung including F16.</li>
+        <li>F16 was expected to require partial CPU offload on this 8GB card; it was fully VRAM-resident instead.</li>
+        <li><code>logic/complex</code> generated tasks fell short of target (10/38) — the teacher model produced many non-uniquely-solvable puzzles; accepted as a documented shortfall.</li>
+        <li>Serving API, adversarial robustness evaluation, and the final written report are not yet built — this dashboard reflects the benchmarking + analysis phases only.</li>
+      </ul>`);
+  }
+}
+
+function renderPolicy(inner) {
+  const cells = DATA.policy.cells;
+  inner.innerHTML = panelWrap("Selection policy map",
+    `Operating point: δ=${DATA.policy.operating_point.delta}, φ=${DATA.policy.operating_point.phi}, ψ=${DATA.policy.operating_point.psi}. Safety floor: ${chip(DATA.policy.safety_floor)}. Rows = category, columns = predicted required-precision class (0=cheapest, 6=F16-required).`,
+    `<div class="overflow-x-auto">
+      <table class="w-full text-xs text-center border-separate" style="border-spacing:4px">
+        <thead><tr><th class="text-left text-slate-500 pr-2">category \\ class</th>${[0,1,2,3,4,5,6].map(c=>`<th class="text-slate-500">${c}</th>`).join("")}</tr></thead>
+        <tbody>
+          ${CATEGORIES.map(cat => `<tr>
+            <td class="text-left text-slate-400 pr-2 whitespace-nowrap">${cat}</td>
+            ${[0,1,2,3,4,5,6].map(cls => {
+              const cell = cells[`${cat}|${cls}`];
+              const rung = cell.rung;
+              const low = cell.low_support;
+              return `<td title="${cat}|${cls}: ${rung}, support=${cell.n_support_tasks} tasks${low?' (low support, coarse fallback)':''}"
+                style="background:${RUNG_COLORS[rung]}${low?'18':'33'};color:${RUNG_COLORS[rung]};border:1px ${low?'dashed':'solid'} ${RUNG_COLORS[rung]}55"
+                class="rounded-lg py-2 font-semibold cursor-help">${rung.replace('_K','').replace('_M','')}${low?'·':''}</td>`;
+            }).join("")}
+          </tr>`).join("")}
+        </tbody>
+      </table>
+    </div>
+    <p class="text-slate-500 text-xs mt-4">Dashed border + "·" = low-support cell (fewer than 5 training tasks), served by the coarse category-only fallback model. Hover any cell for details.</p>`);
+}
+
+fetch("./dashboard_data.json").then(r => r.json()).then(d => {
+  DATA = d;
+  renderKPIs();
+  renderTabs();
+  showPanel("overview");
+});
+</script>
+</body>
+</html>
