@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>QuantLab — which quantization does each task need?</title>
+<title>QuantRoute: Serving Each LLM Prompt at the Cheapest Quantization Level That Stays Accurate and Safe</title>
 <meta name="description" content="Qwen2.5-3B-Instruct measured across seven GGUF quantization levels on one RTX 4060: accuracy, fidelity, safety and cost, per task category and complexity.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,6 +15,7 @@
   .hero-grid { display: grid; gap: 32px; grid-template-columns: 1fr; align-items: center; }
   @media (min-width: 920px) { .hero-grid { grid-template-columns: 1.05fr 0.95fr; } }
   .hero h1 { font-size: clamp(40px, 6.2vw, 72px); font-weight: 800; }
+  .eyebrow { display: inline-block; font-weight: 700; font-size: 15px; line-height: 1.4; padding: 7px 13px; border: 2px solid var(--line); border-radius: 10px; background: var(--paper); box-shadow: var(--shadow-sm); max-width: 580px; }
   .hero h1 .hl { background: var(--sun); padding: 0 .12em; border-radius: 10px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
   .hero .lede { font-size: 19px; color: var(--ink-2); max-width: 560px; margin: 20px 0 26px; }
   .stat-strip { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-width: 560px; }
@@ -72,7 +73,7 @@
         <rect x="13.5" y="14" width="5" height="12" fill="#d05320" stroke="#151515" stroke-width="1.5"/>
         <rect x="21" y="7" width="5" height="19" fill="#151515" stroke="#151515" stroke-width="1.5"/>
       </svg>
-      QuantLab
+      QuantRoute
     </a>
     <nav class="nav" id="nav">
       <a href="#how">How</a>
@@ -96,7 +97,7 @@
 <section class="hero">
   <div class="wrap hero-grid">
     <div>
-      <span class="sticker">Qwen2.5-3B-Instruct &middot; GGUF &middot; llama.cpp</span>
+      <span class="eyebrow">QuantRoute: Serving Each LLM Prompt at the Cheapest Quantization Level That Stays Accurate and Safe</span>
       <h1 style="margin-top:18px">Which <span class="hl">quantization</span> does each task actually need?</h1>
       <p class="lede">One model, served at seven precisions, run through 2,067 prompts each on a single RTX&nbsp;4060. Every number below is measured, not estimated.</p>
       <div class="stat-strip" id="hero-stats"></div>
@@ -376,7 +377,7 @@
 </main>
 
 <footer>
-  <div class="wrap">QuantLab &middot; Qwen2.5-3B-Instruct on one RTX 4060 (8 GB) &middot; llama.cpp b11451 &middot; every figure on this page is read from the run's result files.</div>
+  <div class="wrap">QuantRoute &middot; Qwen2.5-3B-Instruct on one RTX 4060 (8 GB) &middot; llama.cpp b11451 &middot; every figure on this page is read from the run's result files.</div>
 </footer>
 
 <div class="tip" id="tip"></div>

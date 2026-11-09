@@ -75,7 +75,7 @@ class BudgetExhausted(GenerationError):
 # per the plan's Appendix B). Only `grader`, `instructions`, `example_schema`
 # and optional `max_tokens`/`temperature`/`grader_override` matter here --
 # the per-category/per-total `count` fields from the original are dropped,
-# since QuantLab targets a fixed count PER (category, tier) CELL instead.
+# since QuantRoute targets a fixed count PER (category, tier) CELL instead.
 # --------------------------------------------------------------------------
 
 GEN_SPECS: dict[str, dict] = {

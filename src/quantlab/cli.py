@@ -1,4 +1,4 @@
-"""QuantLab command-line entry point.
+"""QuantRoute command-line entry point.
 
 Sub-commands are registered here as later phases add them (bench,
 profile-quants, kl, analyze, audit-refusals, adversarial, serve).

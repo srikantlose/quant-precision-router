@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>QuantLab — Objectives</title>
+<title>QuantRoute — Objectives</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=DM+Sans:opsz,wght@9..40,400..700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -29,7 +29,7 @@
   /* cover */
   .cover { display: grid; grid-template-columns: 1.08fr 0.92fr; gap: 28px; align-items: center; }
   .cover h1 { font-size: 112px; font-weight: 800; }
-  .cover h2 { font-size: 40px; font-weight: 700; margin-top: 14px; max-width: 600px; }
+  .cover h2 { font-size: 31px; font-weight: 700; margin-top: 14px; max-width: 600px; line-height: 1.18; }
   .hl { background: var(--sun); padding: 0 .12em; border-radius: 10px; }
   .cover p.lede { font-size: 19px; color: var(--ink-2); line-height: 1.5; margin-top: 18px; max-width: 590px; }
   .stats { display: flex; gap: 12px; margin-top: 26px; }
@@ -221,7 +221,7 @@
     decide: `<svg width="58" height="58" viewBox="0 0 64 64"><path d="M6 32 H26 M26 32 C36 32 36 14 50 14 M26 32 H50 M26 32 C36 32 36 50 50 50" fill="none" stroke="#151515" stroke-width="3.5" stroke-linecap="round"/><g stroke="#151515" stroke-width="2.5"><rect x="48" y="8" width="12" height="12" rx="3" fill="#ff8d65"/><rect x="48" y="26" width="12" height="12" rx="3" fill="#d05320"/><rect x="48" y="44" width="12" height="12" rx="3" fill="#151515"/></g><circle cx="8" cy="32" r="5" fill="#ffc832" stroke="#151515" stroke-width="2.5"/></svg>`,
   };
   const arrow = `<svg width="40" height="40" viewBox="0 0 40 40"><path d="M4 20 H30 M22 11 L32 20 L22 29" fill="none" stroke="#151515" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-  const foot = (n) => `<div class="foot"><span>QuantLab · Qwen2.5-3B-Instruct · 7 GGUF rungs · RTX 4060 (8 GB)</span><span>${n} / 6</span></div>`;
+  const foot = (n) => `<div class="foot"><span>QuantRoute · Qwen2.5-3B-Instruct · 7 GGUF rungs · RTX 4060 (8 GB)</span><span>${n} / 6</span></div>`;
 
   // ---- pages
   const pages = [];
@@ -229,8 +229,8 @@
   pages.push(`<section class="page"><div class="cover" style="height:100%">
     <div>
       <span class="tag" style="background:var(--sun)">Objectives brief</span>
-      <h1 style="margin-top:22px">QuantLab</h1>
-      <h2>Which <span class="hl">quantization</span> does each task actually need?</h2>
+      <h1 style="margin-top:22px">QuantRoute</h1>
+      <h2>Serving each LLM prompt at the <span class="hl">cheapest quantization level</span> that stays accurate and safe</h2>
       <p class="lede">Three objectives, the research gaps each one closes, and what each has delivered &mdash; measured on Qwen2.5-3B-Instruct across seven GGUF quantization levels on a single RTX&nbsp;4060.</p>
       <div class="stats">
         <div class="stat" style="background:var(--sun)"><div class="n">${D.meta.n_grid_rows.toLocaleString()}</div><div class="l">graded runs</div></div>

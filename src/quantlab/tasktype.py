@@ -185,10 +185,10 @@ def extract_answer(task_type: str, raw_text: str, extract_final_fn) -> str:
     return extract_final_fn(text)
 
 
-# --- QuantLab additions: 12-category mapping for benchmarking/routing -----
+# --- QuantRoute additions: 12-category mapping for benchmarking/routing -----
 #
 # classify() above returns a *prompting-profile* label (11 of CheapRoute's
-# original categories plus the "mc" / "short_qa" aliases below). QuantLab's
+# original categories plus the "mc" / "short_qa" aliases below). QuantRoute's
 # benchmark and policy are keyed on 12 *data* categories matching the seed
 # task set's `type` field. CATEGORY_MAP translates between the two; every
 # other classify() label is already spelled identically to its category.

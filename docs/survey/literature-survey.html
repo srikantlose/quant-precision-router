@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>QuantRoute — Literature Survey, Research Gap and Project Objectives</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4; margin: 18mm 17mm 20mm; }
+  @page wide { size: A4 landscape; margin: 13mm 13mm 17mm; }
+  :root { --ink: #151515; --ink-2: #3f3c35; --muted: #77726a; --line: #151515; --grid: #e6dfd2;
+          --sun: #ffc832; --mint: #2ed3a0; --mint-soft: #e3f8ef; --sky: #bcd3ff; --blush: #ffd9c7; --cream: #fff7ea; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "DM Sans", system-ui, sans-serif; color: var(--ink); font-size: 10.3pt; line-height: 1.55; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  h1, h2, h3 { font-family: "Bricolage Grotesque", "DM Sans", sans-serif; letter-spacing: -0.015em; line-height: 1.12; }
+  p { text-align: justify; hyphens: auto; }
+  .cite { font-family: "JetBrains Mono", monospace; font-size: 0.82em; font-weight: 700; white-space: nowrap; }
+
+  .titleblock { border: 2px solid var(--line); border-radius: 14px; background: var(--cream); padding: 18px 22px 16px; box-shadow: 4px 4px 0 var(--line); margin-bottom: 20px; }
+  .tag { display: inline-block; font-family: "JetBrains Mono", monospace; font-size: 8pt; font-weight: 700; padding: 3px 8px; border: 1.5px solid var(--line); border-radius: 6px; background: var(--sun); }
+  .titleblock h1 { font-size: 23pt; font-weight: 800; margin-top: 10px; }
+  .titleblock .sub { font-style: italic; color: var(--ink-2); font-size: 11.5pt; margin-top: 6px; }
+  .titleblock .meta { font-size: 9pt; color: var(--muted); margin-top: 8px; }
+
+  h2.part { font-size: 16pt; font-weight: 800; margin: 4px 0 12px; display: flex; align-items: center; gap: 10px; }
+  h2.part .num { font-family: "JetBrains Mono", monospace; font-size: 10pt; border: 1.5px solid var(--line); border-radius: 7px; padding: 2px 8px; background: var(--sun); }
+  .module { margin-bottom: 14px; }
+  .module h3 { font-size: 12pt; font-weight: 800; margin-bottom: 5px; display: flex; gap: 8px; align-items: baseline; break-after: avoid; }
+  .module h3 .m { font-family: "JetBrains Mono", monospace; font-size: 8.5pt; color: var(--muted); font-weight: 700; flex: none; }
+  .module > p { margin-bottom: 7px; }
+  .how { border: 1.5px solid var(--line); border-left: 6px solid var(--mint); border-radius: 10px; background: var(--mint-soft); padding: 8px 12px; break-inside: avoid; }
+  .how .k { font-family: "JetBrains Mono", monospace; font-size: 7.8pt; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; display: block; margin-bottom: 2px; }
+  .how p { font-size: 9.9pt; }
+
+  .wide { page: wide; }
+  .tablewrap h2.part { margin-bottom: 4px; }
+  .tablewrap .intro { font-size: 9pt; color: var(--ink-2); margin-bottom: 8px; }
+  table.cmp { width: 100%; border-collapse: collapse; font-size: 7.6pt; line-height: 1.35; border-bottom: 1.5px solid var(--line); }
+  table.cmp thead { display: table-header-group; }
+  table.cmp th { background: var(--ink); color: var(--cream); text-align: left; font-family: "JetBrains Mono", monospace; font-size: 7pt; letter-spacing: .03em; padding: 6px 7px; font-weight: 700; }
+  table.cmp td { padding: 5px 7px; vertical-align: top; border-top: 1px solid var(--grid); }
+  table.cmp tr { break-inside: avoid; }
+  table.cmp tbody tr:nth-child(even) td { background: #fbf8f1; }
+  table.cmp td:first-child { font-weight: 700; white-space: nowrap; }
+  table.cmp td.grp { background: var(--sky) !important; font-family: "JetBrains Mono", monospace; font-size: 7pt; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; padding: 3px 7px; }
+
+  .gaps { list-style: none; display: flex; flex-direction: column; gap: 7px; margin-bottom: 14px; }
+  .gaps li { display: grid; grid-template-columns: 34px 1fr; gap: 8px; align-items: start; }
+  .gaps .g { font-family: "JetBrains Mono", monospace; font-size: 8pt; font-weight: 700; border: 1.5px solid var(--line); border-radius: 6px; padding: 2px 0; text-align: center; background: var(--blush); }
+  .gaps p { margin: 0; }
+  .rationale { border: 1.5px solid var(--line); border-radius: 10px; background: var(--cream); padding: 10px 14px; box-shadow: 3px 3px 0 var(--line); margin-bottom: 22px; break-inside: avoid; }
+  .rationale b.k { font-family: "Bricolage Grotesque", sans-serif; font-size: 11.5pt; }
+
+  .objs { display: flex; flex-direction: column; gap: 10px; }
+  .obj { border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 14px; break-inside: avoid; display: grid; grid-template-columns: 40px 1fr; gap: 12px; }
+  .obj .n { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 22pt; line-height: 1; }
+  .obj h3 { font-size: 11.5pt; font-weight: 800; margin-bottom: 3px; }
+  .obj .gapref { font-family: "JetBrains Mono", monospace; font-size: 7.8pt; font-weight: 700; color: var(--muted); margin-top: 4px; display: block; }
+  .note { font-size: 9pt; color: var(--ink-2); margin-top: 10px; }
+
+  table.vs { font-size: 8.2pt; }
+  table.vs td:first-child { white-space: normal; }
+  .verdict { display: inline-block; font-family: "JetBrains Mono", monospace; font-size: 7pt; font-weight: 700; padding: 2px 7px; border: 1.5px solid var(--line); border-radius: 6px; white-space: nowrap; }
+  .refs { font-size: 8.4pt; line-height: 1.45; }
+  .refs p { text-align: left; padding-left: 30px; text-indent: -30px; margin-bottom: 4px; break-inside: avoid; }
+  .refs .rn { font-family: "JetBrains Mono", monospace; font-weight: 700; display: inline-block; width: 30px; text-indent: 0; }
+  .newpage { break-before: page; }
+</style>
+</head>
+<body>
+
+<div class="titleblock">
+  <span class="tag">QuantRoute · Literature Survey</span>
+  <h1>Literature Survey, Research Gap, and Project Objectives</h1>
+  <div class="sub">QuantRoute: Serving Each LLM Prompt at the Cheapest Quantization Level That Stays Accurate and Safe</div>
+  <div class="meta">Twenty-seven works (2022–2026) grouped into seven topics, each closed by how this project responds. Results quoted for QuantRoute come from its benchmark of Qwen2.5-3B-Instruct at seven GGUF quantization levels on one RTX 4060.</div>
+</div>
+
+<h2 class="part"><span class="num">§</span>Literature Survey</h2>
+
+<div class="module">
+  <h3><span class="m">MODULE 1</span>Quantization Algorithms and the Bit-Width Frontier</h3>
+  <p>Dettmers et al. [1] showed that naive INT8 quantization fails at scale because a few emergent outlier features dominate the activation range, and isolated them in an FP16 path. GPTQ [2], SmoothQuant [3], AWQ [4] and SqueezeLLM [5] each answer “which weights deserve more bits?” differently — second-order reconstruction, moving activation outliers into the weights, activation-aware scaling of salient channels, and a dense-and-sparse split — pushing weight-only quantization to 3–4 bits, while OmniQuant [24], ternary BitNet b1.58 [25] and microscaling formats [26] extend the family. Dettmers and Zettlemoyer [6] turned the choice into a scaling law from about 35,000 runs: for a fixed bit budget, 4-bit is almost always Pareto-optimal. However, every method allocates bits <i>inside</i> the network and is judged on perplexity and averaged zero-shot accuracy; the deployment model is still one precision serving every request, and the 4-bit answer of [6] is a single global rule derived from pre-instruction-tuned models.</p>
+  <div class="how"><span class="k">How QuantRoute addresses this</span><p>QuantRoute applies the same “spend bits where error hurts” principle across the <i>workload</i>: seven GGUF levels of one model (Q2_K to F16) from one pinned repository, with the level chosen per request. Graded on 12 task categories rather than perplexity, Q4_K_M reaches 72.0% accuracy against F16’s 73.4% using 35% of F16’s memory, while Q2_K collapses to 51.2% — confirming the 4-bit sweet spot of [6] while exposing per-category differences that a single global rule cannot see.</p></div>
+</div>
+
+<div class="module">
+  <h3><span class="m">MODULE 2</span>Empirical Impact of Quantization on Task Accuracy</h3>
+  <p>Huang et al. [7] mapped degradation across ten PTQ and LoRA methods on LLaMA3, finding about 2% loss at 4 bits and collapse below 3 bits. Dutta et al. [8] showed that accuracy parity hides large numbers of answer “flips” and proposed flip rate and KL-divergence as necessary complements. Marchisio et al. [9] and Li et al. [10] showed degradation is task-dependent — non-Latin languages and mathematical reasoning suffer most, with losses up to 32.39% on mathematics — while a code-generation study [27] found 4-bit holds for code but lower bit-widths do not. Lee et al. [11], the closest study, stratified 13 datasets by difficulty and found that hard tasks do not always lose the most: quantization magnifies a model’s existing weaknesses. All of these studies are descriptive — they report accuracy deltas, treat difficulty as a label on a whole dataset, measure no real cost, and stop short of a decision rule.</p>
+  <div class="how"><span class="k">How QuantRoute addresses this</span><p>QuantRoute grades every task at every level and resolves accuracy to 36 cells (12 categories × 3 difficulty tiers), recording flip rate and KL-divergence against F16 as [8] recommends: Q8_0 matches F16’s accuracy within 0.4 points yet changes the outcome on 4.4% of tasks. In 25 of the 36 cells a level of 4 bits or below comes within 2 points of F16 and only 3 cells need F16, supporting [11]: difficulty alone does not dictate precision. These measurements then feed a selection rule rather than ending as a table.</p></div>
+</div>
+
+<div class="module">
+  <h3><span class="m">MODULE 3</span>Per-Prompt Difficulty Estimation</h3>
+  <p>Ding et al.’s Hybrid LLM [12] routes queries between a small and a large model on predicted difficulty, cutting large-model calls by up to 40% without losing quality. Zhu et al. [13] read LLM-perceived difficulty from hidden states before a single token is generated, and Zhao et al. [14] use a 32B model’s representations to send each problem to the smallest model likely to solve it. These works show that per-prompt difficulty is cheaply predictable, but every one predicts “will model M answer correctly” and uses the answer to choose between <i>different models</i> — never to choose a numerical precision.</p>
+  <div class="how"><span class="k">How QuantRoute addresses this</span><p>QuantRoute redefines the target as a task’s <b>required precision</b>: the cheapest level that solves it correctly <i>and</i> confidently (mean token log-probability at least τ = −0.229), allowing one failure among the levels above. A cross-fitted classifier on sentence embeddings and 13 surface features predicts it from the prompt alone. The result, reported honestly, is modest — 45.8% exact and 79.8% within one level on 312 held-out tasks, close to a majority-class baseline — showing that prompt text alone is a weak signal and pointing to hidden-state features like those of [13] as the next step.</p></div>
+</div>
+
+<div class="module">
+  <h3><span class="m">MODULE 4</span>Cost-Aware Routing and Model Selection</h3>
+  <p>FrugalGPT [15] cascades queries from cheap to expensive models with up to 98% cost reduction, AutoMix [16] escalates on self-verification through a POMDP meta-router, and RouteLLM [17] trains pre-hoc routers on human preference data, saving 85% on MT-Bench at 95% of GPT-4’s quality. RouterBench [18] standardises evaluation on a cost–performance frontier, and LLMRouterBench [28] shows that several published routers fail to beat simply using the best single model. All of them assume the alternatives are different models with per-token API prices and free switching — assumptions that do not hold for several precisions of one model on local hardware.</p>
+  <div class="how"><span class="k">How QuantRoute addresses this</span><p>QuantRoute routes among bit-widths of <i>one</i> model, prices them as measured local GPU time per 1,000 tasks, and treats switching as a real model load (2.1–5.6 s). A level is served only if it clears an accuracy lower bound, an answer-flip upper bound and a safety bound, and the cheapest level that passes wins. At moderate thresholds the policy serves 64 of 84 cells below F16 at 54% of the always-F16 cost; the held-out comparison against fixed-level baselines — the test [28] shows routers often fail — is the next step.</p></div>
+</div>
+
+<div class="module">
+  <h3><span class="m">MODULE 5</span>Measured Cost and Energy of Quantized Inference</h3>
+  <p>Husom et al. [19] measured energy per token with hardware power meters for 28 quantized LLMs on a Raspberry Pi 4, alongside accuracy on five benchmarks, and Wei et al.’s T-MAC [20] showed that low-bit inference speed depends on the kernel implementation as much as on the bit count. Together they establish that cost is empirical and hardware-specific. However, cost and accuracy are reported side by side rather than optimised together, and neither study targets GPUs, where whether a model fits in video memory matters.</p>
+  <div class="how"><span class="k">How QuantRoute addresses this</span><p>Every level was profiled on the target RTX 4060 — VRAM (1.5–6.1 GB), load time, latency and bits per weight — and these costs enter the same selection rule as accuracy. The data confirm [20]: Q2_K, the smallest file, is slower per task (0.87 s) than Q4_K_M (0.53 s). Even F16 fit entirely in 8 GB, so on this hardware the cost of switching levels, rather than a memory cliff, is the discontinuity a router must account for.</p></div>
+</div>
+
+<div class="module">
+  <h3><span class="m">MODULE 6</span>Same-Model Multi-Precision Serving</h3>
+  <p>Any-Precision LLM [21] overlays several bit-widths into one model’s memory footprint and MatQuant [22] slices int4 and int2 out of int8 weights, so many precisions can be served cheaply. MoQE [23], the closest prior work, routes each input to one of several quantized variants of a single model. However, MoQE routes on generic input features, is evaluated mainly on perplexity, and has no notion of task category or difficulty, no measured cost model and no held-out validation against fixed-precision baselines.</p>
+  <div class="how"><span class="k">How QuantRoute addresses this</span><p>QuantRoute keys its policy on task category and predicted required precision, and chooses the <i>cheapest sufficient</i> level under explicit accuracy, answer-stability and safety bounds rather than the level expected to perform best. Results are reported as graded task accuracy, flip rate and KL-divergence, and the policy is fit on a training split so it can be tested on held-out tasks. On stock llama.cpp, without nested precisions, switching cost is measured rather than assumed away.</p></div>
+</div>
+
+<div class="module">
+  <h3><span class="m">MODULE 7</span>Security of Quantized Models and Routers</h3>
+  <p>Egashira et al. [29], [30] showed that a model can behave benignly in full precision but maliciously once quantized, including under the GGUF formats that llama.cpp uses. Hong et al. [31] found that 3-bit quantization sharply reduces trustworthiness even when benign accuracy looks unchanged, and Shafran et al. [32] showed that query-independent “gadgets” can steer LLM routers. None of these studies concerns a precision router, and the downgrade attack — steering a harmful prompt onto a weak low-bit level — has not been examined.</p>
+  <div class="how"><span class="k">How QuantRoute addresses this</span><p>QuantRoute pins every GGUF file to a SHA-256 hash checked before each launch and runs model-written code only in a locked-down Docker sandbox. A 600-prompt safety slice — XSTest [33] plus 150 planted prompt injections — runs at every level, and a directional safety-flip bound is the third condition of the selection rule; at ψ = 0.05 it bars Q2_K to Q4_K_M and makes Q5_K_M the minimum for prompts the safety classifier flags. Adversarial attacks on the router itself are the next security step.</p></div>
+</div>
+
+<div class="wide tablewrap">
+  <h2 class="part"><span class="num">1</span>Comparative Literature Survey Table</h2>
+  <p class="intro">Twenty-seven works (2022–2026) compared on approach, data, advantages, disadvantages and relevance to this project, grouped by the seven modules above.</p>
+  <table class="cmp">
+    <thead><tr><th style="width:13%">Author [Ref.]</th><th style="width:20%">Approach</th><th style="width:15%">Dataset / Environment</th><th style="width:17%">Advantages</th><th style="width:17%">Disadvantages</th><th style="width:18%">Remarks</th></tr></thead>
+    <tbody id="cmp-body"></tbody>
+  </table>
+</div>
+
+<div class="newpage">
+  <h2 class="part"><span class="num">2</span>Research Gap and Project Rationale</h2>
+  <ul class="gaps">
+    <li><span class="g">G1</span><p><b>Measurement is too coarse to decide with.</b> Quantization studies report degradation averaged over whole benchmarks [1]–[11]; even Lee et al. [11] stratify by dataset, not by the category × difficulty cell a decision procedure needs.</p></li>
+    <li><span class="g">G2</span><p><b>Difficulty is never predicted as precision.</b> Difficulty predictors [12]–[14] estimate “will model M be right” and choose between models; none predicts the minimum precision at which a prompt is still answered correctly.</p></li>
+    <li><span class="g">G3</span><p><b>Precision routing is not cost- or task-aware.</b> Routers [15]–[18] assume different models, API prices and free switching; MoQE [23] routes across precisions but without task category, difficulty, measured cost or held-out validation.</p></li>
+    <li><span class="g">G4</span><p><b>Cost and accuracy are never optimised together.</b> Studies that measure real cost [19], [20] report it beside accuracy; the rest substitute perplexity, gigabytes or API prices for cost.</p></li>
+    <li><span class="g">G5</span><p><b>The literature describes but does not prescribe.</b> No work outputs a validated bit-width selection rule, although [28] shows routers often fail to beat the best single model and [8] shows accuracy alone is an insufficient criterion.</p></li>
+    <li><span class="g">G6</span><p><b>The precision decision is assumed to be benign.</b> Quantized files can be weaponised [29], [30], low bit-widths can erode safety without any visible accuracy loss [31], and routers can be steered [32]; no precision router accounts for any of this.</p></li>
+  </ul>
+  <div class="rationale"><p><b class="k">Project Rationale.</b> A practitioner deploying a quantized model on fixed hardware has no principled way to choose its precision. The field offers one global answer — “use 4-bit” [6] — alongside evidence that it is wrong for part of the traffic [9]–[11], and it has built routing machinery [15]–[18] and difficulty predictors [12]–[14] that have never been pointed at precision. QuantRoute closes that loop: it measures accuracy, answer stability, safety and real cost for every task at every quantization level on one deployment, learns to predict each prompt’s required precision, and serves the cheapest level that passes accuracy, fidelity and safety bounds — treating “harder tasks need more bits” as a hypothesis to test [11], not an assumption to build in.</p></div>
+
+</div>
+
+<div class="newpage">
+  <h2 class="part"><span class="num">3</span>Project Objectives</h2>
+  <div class="objs">
+    <div class="obj" style="background:#fff8de"><div class="n">01</div><div><h3>Build a reproducible measurement harness for the accuracy–fidelity surface</h3><p>Run a seven-level GGUF ladder (Q2_K to F16) of Qwen2.5-3B-Instruct over about 1,500 graded tasks in 12 categories and 3 difficulty tiers plus a 600-prompt safety slice, with hash-pinned model files and sandboxed code grading, recording per-cell accuracy, answer flips and KL-divergence against F16, and measured VRAM, latency and load time for every level.</p><span class="gapref">ADDRESSES G1</span></div></div>
+    <div class="obj" style="background:#eef3ff"><div class="n">02</div><div><h3>Develop a per-prompt task-complexity analyser</h3><p>Label every task with its required precision — the cheapest level that solves it correctly and confidently — and train a cross-fitted predictor that estimates this label from the prompt text alone, reporting its accuracy against simple baselines as a first-class result.</p><span class="gapref">ADDRESSES G2</span></div></div>
+    <div class="obj" style="background:#e9faf2"><div class="n">03</div><div><h3>Derive and validate a quantization-selection policy</h3><p>Fit task-clustered statistical models of accuracy and answer flips and, for each category and predicted-precision cell, serve the cheapest level whose accuracy lower bound, flip bound and safety bound all pass; then validate the policy on held-out tasks against fixed-precision baselines.</p><span class="gapref">ADDRESSES G3 · G4 · G5</span></div></div>
+  </div>
+  <p class="note">Supporting objectives — a measured cost model, a hardened routing service and a security evaluation of the router (G6) — are carried alongside these three.</p>
+</div>
+
+<div style="margin-top:26px">
+  <h2 class="part"><span class="num">4</span>Reported Results versus QuantRoute Results</h2>
+  <p class="intro" style="font-size:9.4pt;color:var(--ink-2);margin-bottom:8px">Each row sets a figure reported in prior work beside what QuantRoute measured. The studies used different models, quantization schemes and benchmarks, so this is a check of whether our measurements agree with each published finding — not a like-for-like leaderboard. QuantRoute figures: Qwen2.5-3B-Instruct, seven GGUF levels, one RTX 4060.</p>
+  <table class="cmp vs">
+    <thead><tr><th style="width:17%">Finding</th><th style="width:31%">Reported in prior work</th><th style="width:38%">QuantRoute measured</th><th style="width:14%">Verdict</th></tr></thead>
+    <tbody id="vs-body"></tbody>
+  </table>
+</div>
+
+<div style="margin-top:26px">
+  <h2 class="part"><span class="num">5</span>References</h2>
+  <div class="refs" id="refs"></div>
+</div>
+
+<script>
+(function () {
+  const ROWS = [
+    ["Module 1 · Quantization algorithms"],
+    ["Dettmers et al. [1] (2022)", "LLM.int8(): INT8 matmul with an FP16 path for outlier features", "OPT / BLOOM up to 175B", "First lossless 8-bit inference at 175B scale", "INT8 only; modest speed-up", "Quantization error is concentrated, not uniform"],
+    ["Frantar et al. [2] (2023)", "GPTQ: layer-wise reconstruction with an approximate inverse-Hessian", "OPT, BLOOM, LLaMA; WikiText-2, C4", "3–4-bit weight-only PTQ; 175B quantized in ~4 GPU-hours", "Weight-only; calibration-sensitive", "De-facto 4-bit baseline; weakest on mathematics [10]"],
+    ["Xiao et al. [3] (2023)", "SmoothQuant: rescaling moves activation outliers into the weights", "OPT, BLOOM, GLM up to 530B", "True W8A8 with real speed and memory gains", "α needs tuning; little gain below 8 bits", "Composes with [2] and [4] rather than competing"],
+    ["Lin et al. [4] (2024)", "AWQ: activation-aware scaling protects ~1% of salient weights", "LLaMA / Llama-2, Vicuna, OpenFlamingo", "No backpropagation; generalises; fast kernels", "Weight-only; salience is a heuristic", "Usually beats GPTQ for weight-only quantization [11]"],
+    ["Kim et al. [5] (2024)", "SqueezeLLM: dense-and-sparse split with non-uniform levels", "LLaMA family; perplexity, MMLU", "Near-lossless 3-bit; 2.3× speed-up", "Needs custom sparse kernels", "Sensitivity-aware allocation as the core principle"],
+    ["Dettmers & Zettlemoyer [6] (2023)", "k-bit inference scaling laws from ~35,000 runs", "BLOOM, OPT, Pythia, GPT-2; zero-shot", "4-bit is Pareto-optimal per bit budget", "Zero-shot only; pre-instruction-tuned models", "Principled but global bit-width choice"],
+    ["Module 2 · Accuracy impact"],
+    ["Huang et al. [7] (2024)", "10 PTQ / LoRA methods on LLaMA3 at 1–8 bits", "LLaMA3-8B/70B, LLaVA", "Broad method × bit-width grid", "Aggregate deltas only; no cost", "~2% loss at 4-bit; collapse at ≤ 3-bit"],
+    ["Dutta et al. [8] (2024)", "Answer flips and KL-divergence against FP16", "6 schemes × 7 tasks", "Shows accuracy parity hides answer churn", "No flip threshold; no cost", "Accuracy alone is an insufficient criterion"],
+    ["Marchisio et al. [9] (2024)", "Multilingual evaluation including human judges", "Multilingual suites across scales", "Automatic metrics understate damage (1.7% vs 16.0%)", "Multilingual focus; no cost", "Degradation is structured, not uniform"],
+    ["Li et al. [10] (2025)", "Mathematical-reasoning degradation analysis with DPO recovery", "GSM8K and maths suites; Llama-3", "Up to 32.39% loss; explains error compounding", "One category; recovery needs fine-tuning", "Category conditions sensitivity"],
+    ["Lee et al. [11] (2025)", "1B–405B models × 4 methods × 13 difficulty-stratified datasets", "13 datasets incl. instruction following", "Closest prior study; small models break at 4-bit", "Dataset-level difficulty; no decision rule", "Hard tasks do not always lose the most"],
+    ["Module 3 · Difficulty estimation"],
+    ["Ding et al. [12] (2024)", "Hybrid LLM: routes small vs large model on predicted difficulty", "MixInstruct", "Up to 40% fewer large-model calls", "Binary choice; labels need both models", "Predicted difficulty as the routing variable"],
+    ["Zhu et al. [13] (2025)", "Difficulty read from hidden states before generation", "Textual and multimodal benchmarks", "Cheap, pre-generation estimate", "White-box; per-model", "Difficulty is latent inside the model"],
+    ["Zhao et al. [14] (2025)", "Difficulty predictors on s1.1-32B features pick the smallest adequate model", "Mathematics benchmarks", "Matches the 32B model at far lower compute", "Mathematics only; sizes, not bits", "Nearest analogue — parameters, not precision"],
+    ["Module 4 · Cost-aware routing"],
+    ["Chen et al. [15] (2023)", "FrugalGPT: cheap-to-expensive LLM cascade", "HEADLINES, OVERRULING, COQA", "Up to 98% cost reduction", "Pays the cheap model on every query; API prices", "Founding work on LLM cascades"],
+    ["Aggarwal et al. [16] (2024)", "AutoMix: self-verification with a POMDP meta-router", "5 models × 5 datasets", "Over 50% cost reduction", "Verification costs extra tokens", "Best-engineered post-hoc escalation"],
+    ["Ong et al. [17] (2025)", "RouteLLM: routers trained on preference data", "Chatbot Arena; MT-Bench, MMLU, GSM8K", "85% savings at 95% of GPT-4 quality", "Needs preference data; binary choice", "Preference data as a difficulty proxy"],
+    ["Hu et al. [18] (2024)", "RouterBench: routing benchmark and Pareto framework", "405k+ outcomes across 8 tasks", "Makes routers comparable", "API-price cost; offline outcomes", "Evaluation substrate for routing"],
+    ["Module 5 · Measured cost"],
+    ["Husom et al. [19] (2025)", "Energy of 28 quantized LLMs with hardware power meters", "Raspberry Pi 4; 5 benchmarks", "Measured joules per token next to accuracy", "CPU/edge only; not optimised jointly", "Per-task cost is precisely measurable"],
+    ["Wei et al. [20] (2025)", "T-MAC: lookup-table low-bit matrix multiply", "BitNet-b1.58-3B, Llama-2; M2-Ultra, Pi 5", "1.1–6.7× speed-ups", "Kernel-level; no accuracy study", "Cost depends on implementation, not bit count"],
+    ["Module 6 · Multi-precision serving"],
+    ["Park et al. [21] (2024)", "Any-Precision LLM: overlaid bit-widths in one footprint", "LLaMA family; perplexity, zero-shot", "Many precisions at single-model memory cost", "Needs a bespoke serving engine", "Swap cost is a property of the serving stack"],
+    ["Nair et al. [22] (2025)", "MatQuant: nested int8 / int4 / int2 weights", "LLM weight quantization", "One model served at several precisions", "Needs its own training procedure", "Second route to multi-precision serving"],
+    ["MoQE [23] (2025)", "Router over quantized variants of one model", "ResNet, LLaMA, Qwen; WikiText, C4", "Shows precision routing works", "Generic features; perplexity-led; no cost model", "Closest prior work"],
+    ["Module 7 · Security"],
+    ["Egashira et al. [29] (2024)", "Model benign in full precision, malicious once quantized", "Open LLMs; rounding-based schemes", "First quantization-triggered attack", "Does not cover GGUF k-quants", "Supply-chain threat from model hubs"],
+    ["Egashira et al. [30] (2025)", "The same attack on GGUF k-quants", "3 LLMs × 9 GGUF types", "Attack deltas up to 88.7% (insecure code)", "Attack-side work", "Directly relevant to llama.cpp deployments"],
+    ["Hong et al. [31] (2024)", "Trustworthiness of compressed LLMs on 8 dimensions", "3 LLMs, 5 compression methods", "4-bit keeps trustworthiness", "Fixed bit-width; no routing", "3-bit loses trust invisibly to accuracy"],
+    ["Shafran et al. [32] (2025)", "Query-independent gadgets that steer LLM routers", "Open and commercial routers", "Shows routers are an attack surface", "Model routers; upgrade direction only", "Precision routers need adversarial testing"],
+  ];
+
+  const REFS = [
+    "T. Dettmers, M. Lewis, Y. Belkada, and L. Zettlemoyer, “LLM.int8(): 8-bit Matrix Multiplication for Transformers at Scale,” in <i>Advances in Neural Information Processing Systems (NeurIPS)</i>, 2022. arXiv:2208.07339.",
+    "E. Frantar, S. Ashkboos, T. Hoefler, and D. Alistarh, “GPTQ: Accurate Post-Training Quantization for Generative Pre-trained Transformers,” in <i>Proc. ICLR</i>, 2023. arXiv:2210.17323.",
+    "G. Xiao, J. Lin, M. Seznec, H. Wu, J. Demouth, and S. Han, “SmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models,” in <i>Proc. ICML</i>, 2023. arXiv:2211.10438.",
+    "J. Lin, J. Tang, H. Tang, S. Yang, et al., “AWQ: Activation-aware Weight Quantization for LLM Compression and Acceleration,” in <i>Proc. MLSys</i>, 2024 (Best Paper). arXiv:2306.00978.",
+    "S. Kim, C. Hooper, A. Gholami, Z. Dong, X. Li, S. Shen, M. W. Mahoney, and K. Keutzer, “SqueezeLLM: Dense-and-Sparse Quantization,” in <i>Proc. ICML</i>, 2024. arXiv:2306.07629.",
+    "T. Dettmers and L. Zettlemoyer, “The Case for 4-bit Precision: k-bit Inference Scaling Laws,” in <i>Proc. ICML</i>, PMLR vol. 202, pp. 7750–7774, 2023. arXiv:2212.09720.",
+    "W. Huang, X. Zheng, X. Ma, H. Qin, et al., “An Empirical Study of LLaMA3 Quantization: From LLMs to MLLMs,” <i>Visual Intelligence</i>, 2024. arXiv:2404.14047.",
+    "A. Dutta, S. Krishna, N. Kwatra, and R. Ramjee, “Accuracy is Not All You Need,” in <i>Advances in Neural Information Processing Systems (NeurIPS)</i>, 2024. arXiv:2407.09141.",
+    "K. Marchisio, S. Dash, H. Chen, D. Aumiller, et al., “How Does Quantization Affect Multilingual LLMs?” in <i>Findings of EMNLP</i>, 2024. arXiv:2407.03211.",
+    "Z. Li, Y. Su, R. Yang, C. Xie, Z. Wang, Z. Xie, N. Wong, and H. Yang, “Quantization Meets Reasoning: Exploring LLM Low-Bit Quantization Degradation for Mathematical Reasoning,” 2025. arXiv:2501.03035.",
+    "J. Lee, S. Park, J. Kwon, J. Oh, and Y. Kwon, “Exploring the Trade-Offs: Quantization Methods, Task Difficulty, and Model Size in Large Language Models From Edge to Giant,” in <i>Proc. IJCAI</i>, 2025. arXiv:2409.11055.",
+    "D. Ding, A. Mallick, C. Wang, R. Sim, S. Mukherjee, V. Rühle, L. V. S. Lakshmanan, and A. Awadallah, “Hybrid LLM: Cost-Efficient and Quality-Aware Query Routing,” in <i>Proc. ICLR</i>, 2024. arXiv:2404.14618.",
+    "Y. Zhu, D. Liu, Z. Lin, W. Tong, S. Zhong, and J. Shao, “The LLM Already Knows: Estimating LLM-Perceived Question Difficulty via Hidden Representations,” 2025. arXiv:2509.12886.",
+    "B. Zhao, B. Kapusuzoglu, K. Balasubramaniam, S. Sahu, S. Chakraborty, and G. I. Winata, “Optimizing Reasoning Efficiency through Prompt Difficulty Prediction,” in <i>NeurIPS Workshop on Efficient Reasoning</i>, 2025. arXiv:2511.03808.",
+    "L. Chen, M. Zaharia, and J. Zou, “FrugalGPT: How to Use Large Language Models While Reducing Cost and Improving Performance,” 2023. arXiv:2305.05176.",
+    "P. Aggarwal, A. Madaan, A. Anand, S. P. Potharaju, et al., “AutoMix: Automatically Mixing Language Models,” in <i>Advances in Neural Information Processing Systems (NeurIPS)</i>, 2024. arXiv:2310.12963.",
+    "I. Ong, A. Almahairi, V. Wu, W.-L. Chiang, T. Wu, J. E. Gonzalez, M. W. Kadous, and I. Stoica, “RouteLLM: Learning to Route LLMs with Preference Data,” in <i>Proc. ICLR</i>, 2025. arXiv:2406.18665.",
+    "Q. J. Hu, J. Bieker, X. Li, N. Jiang, B. Keigwin, G. Ranganath, K. Keutzer, and S. K. Upadhyay, “RouterBench: A Benchmark for Multi-LLM Routing System,” 2024. arXiv:2403.12031.",
+    "E. J. Husom, A. Goknil, L. J. Shrestha, M. Bhattarai, et al., “Sustainable LLM Inference for Edge AI: Evaluating Quantized LLMs for Energy Efficiency, Output Accuracy, and Inference Latency,” <i>ACM Transactions on Internet of Things</i>, 2025. arXiv:2504.03360.",
+    "J. Wei, S. Cao, T. Cao, L. Ma, L. Wang, Y. Zhang, and M. Yang, “T-MAC: CPU Renaissance via Table Lookup for Low-Bit LLM Deployment on Edge,” in <i>Proc. EuroSys</i>, 2025. arXiv:2407.00088.",
+    "Y. Park, J. Hyun, S. Cho, B. Sim, and J. W. Lee, “Any-Precision LLM: Low-Cost Deployment of Multiple, Different-Sized LLMs,” in <i>Proc. ICML</i>, 2024 (Oral). arXiv:2402.10517.",
+    "P. A. Nair, P. Datta, J. Dean, P. Jain, and A. Kusupati, “Matryoshka Quantization,” in <i>Proc. ICML</i>, PMLR vol. 267, pp. 45484–45506, 2025. arXiv:2502.06786.",
+    "“MoQE: Improve Quantization Model Performance via Mixture of Quantization Experts,” 2025. arXiv:2508.09204.",
+    "W. Shao, M. Chen, Z. Zhang, P. Xu, L. Zhao, Z. Li, K. Zhang, P. Gao, Y. Qiao, and P. Luo, “OmniQuant: Omnidirectionally Calibrated Quantization for Large Language Models,” in <i>Proc. ICLR</i>, 2024. arXiv:2308.13137.",
+    "S. Ma, H. Wang, L. Ma, L. Wang, W. Wang, S. Huang, L. Dong, R. Wang, J. Xue, and F. Wei, “The Era of 1-bit LLMs: All Large Language Models are in 1.58 Bits,” 2024. arXiv:2402.17764.",
+    "“Post-Training Quantization of Large Language Models with Microscaling Formats,” 2024. arXiv:2405.07135.",
+    "“Evaluating the Impact of Post-Training Quantization on Large Language Models for Code Generation,” in <i>Proc. IEEE/ACM ICPC</i>, 2026. arXiv:2503.07103.",
+    "H. Li, Y. Zhang, Z. Guo, C. Wang, S. Tang, Q. Zhang, Y. Chen, B. Qi, P. Ye, L. Bai, Z. Wang, and S. Hu, “LLMRouterBench: A Massive Benchmark and Unified Framework for LLM Routing,” in <i>Findings of ACL</i>, pp. 37733–37754, 2026. arXiv:2601.07206.",
+    "K. Egashira, M. Vero, R. Staab, J. He, and M. Vechev, “Exploiting LLM Quantization,” in <i>Advances in Neural Information Processing Systems (NeurIPS)</i>, vol. 37, 2024. arXiv:2405.18137.",
+    "K. Egashira, R. Staab, M. Vero, J. He, and M. Vechev, “Mind the Gap: A Practical Attack on GGUF Quantization,” in <i>Proc. ICML</i>, PMLR vol. 267, 2025. arXiv:2505.23786.",
+    "J. Hong, J. Duan, C. Zhang, Z. Li, C. Xie, K. Lieberman, J. Diffenderfer, B. R. Bartoldson, A. Jaiswal, K. Xu, B. Kailkhura, D. Hendrycks, D. Song, Z. Wang, and B. Li, “Decoding Compressed Trust: Scrutinizing the Trustworthiness of Efficient LLMs Under Compression,” in <i>Proc. ICML</i>, PMLR vol. 235, 2024. arXiv:2403.15447.",
+    "A. Shafran, R. Schuster, T. Ristenpart, and V. Shmatikov, “Rerouting LLM Routers,” 2025. arXiv:2501.01818.",
+    "P. Röttger, H. R. Kirk, B. Vidgen, G. Attanasio, F. Bianchi, and D. Hovy, “XSTest: A Test Suite for Identifying Exaggerated Safety Behaviours in Large Language Models,” in <i>Proc. NAACL</i>, 2024. arXiv:2308.01263.",
+  ];
+
+  document.getElementById("cmp-body").innerHTML = ROWS.map((r) =>
+    r.length === 1 ? `<tr><td class="grp" colspan="6">${r[0]}</td></tr>` : `<tr>${r.map((c) => `<td>${c}</td>`).join("")}</tr>`
+  ).join("");
+  const VERDICT = { agrees: ["Agrees", "#2ed3a0"], partly: ["Partly agrees", "#ffc832"], differs: ["Differs", "#ffd9c7"], pending: ["Not yet tested", "#e9e3d6"] };
+  const VS = [
+    ["Accuracy loss at 4 bits", "About 2% loss at 4-bit and collapse at 3 bits or fewer (LLaMA3, 10 PTQ methods) [7]", "−1.4 pp at Q4_K_M, −4.3 pp at Q3_K_M, −22.2 pp at Q2_K against F16", "agrees"],
+    ["Best bit-width for a memory budget", "4-bit is Pareto-optimal for a fixed bit budget (19M–176B models, zero-shot accuracy) [6]", "Q4_K_M keeps 98% of F16’s accuracy at 35% of its memory; accuracy is flat from Q5_K_M upward", "agrees"],
+    ["Accuracy hides changed answers", "Accuracy within 0–2% of FP16 while many individual answers flip [8]", "Q8_0 is within 0.4 pp of F16 yet changes 4.4% of answers; Q4_K_M is −1.4 pp and changes 12.5%", "agrees"],
+    ["Mathematical reasoning", "Up to 32.39% loss on mathematics, 11.31% on average (Llama-3; AWQ, GPTQ, SmoothQuant) [10]", "No consistent loss: mathematics scores 56.6% at Q2_K against 38.0% at F16 — the cause is not yet diagnosed", "differs"],
+    ["Code generation", "4-bit holds; drops beyond 5–10% at 2–3 bits [27]", "Code generation is 88.1% at Q4_K_M, equal to F16; −17.5 pp at Q3_K_M and −58.7 pp at Q2_K", "agrees"],
+    ["Small models at 4 bits", "Small models suffer severe drops at 4-bit while 70B-scale models stay stable [11]", "A 3B model loses only 1.4 pp at 4-bit with GGUF k-quants; severe loss appears only at 2-bit", "differs"],
+    ["Difficulty versus degradation", "Hard tasks do not always lose the most; quantization magnifies existing weaknesses [11]", "In 25 of 36 category × tier cells a level of 4 bits or less is within 2 pp of F16; the hardest tier is not uniformly the most demanding", "agrees"],
+    ["Safety by bit-width", "4-bit preserves trustworthiness; 3-bit sharply reduces it [31]", "Safety-flip upper bound 6.1% at Q2_K, 5.6% at Q3_K_M, 6.1% at Q4_K_M, 3.0% at Q5_K_M and 1.8% at Q6_K and Q8_0 — erosion runs through 4-bit, with no sharp 3-to-4-bit break", "partly"],
+    ["Cost versus bit count", "Inference speed depends on kernel implementation, not bit count alone [20]", "Q2_K, the smallest file, is slower per task (0.87 s) than Q4_K_M (0.53 s)", "agrees"],
+    ["Predicting difficulty per prompt", "Predicted difficulty routes well — up to 40% fewer large-model calls [12]; hidden-state estimates beat baselines [13]", "Required-precision predictor: 45.8% exact against a 45.5% majority baseline, 79.8% within one level (text features, different target)", "differs"],
+    ["Cost saving from routing", "Up to 98% [15], over 50% [16] and 85% at 95% of GPT-4 quality [17], for API-priced model routing", "46% below the always-F16 cost at moderate bars (fit on the training split); held-out quality still to be measured", "pending"],
+    ["Router versus best single model", "Several routers fail to beat the best single model [28]; MoQE matches the best single quantized model [23]", "The held-out comparison against fixed quantization levels is the next analysis step", "pending"],
+  ];
+  document.getElementById("vs-body").innerHTML = VS.map(([f, prior, ours, v]) =>
+    `<tr><td>${f}</td><td>${prior}</td><td>${ours}</td><td><span class="verdict" style="background:${VERDICT[v][1]}">${VERDICT[v][0]}</span></td></tr>`
+  ).join("");
+  document.getElementById("refs").innerHTML = REFS.map((t, i) => `<p><span class="rn">[${i + 1}]</span>${t}</p>`).join("");
+
+  // Style in-text citations; references keep their own numbering.
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  const nodes = [];
+  while (walker.nextNode()) {
+    const n = walker.currentNode;
+    if (/\[\d+\]/.test(n.nodeValue) && !n.parentElement.closest(".refs, script, style")) nodes.push(n);
+  }
+  nodes.forEach((n) => {
+    const span = document.createElement("span");
+    span.innerHTML = n.nodeValue.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/\[(\d+)\]/g, '<span class="cite">[$1]</span>');
+    n.replaceWith(...span.childNodes);
+  });
+
+  const body = document.body.cloneNode(true);
+  body.querySelectorAll(".refs, script, style").forEach((e) => e.remove());
+  const cited = new Set([...body.textContent.matchAll(/\[(\d+)\]/g)].map((m) => +m[1]));
+  window.__citeCheck = { cited: [...cited].sort((a, b) => a - b), refs: REFS.length };
+  document.body.dataset.ready = "1";
+})();
+</script>
+</body>
+</html>

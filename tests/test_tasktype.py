@@ -65,7 +65,7 @@ def test_extract_answer_freeform_returns_full_text():
     assert extract_answer("summarization", raw, extract_final) == raw
 
 
-# --- QuantLab additions: category mapping ----------------------------------
+# --- QuantRoute additions: category mapping ----------------------------------
 
 def test_to_category_covers_every_classify_label():
     # PROFILES' keys are exactly the label space classify() can return --

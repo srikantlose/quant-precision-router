@@ -1,11 +1,11 @@
-"""Consolidate the CheapRoute seed task set into QuantLab's benchmark schema.
+"""Consolidate the CheapRoute seed task set into QuantRoute's benchmark schema.
 
 Reads CheapRoute's four `eval/tasks/*.jsonl` files (practice.jsonl, holdout.jsonl,
 practice19.jsonl, mycustom.jsonl), which overlap: 19 ids are duplicated verbatim
 across files. Deduplicating keeps the first occurrence (in the file order above),
 and the result is 135 unique tasks -- the number this module's CLI asserts on.
 
-CheapRoute's `type` field (already spelled as one of QuantLab's 12 categories,
+CheapRoute's `type` field (already spelled as one of QuantRoute's 12 categories,
 e.g. "factual_qa", "multiple_choice" -- not a classify()-style label like "mc"
 or "short_qa") becomes `category`; `source="seed"`; `split` is assigned
 deterministically by split_for(), which is also used by later phases' generated

@@ -1,4 +1,4 @@
-"""Graders for QuantLab benchmark tasks. These string/execution graders are
+"""Graders for QuantRoute benchmark tasks. These string/execution graders are
 cheap, deterministic proxies that let the benchmark grid and the analysis
 pipeline measure accuracy per (rung, task) without an LLM judge.
 

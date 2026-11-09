@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>QuantRoute — Abstract</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4; margin: 20mm 20mm 18mm; }
+  :root { --ink: #151515; --ink-2: #3f3c35; --muted: #77726a; --sun: #ffc832; --mint: #2ed3a0; --cream: #fff7ea; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "DM Sans", system-ui, sans-serif; color: var(--ink); font-size: 10.6pt; line-height: 1.6; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .meta { display: grid; grid-template-columns: 110px 1fr; row-gap: 4px; font-size: 10pt; margin-bottom: 18px; }
+  .meta dt { font-family: "JetBrains Mono", monospace; font-size: 8.5pt; font-weight: 700; color: var(--muted); letter-spacing: .05em; text-transform: uppercase; padding-top: 2px; }
+  .meta dd { font-weight: 700; }
+  .fill { background: var(--sun); padding: 0 5px; border-radius: 4px; font-weight: 600; }
+  .label { font-family: "JetBrains Mono", monospace; font-size: 8.5pt; font-weight: 700; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+  h1 { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 24pt; line-height: 1.12; letter-spacing: -0.015em; margin: 4px 0 18px; }
+  h1 .hl { background: var(--sun); padding: 0 .1em; border-radius: 6px; }
+  .rule { height: 3px; background: var(--ink); border-radius: 2px; margin-bottom: 16px; }
+  h2 { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 14pt; letter-spacing: .02em; margin-bottom: 8px; }
+  p.abs { text-align: justify; hyphens: auto; }
+  .kw { margin-top: 14px; font-size: 9.8pt; }
+  .kw b { font-family: "Bricolage Grotesque", sans-serif; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .chips span { font-size: 8.6pt; font-weight: 600; border: 1.5px solid var(--ink); border-radius: 999px; padding: 1px 9px; background: var(--cream); }
+</style>
+</head>
+<body>
+  <dl class="meta">
+    <dt>Project ID</dt><dd>PID-CY014</dd>
+    <dt>Team</dt><dd><span class="fill">[Team member names and USNs]</span></dd>
+  </dl>
+  <div class="label">Project name</div>
+  <h1>QuantRoute: Serving Each LLM Prompt at the <span class="hl">Cheapest Quantization Level</span> That Stays Accurate and Safe</h1>
+  <div class="rule"></div>
+  <h2>ABSTRACT</h2>
+  <p class="abs">Running a large language model on a single consumer GPU forces a choice of quantization level — how many bits each weight keeps — and that choice is usually made once, by convention, for all traffic. Yet the literature shows that quantization damage is strongly task-dependent and that matching accuracy can hide large numbers of changed answers. This project asks whether the right precision depends on the prompt, and builds a system that chooses it. Qwen2.5-3B-Instruct is served at seven GGUF quantization levels (Q2_K to F16) through llama.cpp on an 8 GB RTX 4060 and evaluated on 1,467 graded tasks spanning 12 categories and three difficulty tiers, plus a 600-prompt safety slice built from XSTest and planted prompt injections — 14,469 graded runs in total, with every model file pinned by its SHA-256 hash and model-written code graded inside a locked-down Docker sandbox. For each run the system records accuracy, answer flips and KL-divergence against F16, safety behaviour, and measured cost (VRAM, latency and load time). Each task is labelled with its required precision — the cheapest level that solves it confidently — and a cross-fitted predictor estimates that label from the prompt alone. A selection policy, fitted with task-clustered statistical models, then serves the cheapest level whose accuracy, answer-stability and safety bounds all pass. Q4_K_M comes within 1.4 points of F16’s accuracy at 35% of F16’s memory, while Q2_K collapses to 51%; even Q8_0 changes 4.4% of answers; and in 25 of 36 category–difficulty cells a level of 4 bits or less comes within 2 points of F16. At moderate thresholds the policy serves 64 of 84 cells below F16 at 54% of the cost, while prompt text proves only a weak predictor of required precision (79.8% within one level). The work is delivered with an interactive results dashboard and study guide, with a hardened routing API and adversarial evaluation of the router as the next stage.</p>
+  <div class="kw"><b>Keywords:</b>
+    <div class="chips"><span>Large Language Models</span><span>Post-Training Quantization</span><span>GGUF / llama.cpp</span><span>Precision Routing</span><span>Task Complexity Prediction</span><span>Cost–Accuracy Trade-off</span><span>Answer Fidelity</span><span>AI Safety</span></div>
+  </div>
+</body>
+</html>
