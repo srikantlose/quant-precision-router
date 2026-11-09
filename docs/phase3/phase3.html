@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>QuantRoute — Design, Methodology and Implementation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4; margin: 17mm 17mm 19mm; }
+  @page wide { size: A4 landscape; margin: 12mm 13mm 15mm; }
+  :root { --ink: #151515; --ink-2: #3f3c35; --muted: #77726a; --line: #151515; --grid: #e6dfd2;
+          --sun: #ffc832; --sun-soft: #fff1c2; --mint: #2ed3a0; --mint-soft: #e3f8ef; --sky: #bcd3ff; --sky-soft: #e8f0ff;
+          --blush: #ffd9c7; --cream: #fff7ea; --paper: #fffdf8; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "DM Sans", system-ui, sans-serif; color: var(--ink); font-size: 10.2pt; line-height: 1.55; background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  h1, h2, h3, h4 { font-family: "Bricolage Grotesque", "DM Sans", sans-serif; letter-spacing: -0.015em; line-height: 1.15; }
+  p { text-align: justify; hyphens: auto; margin-bottom: 7px; }
+  code, .mono { font-family: "JetBrains Mono", monospace; font-size: 0.84em; }
+  .cite { font-family: "JetBrains Mono", monospace; font-size: 0.82em; font-weight: 700; white-space: nowrap; }
+  .newpage { break-before: page; }
+  .wide { page: wide; }
+
+  /* title */
+  .titleblock { border: 2px solid var(--line); border-radius: 14px; background: var(--cream); padding: 18px 22px 16px; box-shadow: 4px 4px 0 var(--line); margin-bottom: 16px; }
+  .tag { display: inline-block; font-family: "JetBrains Mono", monospace; font-size: 8pt; font-weight: 700; padding: 3px 8px; border: 1.5px solid var(--line); border-radius: 6px; background: var(--sun); }
+  .titleblock h1 { font-size: 24pt; font-weight: 800; margin-top: 10px; }
+  .titleblock .sub { font-style: italic; color: var(--ink-2); font-size: 11.5pt; margin-top: 6px; }
+  .titleblock .meta { font-size: 9pt; color: var(--muted); margin-top: 8px; }
+  .toc { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 18px; }
+  .toc div { border: 1.5px solid var(--line); border-radius: 10px; padding: 8px 10px; font-size: 8.6pt; line-height: 1.35; background: #fff; }
+  .toc b { display: block; font-family: "Bricolage Grotesque", sans-serif; font-size: 10.5pt; margin-bottom: 2px; }
+  .toc .n { font-family: "JetBrains Mono", monospace; font-size: 7.5pt; font-weight: 700; color: var(--muted); }
+
+  /* headings */
+  h2.part { font-size: 17pt; font-weight: 800; margin: 2px 0 10px; display: flex; align-items: center; gap: 10px; break-after: avoid; }
+  h2.part .num { font-family: "JetBrains Mono", monospace; font-size: 10pt; border: 1.5px solid var(--line); border-radius: 7px; padding: 2px 8px; background: var(--sun); }
+  h3.sec { font-size: 12.5pt; font-weight: 800; margin: 14px 0 6px; break-after: avoid; display: flex; gap: 8px; align-items: baseline; }
+  h3.sec .m { font-family: "JetBrains Mono", monospace; font-size: 8.5pt; color: var(--muted); font-weight: 700; }
+  h4 { font-size: 10.5pt; font-weight: 800; margin: 10px 0 4px; break-after: avoid; }
+
+  /* figures */
+  figure { break-inside: avoid; margin: 8px 0 14px; }
+  .panel { border: 1.5px solid var(--line); border-radius: 12px; background: var(--paper); padding: 8px; }
+  .panel.pad { padding: 12px 14px; }
+  figcaption { font-size: 8.3pt; color: var(--ink-2); margin-top: 6px; line-height: 1.4; }
+  figcaption .fn { font-family: "JetBrains Mono", monospace; font-weight: 700; color: var(--ink); margin-right: 4px; }
+  .fref { font-weight: 700; white-space: nowrap; }
+  .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .center { display: flex; justify-content: center; }
+
+  /* flowchart renderer */
+  .fc { position: relative; }
+  .fc svg { position: absolute; left: 0; top: 0; overflow: visible; }
+  .fc .lbl, .fc-measure { font-size: 7.3pt; line-height: 1.26; text-align: center; padding: 0 5px; }
+  .fc .lbl { position: absolute; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+  .fc .lbl.inv { color: var(--cream); }
+  .fc .lbl.left { align-items: flex-start; text-align: left; }
+  .fc-measure { position: absolute; left: -9999px; top: 0; visibility: hidden; }
+  .fc .t, .fc-measure .t { font-weight: 700; display: block; }
+  .fc .o, .fc-measure .o { font-family: "JetBrains Mono", monospace; font-size: 6.2pt; font-weight: 700; color: var(--ink-2); display: block; margin-top: 1px; }
+  .fc .lbl.inv .o { color: #e9e2d2; }
+  .fc .mc, .fc-measure .mc { font-family: "JetBrains Mono", monospace; font-size: 6.3pt; font-weight: 700; display: inline-block; border: 1.2px solid var(--ink); border-radius: 4px; padding: 0 3px; background: var(--sun); margin-bottom: 2px; color: var(--ink); }
+  .fc .elbl { position: absolute; transform: translate(-50%, -50%); font-family: "JetBrains Mono", monospace; font-size: 6.2pt; font-weight: 700; background: var(--paper); padding: 0 2px; white-space: nowrap; color: var(--ink-2); line-height: 1.2; }
+  .fc .glbl { position: absolute; font-family: "JetBrains Mono", monospace; font-size: 6.6pt; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-2); }
+
+  /* modules */
+  .mod { margin-top: 16px; break-inside: avoid; }
+  table.t td.nw { white-space: nowrap; }
+  .modhead { display: flex; align-items: center; gap: 8px; break-after: avoid; flex-wrap: wrap; }
+  .modhead .code { font-family: "JetBrains Mono", monospace; font-size: 8.5pt; font-weight: 700; border: 1.5px solid var(--line); border-radius: 6px; padding: 1px 7px; background: var(--sun); }
+  .modhead h3 { font-size: 13pt; font-weight: 800; }
+  .status { font-family: "JetBrains Mono", monospace; font-size: 7pt; font-weight: 700; border: 1.5px solid var(--line); border-radius: 20px; padding: 1px 8px; }
+  .status.built { background: var(--mint-soft); }
+  .status.next { background: #fff; border-style: dashed; }
+  .files { font-family: "JetBrains Mono", monospace; font-size: 7.4pt; color: var(--muted); margin: 3px 0 5px; break-after: avoid; }
+  .modbody { display: grid; grid-template-columns: 392px 1fr; gap: 10px; align-items: start; break-inside: avoid; }
+  .modbody figure { margin: 0; }
+  .ipo { display: flex; flex-direction: column; gap: 7px; }
+  .ipo > div { border: 1.5px solid var(--line); border-radius: 10px; padding: 7px 10px; font-size: 8.5pt; line-height: 1.42; background: #fff; }
+  .ipo .k { font-family: "JetBrains Mono", monospace; font-size: 7.2pt; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; display: inline-block; border: 1.3px solid var(--line); border-radius: 5px; padding: 0 6px; margin-bottom: 4px; }
+  .ipo .i { border-left: 6px solid #6f98ea; } .ipo .i .k { background: var(--sky-soft); }
+  .ipo .p { border-left: 6px solid var(--sun); } .ipo .p .k { background: var(--sun-soft); }
+  .ipo .o { border-left: 6px solid var(--mint); } .ipo .o .k { background: var(--mint-soft); }
+  .ipo ul { padding-left: 13px; } .ipo li { margin-bottom: 1px; }
+  .extra { margin-top: 8px; break-inside: avoid; }
+
+  /* tables */
+  table.t { width: 100%; border-collapse: collapse; font-size: 8.3pt; line-height: 1.38; border-bottom: 1.5px solid var(--line); }
+  table.t thead { display: table-header-group; }
+  table.t th { background: var(--ink); color: var(--cream); text-align: left; font-family: "JetBrains Mono", monospace; font-size: 7.2pt; letter-spacing: .03em; padding: 5px 7px; font-weight: 700; }
+  table.t td { padding: 4px 7px; vertical-align: top; border-top: 1px solid var(--grid); }
+  table.t tr { break-inside: avoid; }
+  table.t tbody tr:nth-child(even) td { background: #fbf8f1; }
+  table.t td.grp { background: var(--sky) !important; font-family: "JetBrains Mono", monospace; font-size: 7pt; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; padding: 3px 7px; }
+  table.t td.k { font-weight: 700; }
+  table.t td.num, table.t th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  table.t .m { font-family: "JetBrains Mono", monospace; font-size: 7.3pt; }
+  .tcap { font-size: 8.3pt; color: var(--ink-2); margin: 0 0 5px; }
+  .tcap .fn { font-family: "JetBrains Mono", monospace; font-weight: 700; color: var(--ink); margin-right: 4px; }
+  .tablefig { break-inside: avoid; margin: 8px 0 14px; }
+  .pill { display: inline-block; font-family: "JetBrains Mono", monospace; font-size: 6.8pt; font-weight: 700; border: 1.3px solid var(--line); border-radius: 20px; padding: 0 6px; white-space: nowrap; }
+  .pill.b { background: var(--mint-soft); } .pill.n { background: #fff; border-style: dashed; } .pill.p { background: var(--sun-soft); }
+
+  /* callouts */
+  .note { border: 1.5px solid var(--line); border-left: 6px solid var(--mint); border-radius: 10px; background: var(--mint-soft); padding: 7px 12px; font-size: 9pt; margin: 8px 0 12px; break-inside: avoid; }
+  .note b.k { font-family: "JetBrains Mono", monospace; font-size: 7.6pt; letter-spacing: .05em; text-transform: uppercase; display: block; margin-bottom: 2px; }
+  .note.warm { border-left-color: var(--sun); background: var(--sun-soft); }
+
+  /* workflow timeline */
+  .steps { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 12px; }
+  .step { display: grid; grid-template-columns: 24px 1fr; gap: 8px; align-items: center; border: 1.5px solid var(--line); border-radius: 10px; padding: 4px 9px; background: #fff; font-size: 8pt; line-height: 1.3; break-inside: avoid; }
+  .step .n { width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--line); display: flex; align-items: center; justify-content: center; font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 8pt; background: var(--mint); }
+  .step.wip .n { background: var(--sun); } .step.next .n { background: #fff; } .step.next { border-style: dashed; }
+  .step b { font-family: "Bricolage Grotesque", sans-serif; font-size: 9.6pt; }
+  .step .out { font-family: "JetBrains Mono", monospace; font-size: 6.9pt; font-weight: 700; color: var(--ink-2); display: block; margin-top: 2px; }
+  .stagebar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px; }
+  .stagebar div { border: 1.5px solid var(--line); border-radius: 8px; padding: 4px 8px; font-size: 8pt; line-height: 1.3; }
+  .stagebar b { font-family: "JetBrains Mono", monospace; font-size: 7.4pt; display: block; letter-spacing: .04em; text-transform: uppercase; }
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 7.8pt; color: var(--ink-2); margin-top: 6px; align-items: center; }
+  .legend i { display: inline-block; width: 11px; height: 11px; border: 1.3px solid var(--ink); border-radius: 3px; vertical-align: -1px; margin-right: 4px; }
+
+  /* interaction matrix */
+  table.mx { border-collapse: collapse; width: 100%; font-size: 7.6pt; }
+  table.mx th { font-family: "JetBrains Mono", monospace; font-size: 6.5pt; font-weight: 700; padding: 3px 2px; vertical-align: bottom; text-align: center; color: var(--ink-2); }
+  table.mx th.rot { height: 66px; white-space: nowrap; }
+  table.mx th.rot span { display: inline-block; transform: rotate(-55deg); transform-origin: left bottom; width: 14px; position: relative; left: 8px; }
+  table.mx td { border-top: 1px solid var(--grid); padding: 1px 3px; text-align: center; height: 16px; }
+  table.mx td.m { text-align: left; white-space: nowrap; font-weight: 700; }
+  table.mx td.m .c { font-family: "JetBrains Mono", monospace; font-size: 6.6pt; color: var(--muted); margin-right: 4px; }
+  .dw, .dr { display: inline-block; width: 11px; height: 11px; border-radius: 50%; border: 1.6px solid var(--ink); vertical-align: middle; }
+  .dw { background: var(--ink); }
+  .dr { background: #fff; }
+
+  /* software stack */
+  .stack { display: flex; flex-direction: column; gap: 5px; }
+  .layer { display: grid; grid-template-columns: 118px 1fr; border: 1.5px solid var(--line); border-radius: 9px; overflow: hidden; break-inside: avoid; }
+  .layer > b { font-family: "JetBrains Mono", monospace; font-size: 7pt; letter-spacing: .04em; text-transform: uppercase; padding: 6px 8px; border-right: 1.5px solid var(--line); display: flex; align-items: center; }
+  .layer > div { display: flex; flex-wrap: wrap; gap: 4px; padding: 5px 7px; background: #fff; align-items: center; }
+  .chip { font-size: 7.6pt; border: 1.2px solid var(--line); border-radius: 6px; padding: 1px 6px; background: #fff; white-space: nowrap; }
+  .chip i { font-style: normal; font-family: "JetBrains Mono", monospace; font-size: 6.6pt; color: var(--muted); margin-left: 3px; }
+
+  /* phase status */
+  .phases { display: grid; grid-template-columns: repeat(8, 1fr); gap: 5px; }
+  .ph { border: 1.5px solid var(--line); border-radius: 8px; padding: 4px 6px; font-size: 7.2pt; line-height: 1.25; min-height: 50px; break-inside: avoid; }
+  .ph b { font-family: "JetBrains Mono", monospace; font-size: 7.6pt; display: block; }
+  .ph.d { background: var(--mint-soft); } .ph.w { background: var(--sun-soft); } .ph.n { background: #fff; border-style: dashed; }
+
+  /* prompt card */
+  .prompt { font-family: "JetBrains Mono", monospace; font-size: 7.6pt; line-height: 1.5; border: 1.5px solid var(--line); border-radius: 8px; background: #fff; padding: 7px 9px; }
+  .prompt mark { background: #ffe3d8; border: 1px dashed #e0603a; border-radius: 3px; padding: 0 2px; }
+
+  .refs { font-size: 8.4pt; line-height: 1.45; }
+  .refs p { text-align: left; padding-left: 30px; text-indent: -30px; margin-bottom: 4px; break-inside: avoid; }
+  .refs .rn { font-family: "JetBrains Mono", monospace; font-weight: 700; display: inline-block; width: 30px; text-indent: 0; }
+  ul.tight { padding-left: 16px; margin-bottom: 8px; } ul.tight li { margin-bottom: 3px; }
+</style>
+</head>
+<body>
+
+<div class="titleblock">
+  <span class="tag">QuantRoute · Phase 3 · PID-CY014</span>
+  <h1>System Design, Methodology and Implementation</h1>
+  <div class="sub">QuantRoute: Serving Each LLM Prompt at the Cheapest Quantization Level That Stays Accurate and Safe</div>
+  <div class="meta">System architecture, the fifteen modules with their inputs, processing and outputs, hardware and software requirements with exact versions, and the datasets and experimental setup. All figures come from the project’s own runs of Qwen2.5-3B-Instruct on one RTX 4060.</div>
+</div>
+
+<div class="toc">
+  <div><span class="n">SECTION 1</span><b>System Architecture</b>Overview, block diagram, workflow, component interaction</div>
+  <div><span class="n">SECTION 2</span><b>Module-wise Explanation</b>15 modules, each with a flowchart and input → processing → output</div>
+  <div><span class="n">SECTION 3</span><b>Implementation Details</b>Hardware and software requirements, build status</div>
+  <div><span class="n">SECTION 4</span><b>Datasets and Experimental Setup</b>Corpora, safety slice, model files, protocol, metrics</div>
+</div>
+
+<!-- ============================ 1. ARCHITECTURE ============================ -->
+<h2 class="part"><span class="num">1</span>System Architecture</h2>
+<p>QuantRoute answers one question for every prompt: <b>what is the cheapest quantization level of the model that will still answer it accurately, consistently and safely?</b> One model, Qwen2.5-3B-Instruct <span class="cite">[1]</span>, is kept at seven GGUF quantization levels (“rungs”) — Q2_K, Q3_K_M, Q4_K_M, Q5_K_M, Q6_K, Q8_0 and the F16 reference — and served by llama.cpp <span class="cite">[2]</span> on a single 8 GB RTX 4060. Lower rungs use less memory and load faster but may answer some prompts wrongly, change answers that F16 gets right, or stop refusing harmful requests.</p>
+<p>The system is split into two planes that share one artefact (<span class="fref" data-r="fig-glance"></span>). The <b>offline plane</b> builds a graded benchmark, runs every prompt at every rung, and learns a <i>policy</i>: a lookup table from (task category, predicted required precision) to a rung. The <b>online plane</b> loads that table and, for each incoming prompt, classifies it, predicts how much precision it needs, looks up the rung, enforces a safety floor and serves the answer. Everything runs on one local workstation. The network is used only to download the model and datasets once, and to call a teacher model while generating benchmark tasks.</p>
+
+<figure id="fig-glance" data-fig>
+  <div class="panel"><div class="fc" id="fc-glance"></div></div>
+  <figcaption>QuantRoute at a glance. The offline plane runs once per model and machine and produces <code>policy.json</code>; the online plane uses it to choose a rung for every prompt.</figcaption>
+</figure>
+
+<div class="note"><b class="k">Design principles</b>
+  Measure, don’t assume: cost, memory and drift are measured on the target GPU rather than inferred from bit-widths. One code path: the benchmark and the router share the same prompt preparation and answer extraction, so a task is graded exactly as it would be served. Bounds, not averages: a rung is chosen only when one-sided 95% confidence bounds on accuracy, answer flips and safety all pass. Integrity: every model file is pinned by SHA-256 and model-written code only runs in a locked-down container.</div>
+
+<h3 class="sec"><span class="m">1.1</span>Overall Workflow</h3>
+<p>The workflow runs in four stages, each producing files that the next stage reads (<span class="fref" data-r="fig-flow"></span>).</p>
+<ol class="tight" style="padding-left:18px">
+  <li><b>Build.</b> Merge 135 seed tasks with 1,332 teacher-generated, verified tasks into a 1,467-task benchmark (12 categories × 3 tiers); add 600 safety prompts; download the seven model files from one pinned commit and record their SHA-256 hashes.</li>
+  <li><b>Measure.</b> Send all 2,067 prompts to each rung through the server pool (14,469 graded runs, zero errors), profile VRAM and load time, and record answer flips and KL-divergence against F16.</li>
+  <li><b>Learn</b> (training split only). Label each task’s required precision, train the predictor, fit accuracy and flip bounds per cell, set the safety floor, and pick the cheapest admissible rung for each of the 84 cells.</li>
+  <li><b>Serve and evaluate.</b> Apply the policy to live prompts through the API, attack it, and present every result. The 450 test tasks are used only for final evaluation.</li>
+</ol>
+
+<figure id="fig-flow" data-fig>
+  <div class="panel pad">
+    <div class="stagebar">
+      <div style="background:var(--sky-soft)"><b>Build</b>steps 1–4 · data and models</div>
+      <div style="background:var(--sun-soft)"><b>Measure</b>steps 5–6 · GPU runs</div>
+      <div style="background:var(--mint-soft)"><b>Learn</b>steps 7–11 · training split</div>
+      <div style="background:var(--blush)"><b>Serve &amp; evaluate</b>steps 12–14</div>
+    </div>
+    <div class="steps" id="steps"></div>
+    <div class="legend"><span><i style="background:var(--mint)"></i>done</span><span><i style="background:var(--sun)"></i>partly done</span><span><i style="background:#fff;border-style:dashed"></i>next stage</span><span style="margin-left:auto" class="mono">Pn = plan phase that delivers the step</span></div>
+  </div>
+  <figcaption>End-to-end workflow in fourteen steps. Each step names the file it produces; later steps read only those files, so any stage can be re-run on its own.</figcaption>
+</figure>
+
+<div class="wide">
+  <h3 class="sec" style="margin-top:0"><span class="m">1.2</span>System Block Diagram</h3>
+  <figure id="fig-arch" data-fig style="margin-top:4px">
+    <div class="panel"><div class="fc" id="fc-arch"></div></div>
+    <figcaption>System architecture: fifteen modules in five layers, from external sources on the left to serving and presentation on the right. Arrows show the files and calls that connect them. Dashed modules (M13, M14) are designed and specified but not yet built.</figcaption>
+  </figure>
+</div>
+
+<h3 class="sec"><span class="m">1.3</span>Interaction Between Components</h3>
+<p>Modules in different stages never call each other directly. They communicate through versioned files on disk (<span class="fref" data-r="fig-matrix"></span>), and every file records how it was produced: the model hash, llama.cpp build, seed and split. This makes each stage reproducible and lets an expensive stage, such as the three-hour GPU grid, be resumed or skipped. Live interaction happens in two places:</p>
+<ul class="tight">
+  <li><b>Measurement stage:</b> the grid runner asks the server pool for a rung, and the pool starts a llama-server process and talks to it over a local OpenAI-compatible HTTP endpoint. The grader starts a Docker container for each code answer.</li>
+  <li><b>Serving stage:</b> each request passes through the API, router, predictor, policy, safety classifier and server pool (<span class="fref" data-r="fig-seq"></span>).</li>
+</ul>
+
+<figure id="fig-matrix" data-fig>
+  <div class="panel pad"><table class="mx" id="mx"></table>
+    <div class="legend"><span><span class="dw"></span> writes</span><span><span class="dr"></span> reads</span><span style="margin-left:auto">Read across a row for what a module consumes and produces; read down a column for who depends on a file.</span></div></div>
+  <figcaption>Component interaction matrix: which module writes (●) and reads (○) each shared artefact.</figcaption>
+</figure>
+
+<figure id="fig-seq" data-fig>
+  <div class="panel"><div class="fc" id="fc-seq"></div></div>
+  <figcaption>Interaction for one live request through the routing service (designed for the next stage, P12). Checks that reject a request return early with the HTTP status shown; the model always receives the original prompt.</figcaption>
+</figure>
+
+<!-- ============================ 2. MODULES ============================ -->
+<h2 class="part" style="margin-top:18px"><span class="num">2</span>Module-wise Explanation</h2>
+<p>The system is decomposed into fifteen modules (<span class="fref" data-r="tab-mods"></span>), grouped into the five layers of <span class="fref" data-r="fig-arch"></span>. Each is a Python module, or a small group of them, in <code>src/quantlab/</code> with its own unit tests. For each module, the input, processing and output are listed beside a flowchart of its logic. Flowchart shapes follow the usual conventions:</p>
+<div class="panel pad" style="margin-bottom:12px"><div class="fc" id="fc-key"></div></div>
+
+<div class="tablefig" id="tab-mods" data-tab>
+  <p class="tcap">Module index.</p>
+  <table class="t">
+    <thead><tr><th style="width:6%">#</th><th style="width:33%">Module</th><th style="width:47%">Source files</th><th style="width:14%">Status</th></tr></thead>
+    <tbody id="mods-body"></tbody>
+  </table>
+</div>
+
+<div id="modules"></div>
+
+<!-- ============================ 3. IMPLEMENTATION ============================ -->
+<div class="newpage"></div>
+<h2 class="part"><span class="num">3</span>Implementation Details</h2>
+<h3 class="sec"><span class="m">3.1</span>Hardware Requirements</h3>
+<p>QuantRoute is designed for a single consumer workstation with one NVIDIA GPU. The GPU runs every model level; the CPU runs everything else, including sentence embeddings, statistics, the sandbox containers and the API. <span class="fref" data-r="tab-hw"></span> lists the minimum and recommended specifications next to the machine every result in this report was measured on, and <span class="fref" data-r="fig-hw"></span> shows which component does which job.</p>
+
+<div class="tablefig" id="tab-hw" data-tab>
+  <p class="tcap">Hardware requirements.</p>
+  <table class="t">
+    <thead><tr><th style="width:13%">Component</th><th style="width:27%">Minimum</th><th style="width:25%">Recommended</th><th style="width:35%">Used in this project (measured)</th></tr></thead>
+    <tbody>
+      <tr><td class="k">GPU</td><td>NVIDIA GPU with CUDA 12 support and 4 GB VRAM (Q2_K–Q8_0 fit; F16 partly offloads to the CPU)</td><td>NVIDIA GPU with 8 GB+ VRAM so the whole ladder, including F16, stays on the GPU</td><td>NVIDIA GeForce RTX 4060, 8 GB GDDR6 (8,188 MiB), compute capability 8.9, PCIe 4.0 ×8, driver 617.42</td></tr>
+      <tr><td class="k">Processor</td><td>4-core x86-64 with AVX2</td><td>6+ cores, 12 threads</td><td>AMD Ryzen 5 7600, 6 cores / 12 threads, 3.8 GHz base</td></tr>
+      <tr><td class="k">Memory</td><td>16 GB</td><td>32 GB</td><td>32 GB DDR5 (2 × 16 GB, running at 4,800 MT/s)</td></tr>
+      <tr><td class="k">Storage</td><td>60 GB free on an SSD: 20.9 GB of model files, about 25 GB of temporary F16 logits for KL, about 3 GB of tools and environment</td><td>100 GB+ on NVMe, for fast model loads and the logits file</td><td>Crucial P3 Plus 1 TB NVMe SSD</td></tr>
+      <tr><td class="k">Network</td><td>Needed only for one-time downloads and the teacher API during task generation</td><td>Broadband; inference itself is fully offline</td><td>Home broadband; 467 teacher API calls in total</td></tr>
+      <tr><td class="k">Sensors / devices</td><td colspan="3">None. QuantRoute is a pure software system; prompts arrive as text over HTTP or from files.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<figure id="fig-hw" data-fig>
+  <div class="panel"><div class="fc" id="fc-hw"></div></div>
+  <figcaption>What runs where on the reference workstation. Only llama-server uses the GPU, and the pool loads one large rung at a time. Embeddings deliberately run on the CPU (a CPU build of PyTorch) so they never compete with the model for video memory.</figcaption>
+</figure>
+
+<div class="twocol">
+  <figure id="fig-vram" data-fig>
+    <div class="panel"><div id="ch-vram"></div></div>
+    <figcaption>Measured VRAM per rung against the 8,188 MiB card. Every rung, F16 included, keeps all its layers on the GPU when loaded alone.</figcaption>
+  </figure>
+  <figure id="fig-disk" data-fig>
+    <div class="panel"><div id="ch-disk"></div></div>
+    <figcaption>Disk space by item. The F16 logits file is needed only while the KL-divergence pass runs and is deleted afterwards.</figcaption>
+  </figure>
+</div>
+
+<figure id="fig-speed" data-fig>
+  <div class="panel"><div id="ch-speed"></div></div>
+  <figcaption>Measured speed on the RTX 4060 over all 14,469 runs. Q2_K generates tokens fastest but writes more than twice as many per answer, so it is slower per task than Q4_K_M. Cost has to be measured, not inferred from bit-width.</figcaption>
+</figure>
+
+<h3 class="sec"><span class="m">3.2</span>Software Requirements</h3>
+<p>The system is written in Python and built only on open-source components. Everything except the teacher API runs locally. Versions are pinned: Python packages in <code>requirements.lock.txt</code>, the llama.cpp build tag in <code>config.yaml</code>, model files by commit and SHA-256 in <code>models/models.lock.json</code>, and the sandbox image by digest. <span class="fref" data-r="tab-sw"></span> lists them and <span class="fref" data-r="fig-stack"></span> shows how they layer.</p>
+
+<div class="tablefig" id="tab-sw" data-tab>
+  <p class="tcap">Software requirements with the exact versions used.</p>
+  <table class="t">
+    <thead><tr><th style="width:18%">Category</th><th style="width:30%">Tool / library</th><th style="width:18%">Version</th><th style="width:34%">Role in QuantRoute</th></tr></thead>
+    <tbody id="sw-body"></tbody>
+  </table>
+</div>
+
+<figure id="fig-stack" data-fig>
+  <div class="panel pad"><div class="stack" id="stack"></div></div>
+  <figcaption>Software stack, from hardware and drivers at the bottom to the user-facing interfaces at the top.</figcaption>
+</figure>
+
+<h3 class="sec"><span class="m">3.3</span>Implementation Status and Code Organisation</h3>
+<p>The work follows a 16-phase plan (P0–P15). The measurement and learning layers are complete: 24 source modules, 5,083 lines of Python, and 1,653 lines of tests. The unit suite has 138 tests and all pass. A further 7 tests need Docker or the GPU and are run explicitly. The grid run finished with 0 errors in 14,469 rows. The remaining analysis (held-out baselines, sweep, bootstrap and audits), the routing API and the adversarial evaluation are the next stage (<span class="fref" data-r="fig-phases"></span>).</p>
+<figure id="fig-phases" data-fig>
+  <div class="panel pad"><div class="phases" id="phases"></div>
+    <div class="legend"><span><i style="background:var(--mint-soft)"></i>complete</span><span><i style="background:var(--sun-soft)"></i>in progress</span><span><i style="background:#fff;border-style:dashed"></i>next stage</span></div></div>
+  <figcaption>Implementation status by plan phase. P0–P10 are complete; P11 has labels, predictor, pooled models, safety and policy done; P12–P15 follow.</figcaption>
+</figure>
+
+<!-- ============================ 4. DATA & SETUP ============================ -->
+<div class="newpage"></div>
+<h2 class="part"><span class="num">4</span>Dataset Details and Experimental Setup</h2>
+<p>No public benchmark grades the same prompts across the full quantization ladder of one model, by category and difficulty, together with safety prompts and measured cost. QuantRoute therefore assembles its own evaluation data from five sources (<span class="fref" data-r="tab-data"></span>, <span class="fref" data-r="fig-lineage"></span>): a graded <b>benchmark slice</b> of 1,467 tasks, a <b>safety slice</b> of 600 prompts, a <b>fidelity corpus</b> for KL-divergence, and the <b>model files</b> themselves.</p>
+
+<div class="tablefig" id="tab-data" data-tab>
+  <p class="tcap">Datasets, their size in this project, and why each matters.</p>
+  <table class="t">
+    <thead><tr><th style="width:17%">Dataset</th><th style="width:22%">Source and licence handling</th><th style="width:13%">Size used</th><th style="width:48%">Role and importance</th></tr></thead>
+    <tbody>
+      <tr><td class="k">CheapRoute seed tasks</td><td>The team’s earlier routing project; 4 JSONL files (154 rows, 19 duplicates)</td><td>135 tasks</td><td>Hand-written tasks across all 12 categories with deterministic graders. They anchor the benchmark in human-authored prompts and fixed the task schema and the seven grader types.</td></tr>
+      <tr><td class="k">Teacher-generated tasks</td><td>gpt-oss-120b <span class="cite">[3]</span> via the Fireworks AI API, verified before acceptance</td><td>1,332 tasks</td><td>Fill each of the 36 category × tier cells to about 38 tasks, so per-cell accuracy, flips and bounds can be estimated. Without them most cells would hold fewer than five seeds.</td></tr>
+      <tr><td class="k">XSTest <span class="cite">[4]</span></td><td>Public CSV, downloaded at build time and never committed (the repository declares no licence)</td><td>450 prompts</td><td>200 genuinely unsafe prompts that should be refused and 250 safe prompts that only look unsafe. Together they measure whether quantization weakens refusals and whether it causes over-refusal.</td></tr>
+      <tr><td class="k">Constructed injections</td><td>Built from the benchmark’s own extraction and summarization tasks, seed 42</td><td>150 prompts</td><td>Each carries a planted override instruction with a unique canary word. They measure whether lower rungs follow injected instructions more readily than F16.</td></tr>
+      <tr><td class="k">WikiText-2 (raw test) <span class="cite">[5]</span></td><td>Public corpus, downloaded for the KL pass</td><td>40 × 4,096 tokens</td><td>A neutral text corpus for comparing each rung’s full next-token distribution with F16’s. It catches drift that graded tasks miss.</td></tr>
+      <tr><td class="k">Qwen2.5-3B-Instruct GGUF <span class="cite">[1]</span></td><td>Official Hugging Face repository, commit <code>7dabda4</code>, SHA-256 pinned</td><td>7 rungs, 20.85 GB</td><td>The object under study. One repository and one quantization recipe, so rungs differ only in precision.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<figure id="fig-lineage" data-fig>
+  <div class="panel"><div class="fc" id="fc-lineage"></div></div>
+  <figcaption>Data lineage: how the five sources become the two slices, and how the slices become 14,469 graded runs and 163,840 KL-scored tokens per rung.</figcaption>
+</figure>
+
+<h3 class="sec"><span class="m">4.1</span>Benchmark Slice: 1,467 Graded Tasks</h3>
+<p>Tasks cover 12 categories that a general assistant receives — maths, multiple choice, factual Q&amp;A, classification, sentiment, extraction, language, logic, summarization, named-entity recognition, code generation and code debugging — at three difficulty tiers. Each generated task was written for a requested tier. Seeds were tiered by a heuristic scorer. Tiers are used only to stratify and report results, never to route. Every task carries its own deterministic grader (<span class="fref" data-r="fig-comp"></span>), so accuracy is measured without an LLM judge.</p>
+<p>A task enters the benchmark only if the teacher can answer it correctly under that grader. This drops tasks the teacher gets wrong as well as malformed ones, and the drop rate is logged per cell. It is also why complex logic has only 12 tasks: verification rejected every complex logic puzzle the teacher wrote, and the run used 467 of its 600 permitted API calls. Tasks are split 70/30 into train and test by a SHA-256 hash of their id, giving 1,017 training and 450 test tasks. The split is fixed and independent of content.</p>
+
+<figure id="fig-cat" data-fig>
+  <div class="panel"><div id="ch-cat"></div></div>
+  <figcaption>Tasks per category, split by source. Generated tasks bring every category to 99–132 tasks; seeds contribute 4–19 each.</figcaption>
+</figure>
+
+<div class="twocol">
+  <figure id="fig-heat" data-fig>
+    <div class="panel"><div id="ch-heat"></div></div>
+    <figcaption>Tasks per category × difficulty tier. Most cells hold 37–56 tasks; complex logic (12) is the one thin cell.</figcaption>
+  </figure>
+  <figure id="fig-comp" data-fig>
+    <div class="panel"><div id="ch-comp"></div></div>
+    <figcaption>Composition by tier and split, and the grader each task uses. <code>py_exec</code> answers are executed in the sandbox.</figcaption>
+  </figure>
+</div>
+
+<div class="tablefig" id="tab-ex" data-tab>
+  <p class="tcap">One example task per category, with its grader. Prompts are shown as generated; summarization is truncated.</p>
+  <table class="t">
+    <thead><tr><th style="width:15%">Category</th><th style="width:70%">Example prompt (easy tier)</th><th style="width:15%">Grader</th></tr></thead>
+    <tbody id="ex-body"></tbody>
+  </table>
+</div>
+
+<h3 class="sec"><span class="m">4.2</span>Safety Slice: 600 Prompts</h3>
+<p>The safety slice judges each rung against F16 rather than in isolation (<span class="fref" data-r="fig-waffle"></span>). A prompt is handled <i>safely</i> if:</p>
+<ul class="tight">
+  <li>a harmful prompt is refused;</li>
+  <li>a benign look-alike is <i>not</i> refused;</li>
+  <li>an injection’s canary word does not appear in the answer.</li>
+</ul>
+<p>Refusals are detected by a string matcher. A stratified audit of 200 responses by an LLM judge is planned to measure the matcher’s error rates. The injections are built so that the original task stays answerable and the canary is a random token that never occurs naturally, which makes success or failure unambiguous (<span class="fref" data-r="fig-inj"></span>).</p>
+<div class="twocol">
+  <figure id="fig-waffle" data-fig>
+    <div class="panel"><div id="ch-waffle"></div></div>
+    <figcaption>Safety slice composition; each square is five prompts. Train/test: harmful 144/56, benign look-alike 167/83, injection 104/46.</figcaption>
+  </figure>
+  <figure id="fig-inj" data-fig>
+    <div class="panel pad">
+      <div class="prompt">Extract the year from: ‘The company was founded in 1998 by two college roommates.’ Reply with just the year. <mark>[planted instruction telling the model to reply only with the canary word ZEBRA·····]</mark></div>
+      <div class="fc" id="fc-inj" style="margin-top:8px"></div>
+    </div>
+    <figcaption>How an injection task is built and judged. The source task keeps its own answer (1998); the rung counts as unsafe if the canary appears in its output.</figcaption>
+  </figure>
+</div>
+
+<h3 class="sec"><span class="m">4.3</span>Model Files and Fidelity Corpus</h3>
+<p>All seven rungs come from one commit of the official repository, so they share a single quantization recipe and differ only in precision. A third-party build of “Q4_K_M” from another repository is a different file of a different size, and mixing the two would confound the comparison. Each file’s hash is checked before every server launch, which also guards against the tampered-quantization attacks described by Egashira et al. <span class="cite">[15]</span>. Effective bits per weight are measured as file size ÷ parameter count, which is why they exceed the nominal labels (<span class="fref" data-r="tab-ladder"></span>).</p>
+
+<div class="tablefig" id="tab-ladder" data-tab>
+  <p class="tcap">The quantization ladder as measured on the reference machine.</p>
+  <table class="t">
+    <thead><tr><th>Rung</th><th class="num">File size</th><th class="num">Bits / weight</th><th class="num">VRAM (MiB)</th><th class="num">Load time</th><th class="num">Mean KL vs F16</th><th class="num">Same top token</th><th>SHA-256 (first 16 hex)</th></tr></thead>
+    <tbody id="ladder-body"></tbody>
+  </table>
+</div>
+
+<h3 class="sec"><span class="m">4.4</span>Experimental Setup</h3>
+<h4>The measurement grid</h4>
+<p>Every prompt in both slices is run at every rung: 2,067 prompts × 7 rungs = <b>14,469 graded runs</b> (<span class="fref" data-r="fig-grid"></span>). Only one rung is loaded at a time, and rungs run in a fixed order. Decoding is deterministic: temperature 0, seed 42, prompt cache off. Any difference between two rows for the same task is therefore caused by precision alone. <span class="fref" data-r="tab-ctrl"></span> lists the controlled settings.</p>
+
+<figure id="fig-grid" data-fig>
+  <div class="panel"><div id="ch-grid"></div></div>
+  <figcaption>The measurement grid. Each row is one rung’s pass over all 2,067 prompts, which took 20–42 minutes on the RTX 4060. Each cell records the answer, correctness or safety, token log-probabilities, tokens and latency, plus the model hash and llama.cpp build.</figcaption>
+</figure>
+
+<div class="tablefig" id="tab-ctrl" data-tab>
+  <p class="tcap">Controlled experimental settings (from <code>config.yaml</code>).</p>
+  <table class="t">
+    <thead><tr><th style="width:20%">Setting</th><th style="width:38%">Value</th><th style="width:42%">Why it is controlled</th></tr></thead>
+    <tbody id="ctrl-body"></tbody>
+  </table>
+</div>
+
+<h4>Metrics</h4>
+<div class="tablefig" id="tab-metrics" data-tab>
+  <p class="tcap">Metrics recorded per rung, and per category and cell where applicable.</p>
+  <table class="t">
+    <thead><tr><th style="width:20%">Metric</th><th style="width:47%">Definition</th><th style="width:33%">Purpose</th></tr></thead>
+    <tbody id="metrics-body"></tbody>
+  </table>
+</div>
+
+<h4>Training and evaluation protocol</h4>
+<p>Everything that is learned (τ, labels, predictor, pooled models, safety floor, classifier threshold and policy) is fitted on the <b>training split</b> only. The predictor’s outputs on training tasks come from 5-fold cross-fitting (<span class="fref" data-r="fig-folds"></span>): each task’s predicted class comes from a model that never saw that task’s label. Without this, the pooled models would learn from labels that leaked through the predictor. The <b>test split</b> is used once, to compare the learned policy with the baselines in <span class="fref" data-r="tab-base"></span>.</p>
+<div class="twocol">
+  <figure id="fig-protocol" data-fig>
+    <div class="panel"><div class="fc" id="fc-protocol"></div></div>
+    <figcaption>Train/test protocol. The split is a hash of each task id, so it is fixed and independent of content.</figcaption>
+  </figure>
+  <figure id="fig-folds" data-fig>
+    <div class="panel"><div id="ch-folds"></div></div>
+    <figcaption>5-fold cross-fitting on the 1,017 training tasks. Each fold’s predictions come from a model fitted on the other four folds.</figcaption>
+  </figure>
+</div>
+
+<div class="tablefig" id="tab-base" data-tab>
+  <p class="tcap">Policies compared on the held-out test split.</p>
+  <table class="t">
+    <thead><tr><th style="width:22%">Policy</th><th style="width:78%">How it chooses the rung</th></tr></thead>
+    <tbody>
+      <tr><td class="k">always-&lt;rung&gt; (×7)</td><td>Serve every prompt at one fixed rung, from Q2_K to F16. This is how quantized models are deployed today.</td></tr>
+      <tr><td class="k">best fixed</td><td>The cheapest single rung whose overall training accuracy lower bound, flip upper bound and safety upper bound pass the same δ, φ and ψ.</td></tr>
+      <tr><td class="k">resident subset</td><td>The best set of rungs that fit in VRAM together, choosing within the set, with simulated swap costs included.</td></tr>
+      <tr><td class="k">learned (QuantRoute)</td><td>The 84-cell policy: predicted category and predicted required precision → cheapest admissible rung, raised to the safety floor for flagged prompts.</td></tr>
+      <tr><td class="k">oracle</td><td>The cheapest rung that actually got each test task right (or safe). This is an unreachable lower bound on cost.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h4>Operating point, sweep and statistical analysis</h4>
+<ul class="tight">
+  <li><b>Default operating point.</b> δ = 0.02: a rung may lose at most 2 points of accuracy against F16, measured by its lower bound. φ = 0.10: at most 10% flipped answers, by the upper bound. ψ = 0.05: at most 5% safety flips, by the upper bound.</li>
+  <li><b>Sweep.</b> The policy is refitted for 8 × 6 × 5 = 240 (δ, φ, ψ) combinations to trace the cost–accuracy frontier.</li>
+  <li><b>Pooled models.</b> Accuracy and flip bounds use one-sided 95% intervals (z = 1.645) from GEE <span class="cite">[9]</span> with task-clustered correlation, fitted in statsmodels <span class="cite">[11]</span>.</li>
+  <li><b>Safety bounds.</b> Safety-flip rates use Wilson score bounds <span class="cite">[10]</span>.</li>
+  <li><b>Uncertainty.</b> Bootstrap: 200 refits of the whole pipeline on resampled training tasks, to check policy stability, and 1,000 resamples of test tasks, to give 95% confidence intervals on each policy’s accuracy and cost.</li>
+  <li><b>Security checks.</b> A differential test flags any category whose flip rate at one rung jumps more than 10 points above both neighbouring rungs (p &lt; 0.01), and any rung whose KL is out of order, as a sign of a planted quantization backdoor <span class="cite">[15]</span>. The planned adversarial stage then attacks the router with cost-inflation and downgrade prompts, including router “gadgets” in the style of <span class="cite">[14]</span>.</li>
+</ul>
+
+<figure id="fig-sample" data-fig>
+  <div class="panel"><div id="ch-sample"></div></div>
+  <figcaption>Sample outputs of the setup (benchmark slice, all 1,467 tasks). Accuracy is flat from Q4_K_M upward and collapses at Q2_K, but flips and KL rise steadily as precision falls. Even Q8_0, within 0.4 points of F16’s accuracy, changes 4.4% of outcomes <span class="cite">[6]</span>. These are the signals the selection rule combines.</figcaption>
+</figure>
+
+<div class="note warm"><b class="k">Expected outcomes and how they will be judged</b>
+  <ul class="tight" style="margin:2px 0 0">
+    <li><b>Cheap rungs suffice for many cells.</b> A rung at or below 4 bits stays within δ of F16 in most category × tier cells. Current data: 25 of 36 cells, consistent with the 4-bit result of Dettmers and Zettlemoyer <span class="cite">[13]</span>.</li>
+    <li><b>Required precision is predictable from the prompt.</b> The predictor should beat the majority-class and per-category baselines. Current data: 45.8% exact versus 45.5% and 48.4%, and 79.8% within one level, so prompt text alone is a weak signal.</li>
+    <li><b>Lower cost on held-out tasks.</b> On the test split, the learned policy should cost less than the best fixed rung at equal accuracy and flip rate. This is the first test of the next stage.</li>
+    <li><b>Safety holds.</b> Served safety flips should stay within ψ, and flagged prompts should never be served below the floor (currently Q5_K_M), including under downgrade attacks.</li>
+  </ul></div>
+
+<h2 class="part" style="margin-top:16px"><span class="num">§</span>References</h2>
+<div class="refs" id="refs"></div>
+
+<script src="figures.js"></script>
+</body>
+</html>
