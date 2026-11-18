@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QuantRoute Replay Demo</title>
+<meta name="description" content="Pick any of 450 held-out questions and watch QuantRoute choose which quantized version of Qwen2.5-3B-Instruct answers it, replayed from recorded answers.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=DM+Sans:opsz,wght@9..40,400..700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='1' y='1' width='30' height='30' rx='8' fill='%23ffc832' stroke='%23151515' stroke-width='2'/%3E%3Crect x='6' y='20' width='5' height='6' fill='%23ff8d65'/%3E%3Crect x='13.5' y='14' width='5' height='12' fill='%23d05320'/%3E%3Crect x='21' y='7' width='5' height='19' fill='%23151515'/%3E%3C/svg%3E">
+<style>
+  .hero { padding: 44px 0 8px; display: flex; flex-direction: column; gap: 14px; }
+  .hero h1 { font-size: clamp(34px, 5vw, 58px); font-weight: 800; max-width: 920px; }
+  .hero h1 .hl { background: var(--sun); padding: 0 .12em; border-radius: 10px; }
+  .hero .lede { font-size: 18px; color: var(--ink-2); max-width: 780px; margin: 0; }
+
+  .controls-card { display: grid; grid-template-columns: 1.1fr repeat(3, 1fr); gap: 18px 24px; align-items: start; margin-top: 26px; }
+  .controls-card .grp { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  .toggle { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; cursor: pointer; }
+  .toggle input { width: 18px; height: 18px; accent-color: #151515; }
+
+  .main-grid { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 22px; margin-top: 22px; align-items: start; }
+  .picker { display: flex; flex-direction: column; gap: 10px; position: sticky; top: 84px; }
+  .picker input[type=search], .picker select { font: inherit; font-size: 14px; padding: 9px 11px; border: 2px solid var(--line); border-radius: 10px; background: var(--paper); width: 100%; }
+  .picker .row { display: flex; gap: 8px; }
+  .qlist { max-height: calc(100vh - 330px); min-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding: 2px 4px 2px 2px; }
+  .qitem { text-align: left; background: var(--paper); border: 2px solid var(--grid); border-radius: 10px; padding: 8px 10px; cursor: pointer; font: inherit; display: flex; flex-direction: column; gap: 4px; }
+  .qitem:hover { border-color: var(--line); }
+  .qitem.sel { border-color: var(--line); background: #fff1c2; box-shadow: var(--shadow-sm); }
+  .qitem .t { font-size: 13.5px; line-height: 1.35; color: var(--ink); }
+  .qitem .m { display: flex; gap: 6px; align-items: center; font-size: 12px; color: var(--muted); }
+  .qitem .m .rchip { font-size: 10.5px; padding: 1px 6px; border-width: 1.5px; }
+  .count { font-size: 13px; color: var(--muted); }
+
+  .qcard { padding: 20px 22px; display: flex; flex-direction: column; gap: 12px; }
+  .qtext { font-family: var(--mono); font-size: 14px; line-height: 1.6; border: 2px dashed var(--line); border-radius: 12px; padding: 12px 14px; background: var(--bg); white-space: pre-wrap; overflow-wrap: anywhere; max-height: 260px; overflow-y: auto; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 13.5px; color: var(--ink-2); }
+  .meta b { color: var(--ink); }
+
+  .pipe { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 26px; margin: 20px 0; }
+  .st { position: relative; border: 2px solid var(--line); border-radius: 14px; padding: 12px; background: var(--paper); display: flex; flex-direction: column; gap: 6px; min-width: 0; box-shadow: var(--shadow-sm); }
+  .st:not(:last-child)::after { content: ""; position: absolute; right: -21px; top: 50%; width: 12px; height: 12px; border-top: 3px solid var(--line); border-right: 3px solid var(--line); transform: translateY(-50%) rotate(45deg); }
+  .st .k { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+  .st .v { font-family: var(--display); font-weight: 800; font-size: 20px; line-height: 1.15; overflow-wrap: anywhere; }
+  .st .d { font-size: 12.5px; color: var(--ink-2); line-height: 1.4; }
+  .st.final { background: var(--sun); }
+  .st.warn { background: var(--blush); }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .ans { padding: 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .ans .hd { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .ans .txt { font-family: var(--mono); font-size: 13px; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 200px; overflow-y: auto; color: var(--ink-2); }
+  .ans .st2 { font-family: var(--mono); font-size: 12.5px; font-weight: 700; color: var(--ink-2); }
+  .verdict { margin-top: 16px; }
+  .ok { color: #0b7a3e; font-weight: 800; } .no { color: #b3261e; font-weight: 800; }
+
+  table.all { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  table.all th { font-family: var(--mono); font-size: 11px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); text-align: left; padding: 8px; border-bottom: 2px solid var(--line); }
+  table.all td { padding: 8px; border-bottom: 1px solid var(--grid); vertical-align: top; }
+  table.all td.a { font-family: var(--mono); font-size: 12.5px; color: var(--ink-2); overflow-wrap: anywhere; max-width: 0; width: 40%; }
+  table.all td:last-child { white-space: nowrap; }
+  table.all td.a div { max-height: 4.8em; overflow: hidden; }
+  table.all tr.served td { background: #fff1c2; }
+  table.all td.n { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .gate { font-family: var(--mono); font-size: 11.5px; font-weight: 700; padding: 2px 7px; border-radius: 6px; border: 1.5px solid currentColor; white-space: nowrap; }
+  .gate.pass { color: #0b7a3e; } .gate.fail { color: #b3261e; } .gate.ref { color: var(--muted); }
+  .need { font-family: var(--mono); font-size: 10.5px; font-weight: 800; background: var(--mint); border: 1.5px solid var(--line); border-radius: 6px; padding: 1px 5px; margin-left: 6px; white-space: nowrap; }
+
+  .totals { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+  .tot { padding: 16px; display: flex; flex-direction: column; gap: 6px; }
+  .tot .name { font-family: var(--display); font-weight: 800; font-size: 18px; }
+  .tot .big2 { font-family: var(--display); font-weight: 800; font-size: 30px; line-height: 1; }
+  .tot .sub { font-size: 13px; color: var(--ink-2); }
+  .tot.me { background: var(--sun); }
+  .usage { display: flex; height: 34px; border: 2px solid var(--line); border-radius: 10px; overflow: hidden; margin-top: 14px; }
+  .usage div { display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 11.5px; font-weight: 700; white-space: nowrap; overflow: hidden; border-right: 2px solid var(--paper); }
+  .usage div:last-child { border-right: 0; }
+  @media (max-width: 1080px) { .main-grid { grid-template-columns: 1fr; } .picker { position: static; } .qlist { max-height: 360px; } .pipe { grid-template-columns: 1fr 1fr; } .st::after { display: none; } .controls-card { grid-template-columns: 1fr 1fr; } .totals { grid-template-columns: 1fr 1fr; } .compare { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="logo" href="index.html">
+      <svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <rect x="1" y="1" width="30" height="30" rx="8" fill="#ffc832" stroke="#151515" stroke-width="2"/>
+        <rect x="6" y="20" width="5" height="6" fill="#ff8d65" stroke="#151515" stroke-width="1.5"/>
+        <rect x="13.5" y="14" width="5" height="12" fill="#d05320" stroke="#151515" stroke-width="1.5"/>
+        <rect x="21" y="7" width="5" height="19" fill="#151515" stroke="#151515" stroke-width="1.5"/>
+      </svg>
+      QuantRoute
+    </a>
+    <nav class="nav" id="nav">
+      <a href="index.html">Results dashboard</a>
+      <a href="demo.html" class="active">Replay demo</a>
+      <a href="guide.html">Study guide</a>
+      <a href="revision.html">Revision notes</a>
+    </nav>
+    <a class="btn dark" href="guide.html">New here? Start with the guide</a>
+  </div>
+</header>
+
+<main class="wrap" id="top">
+  <section class="hero">
+    <span class="kicker">Replay demo · 450 held-out questions · no model download needed</span>
+    <h1>Pick a question. Watch QuantRoute choose <span class="hl">which version of the model</span> answers it.</h1>
+    <p class="lede">QuantRoute keeps seven versions of Qwen2.5-3B-Instruct, from tiny Q2_K to full-precision F16. For each question it predicts how much precision is needed and serves the cheapest version that passes its accuracy, answer-stability and safety checks. Every version's answer to every question below was recorded on an RTX 4060, so this page replays the real decisions and answers in your browser.</p>
+    <div class="note info"><span class="note-tag">HOW THIS WORKS</span><span>The detected category and predicted precision are the predictor's real outputs, and the safety score comes from the trained classifier. The answers shown are the ones each version actually gave. None of these 450 questions were used to fit the policy. The live routing service, which would answer new questions you type in, is the project's next stage.</span></div>
+  </section>
+
+  <section class="card pad controls-card" aria-label="Policy thresholds">
+    <div class="grp">
+      <div class="chart-title">Policy thresholds</div>
+      <div class="pills" id="presets">
+        <button class="pill" data-p="strict" type="button">Strict (project default)</button>
+        <button class="pill" data-p="balanced" type="button">Balanced</button>
+        <button class="pill" data-p="loose" type="button">Loose</button>
+      </div>
+      <label class="toggle" for="flag"><input type="checkbox" id="flag"> Pretend the safety classifier flags this question</label>
+    </div>
+    <div class="slider-row"><label for="sl-d">Accuracy allowance δ</label><span class="val" id="v-d"></span><input type="range" id="sl-d" min="0" max="0.15" step="0.005"><span class="hint">How far below F16's accuracy (lower bound) a version may fall.</span></div>
+    <div class="slider-row"><label for="sl-f">Flip limit φ</label><span class="val" id="v-f"></span><input type="range" id="sl-f" min="0" max="1" step="0.01"><span class="hint">Most answers that may differ from F16 (upper bound).</span></div>
+    <div class="slider-row"><label for="sl-s">Safety limit ψ</label><span class="val" id="v-s"></span><input type="range" id="sl-s" min="0" max="0.3" step="0.005"><span class="hint">Most safety slips allowed per version (upper bound).</span></div>
+  </section>
+
+  <div class="main-grid">
+    <aside class="picker card pad" aria-label="Choose a question">
+      <div class="chart-title">Choose a question</div>
+      <input type="search" id="q" placeholder="Search the question text…" aria-label="Search questions">
+      <div class="row">
+        <select id="cat" aria-label="Filter by category"></select>
+        <button class="btn" id="rand" type="button">Random</button>
+      </div>
+      <select id="only" aria-label="Filter by outcome">
+        <option value="all">All questions</option>
+        <option value="cheap">Served below F16</option>
+        <option value="savedright">Cheaper and still correct</option>
+        <option value="flip">Cheaper but wrong where F16 was right</option>
+        <option value="miscat">Category detected wrongly</option>
+      </select>
+      <div class="count" id="count"></div>
+      <div class="qlist" id="qlist"></div>
+    </aside>
+
+    <section aria-label="Routing decision" style="min-width:0">
+      <div class="card qcard" id="qcard"></div>
+      <div class="pipe" id="pipe"></div>
+      <div class="compare" id="compare"></div>
+      <div class="note verdict" id="verdict"></div>
+      <div class="card pad" style="margin-top:20px">
+        <div class="chart-title">What all seven versions said</div>
+        <div class="chart-sub">Each version's recorded answer, and whether it passes this cell's three checks at the thresholds above. The highlighted row is the version QuantRoute serves.</div>
+        <div style="overflow-x:auto"><table class="all" id="all"></table></div>
+      </div>
+    </section>
+  </div>
+
+  <section class="block" id="totals-sec">
+    <div class="sec-head"><span class="sec-tag">ALL 450</span><div><h2>Replay every question at these thresholds</h2><p>Totals over all 450 held-out questions, using each version's recorded correctness and answer time. Moving the sliders above recomputes them.</p></div></div>
+    <div class="totals" id="totals"></div>
+    <div class="usage" id="usage" aria-label="How often each version is served"></div>
+    <div class="legend" id="ulegend" style="margin-top:10px"></div>
+    <p class="small muted" style="margin-top:12px">GPU time is the sum of the recorded wall-clock answer times on the RTX 4060. Model loading time is not included. "Cheapest correct (hindsight)" picks, for each question, the cheapest version that happened to answer correctly. No real router can know that in advance, so it is a lower bound, not a target.</p>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">QuantRoute &middot; replayed from 3,150 recorded answers (450 questions × 7 versions) &middot; Qwen2.5-3B-Instruct on one RTX 4060 &middot; llama.cpp b11451</div>
+</footer>
+
+<script src="data.js"></script>
+<script src="demo-data.js"></script>
+<script src="demo.js"></script>
+</body>
+</html>

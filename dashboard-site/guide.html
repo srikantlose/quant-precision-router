@@ -2,254 +2,787 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>QuantRoute Study Guide</title>
-<meta name="description" content="Learn the whole QuantRoute project fast: flowcharts, flashcards, key numbers, viva answers and a self-check quiz.">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="A beginner's interactive walk-through of QuantRoute: what quantization is, how the project measured it, and how it picks a model version for each question.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='1' y='1' width='30' height='30' rx='8' fill='%23ffc832' stroke='%23151515' stroke-width='2'/%3E%3Crect x='6' y='20' width='5' height='6' fill='%23ff8d65'/%3E%3Crect x='13.5' y='14' width='5' height='12' fill='%23d05320'/%3E%3Crect x='21' y='7' width='5' height='19' fill='%23151515'/%3E%3C/svg%3E">
+<title>QuantRoute From Zero</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=DM+Sans:opsz,wght@9..40,400..700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='1' y='1' width='30' height='30' rx='8' fill='%23ffc832' stroke='%23151515' stroke-width='2'/%3E%3Crect x='6' y='20' width='5' height='6' fill='%23ff8d65'/%3E%3Crect x='13.5' y='14' width='5' height='12' fill='%23d05320'/%3E%3Crect x='21' y='7' width='5' height='19' fill='%23151515'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=JetBrains+Mono:wght@500;700&display=swap">
 <style>
-  .progress { flex: none; display: flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 12px; font-weight: 700; }
-  .progress .bar { width: 120px; height: 12px; border: 2px solid var(--line); border-radius: 99px; background: var(--paper); overflow: hidden; }
-  .progress .bar span { display: block; height: 100%; width: 0; background: var(--mint); transition: width .3s ease; }
-  @media (max-width: 720px) { .progress .bar { width: 60px; } }
+/* Layout: a field guide. A sticky chapter rail on the left (a chip bar on phones) and one column of
+   short chapters, each with a picture and something to try. Same visual language as the project dashboard. */
+:root {
+  --paper: #faf8f3; --panel: #ffffff; --ink: #161513; --ink-2: #45413a; --muted: #77716a; --line: #161513; --grid: #e6dfd2;
+  --shadow: #161513; --on-pop: #161513;
+  --sun: #ffc832; --sun-soft: #fff1c2; --mint: #2ed3a0; --mint-soft: #ddf7ec; --sky: #bcd3ff; --sky-soft: #e8f0ff;
+  --coral: #ff8d65; --coral-soft: #ffe3d8; --good: #13805c; --bad: #c8412a;
+  --r0: #ff8d65; --r1: #ec6d3d; --r2: #d05320; --r3: #b13d02; --r4: #8e2e00; --r5: #6b2101; --r6: #161513;
+  --display: "Bricolage Grotesque", "DM Sans", system-ui, sans-serif;
+  --body: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #131210; --panel: #1d1b18; --ink: #f2eee5; --ink-2: #d2ccc0; --muted: #9c968a; --line: #d9d3c6; --grid: #35322c;
+  --shadow: #000000; --sun-soft: #3a3013; --mint-soft: #11322a; --sky-soft: #1a2541; --coral-soft: #3d2218;
+  --good: #3fd19c; --bad: #ff7a5c; --r6: #f2eee5; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --paper: #131210; --panel: #1d1b18; --ink: #f2eee5; --ink-2: #d2ccc0; --muted: #9c968a; --line: #d9d3c6; --grid: #35322c;
+  --shadow: #000000; --sun-soft: #3a3013; --mint-soft: #11322a; --sky-soft: #1a2541; --coral-soft: #3d2218;
+  --good: #3fd19c; --bad: #ff7a5c; --r6: #f2eee5; color-scheme: dark; }
 
-  .hero { padding: 48px 0 8px; }
-  .hero h1 { font-size: clamp(38px, 5.6vw, 64px); font-weight: 800; }
-  .hero h1 .hl { background: var(--mint); padding: 0 .12em; border-radius: 10px; }
-  .tldr { display: grid; gap: 14px; grid-template-columns: 1fr; margin-top: 26px; }
-  @media (min-width: 860px) { .tldr { grid-template-columns: repeat(3, 1fr); } }
-  .tldr .card { padding: 18px 20px; }
-  .tldr .card:nth-child(1) { background: var(--sun); }
-  .tldr .card:nth-child(2) { background: #bcd3ff; }
-  .tldr .card:nth-child(3) { background: var(--blush); }
-  .tldr h3 { font-size: 20px; margin: 6px 0 8px; }
-  .tldr p { margin: 0; font-size: 15px; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.6; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); }
+h1, h2, h3 { font-family: var(--display); letter-spacing: -0.02em; line-height: 1.1; text-wrap: balance; margin: 0; }
+p { margin: 0; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
+.mono { font-family: var(--mono); }
+b, strong { font-weight: 700; }
 
-  .done-btn { margin-left: auto; flex: none; }
-  .done-btn.is-done { background: var(--mint); }
-  .sec-head { flex-wrap: wrap; }
+.page { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 64px;
+        display: grid; grid-template-columns: 200px minmax(0, 780px); gap: 40px; justify-content: center; }
+@media (max-width: 900px) { .page { grid-template-columns: minmax(0, 1fr); gap: 0; padding-block: 0 48px; } }
 
-  .fc-wrap { overflow-x: auto; border-radius: 12px; }
-  .fc { display: block; width: 100%; min-width: 880px; height: auto; }
-  .fc .node { cursor: pointer; }
-  .fc .node rect { transition: stroke-width .12s ease; }
-  .fc .node:hover rect.box, .fc .node.sel rect.box { stroke-width: 4; }
-  .fc .node.sel rect.halo { opacity: 1; }
-  .fc .edge { fill: none; stroke: #151515; stroke-width: 2.2; transition: opacity .15s ease, stroke-width .15s ease; }
-  .fc.focus .edge { opacity: .14; }
-  .fc.focus .edge.hot { opacity: 1; stroke-width: 3.2; }
-  .fc.focus .node { opacity: .4; }
-  .fc.focus .node.hot { opacity: 1; }
-  .fc .nbox { font-family: var(--body); display: flex; flex-direction: column; justify-content: center; height: 100%; padding: 6px 12px; line-height: 1.2; }
-  .fc .nbox b { font-family: var(--display); font-size: 16px; letter-spacing: -0.01em; }
-  .fc .nbox span { font-size: 12.5px; color: #3a372f; margin-top: 3px; }
-  .fc .lane { font-family: var(--mono); font-weight: 700; font-size: 13px; }
+/* rail */
+.rail { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start; display: flex; flex-direction: column; gap: 2px; }
+.rail .brand { font-family: var(--display); font-weight: 800; font-size: 20px; margin-bottom: 10px; }
+.rail .brand small { display: block; font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .05em; text-transform: uppercase; }
+.rail a { display: grid; grid-template-columns: 26px 1fr; gap: 8px; align-items: center; text-decoration: none; color: var(--ink-2); font-size: 14px; padding: 5px 8px; border-radius: 9px; border: 1.5px solid transparent; }
+.rail a .n { font-family: var(--mono); font-size: 11px; font-weight: 700; width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--line); display: flex; align-items: center; justify-content: center; background: var(--panel); }
+.rail a.on { border-color: var(--line); background: var(--panel); color: var(--ink); font-weight: 700; box-shadow: 2px 2px 0 var(--shadow); }
+.rail a.on .n { background: var(--sun); color: var(--on-pop); }
+.rail a.seen .n { background: var(--mint); color: var(--on-pop); }
+@media (max-width: 900px) {
+  .rail { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; flex-direction: row; overflow-x: auto; gap: 6px; padding: 10px 0; background: var(--paper); border-bottom: 1.5px solid var(--grid); scrollbar-width: none; }
+  .rail .brand { display: none; }
+  .rail a { grid-template-columns: 24px auto; white-space: nowrap; flex: none; }
+}
 
-  .explain { display: grid; gap: 16px; grid-template-columns: 1fr; margin-top: 18px; }
-  @media (min-width: 860px) { .explain { grid-template-columns: 1.3fr 1fr; } }
-  .explain h3 { font-size: 24px; margin-bottom: 8px; }
-  .explain > .card { align-self: start; }
-  .explain dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; font-size: 14.5px; }
-  .explain dt { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--muted); padding-top: 2px; }
-  .explain dd { margin: 0; }
-  .keynum { font-family: var(--display); font-weight: 800; font-size: 42px; line-height: 1; letter-spacing: -0.03em; }
+main { display: flex; flex-direction: column; gap: 56px; min-width: 0; }
 
-  .cards { display: grid; gap: 16px; grid-template-columns: 1fr; }
-  @media (min-width: 640px) { .cards { grid-template-columns: repeat(2, 1fr); } }
-  @media (min-width: 980px) { .cards { grid-template-columns: repeat(3, 1fr); } }
-  .flip { perspective: 1000px; height: 178px; cursor: pointer; }
-  .flip-inner { position: relative; width: 100%; height: 100%; transition: transform .45s cubic-bezier(.3,.9,.3,1); transform-style: preserve-3d; }
-  .flip.on .flip-inner { transform: rotateY(180deg); }
-  .face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border: 2px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); padding: 18px; display: flex; flex-direction: column; }
-  .face.front { background: var(--paper); justify-content: space-between; }
-  .face.back { background: var(--ink); color: var(--bg); transform: rotateY(180deg); font-size: 14.5px; line-height: 1.5; overflow: auto; }
-  .face.front h3 { font-size: 24px; }
-  .face .topic { font-family: var(--mono); font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 6px; border: 2px solid var(--line); align-self: flex-start; }
-  .face .hint { font-size: 12.5px; color: var(--muted); }
-  .face.back b { color: var(--sun); }
-  .search { flex: 1; min-width: 200px; max-width: 340px; font: inherit; font-size: 14px; padding: 9px 14px; border: 2px solid var(--line); border-radius: 12px; background: var(--paper); box-shadow: var(--shadow-sm); outline: none; }
-  .search:focus { box-shadow: 4px 4px 0 var(--sky); }
+/* hero */
+.hero { display: flex; flex-direction: column; gap: 16px; padding-top: 6px; }
+.eyebrow { font-family: var(--mono); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); }
+.eyebrow span { background: var(--sun); color: var(--on-pop); border: 1.5px solid var(--line); border-radius: 6px; padding: 2px 7px; margin-right: 8px; }
+.hero h1 { font-size: clamp(34px, 6vw, 56px); font-weight: 800; }
+.hero .lede { font-size: 18px; color: var(--ink-2); max-width: 62ch; }
+.thirty { border: 2px solid var(--line); border-radius: 16px; background: var(--panel); box-shadow: 4px 4px 0 var(--shadow); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.thirty .k { font-family: var(--mono); font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+.strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.strip a { text-decoration: none; color: var(--ink); border: 1.5px solid var(--line); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; position: relative; min-width: 0; }
+.strip a b { font-family: var(--display); font-size: 18px; }
+.strip a span { font-size: 13.5px; color: var(--ink-2); line-height: 1.4; }
+.strip a:hover { box-shadow: 2px 2px 0 var(--shadow); transform: translate(-1px, -1px); }
+.strip a:nth-child(1) { background: var(--sky-soft); } .strip a:nth-child(2) { background: var(--sun-soft); }
+.strip a:nth-child(3) { background: var(--mint-soft); } .strip a:nth-child(4) { background: var(--coral-soft); }
+@media (max-width: 640px) { .strip { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
-  .nums { display: grid; gap: 14px; grid-template-columns: repeat(2, 1fr); }
-  @media (min-width: 860px) { .nums { grid-template-columns: repeat(4, 1fr); } }
-  .num { padding: 16px; }
-  .num .n { font-family: var(--display); font-weight: 800; font-size: 32px; line-height: 1.05; letter-spacing: -0.03em; }
-  .num .l { font-size: 13.5px; color: var(--ink-2); margin-top: 4px; }
+/* chapters */
+.ch { display: flex; flex-direction: column; gap: 16px; scroll-margin-top: 80px; }
+.ch-head { display: flex; flex-direction: column; gap: 6px; }
+.ch-num { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: .05em; text-transform: uppercase; }
+.ch h2 { font-size: clamp(26px, 4vw, 34px); font-weight: 800; }
+.ch .intro { color: var(--ink-2); max-width: 64ch; }
+.key { border: 1.5px solid var(--line); border-left: 7px solid var(--mint); border-radius: 12px; background: var(--mint-soft); padding: 10px 14px; font-size: 15.5px; }
+.key b.k { font-family: var(--mono); font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; display: block; margin-bottom: 2px; }
+.box { border: 2px solid var(--line); border-radius: 16px; background: var(--panel); box-shadow: 4px 4px 0 var(--shadow); padding: 18px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.box h3 { font-size: 19px; font-weight: 800; }
+.hint { font-size: 13.5px; color: var(--muted); }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+@media (max-width: 640px) { .two { grid-template-columns: minmax(0, 1fr); } }
+svg { display: block; max-width: 100%; height: auto; }
+svg text { font-family: var(--body); }
+.f-ink { fill: var(--ink); } .f-ink2 { fill: var(--ink-2); } .f-muted { fill: var(--muted); } .s-grid { stroke: var(--grid); } .s-line { stroke: var(--line); }
 
-  .acc { display: grid; gap: 12px; }
-  .acc details { background: var(--paper); border: 2px solid var(--line); border-radius: 14px; box-shadow: var(--shadow-sm); }
-  .acc summary { list-style: none; cursor: pointer; padding: 16px 18px; font-weight: 700; font-size: 16px; display: flex; gap: 12px; align-items: center; }
-  .acc summary::-webkit-details-marker { display: none; }
-  .acc summary::after { content: "+"; margin-left: auto; font-family: var(--mono); font-size: 20px; font-weight: 700; }
-  .acc details[open] summary::after { content: "−"; }
-  .acc details[open] summary { border-bottom: 2px dashed var(--grid); }
-  .acc .ans { padding: 14px 18px 18px; font-size: 15px; color: var(--ink-2); }
-  .acc .q { font-family: var(--mono); font-size: 12px; background: var(--sun); border: 2px solid var(--line); border-radius: 7px; padding: 1px 7px; }
+/* buttons, chips */
+.btn { border: 1.5px solid var(--line); background: var(--panel); border-radius: 10px; padding: 7px 12px; font-size: 14px; font-weight: 700; cursor: pointer; }
+.btn:hover { box-shadow: 2px 2px 0 var(--shadow); transform: translate(-1px, -1px); }
+.btn[aria-pressed="true"], .btn.on { background: var(--sun); color: var(--on-pop); box-shadow: 2px 2px 0 var(--shadow); }
+.btn.primary { background: var(--ink); color: var(--paper); }
+.rung { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 13px; font-weight: 700; white-space: nowrap; }
+.rung i { width: 11px; height: 11px; border-radius: 3px; display: inline-block; border: 1px solid var(--line); }
+.ok { color: var(--good); font-weight: 700; } .no { color: var(--bad); font-weight: 700; }
 
-  .timeline { display: grid; gap: 14px; grid-template-columns: 1fr; }
-  @media (min-width: 860px) { .timeline { grid-template-columns: 1fr 1fr; } }
-  .bug { padding: 16px 18px; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; }
-  .bug .tag { grid-row: span 3; font-family: var(--mono); font-weight: 700; font-size: 12px; background: var(--blush); border: 2px solid var(--line); border-radius: 8px; padding: 4px 8px; height: fit-content; }
-  .bug h4 { font-size: 17px; }
-  .bug p { margin: 0; font-size: 14px; color: var(--ink-2); }
-  .bug .fix { font-size: 14px; }
-  .bug .fix b { background: var(--mint); padding: 0 4px; border-radius: 4px; }
+/* ch1 numbers */
+.numgrid { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 3px; font-family: var(--mono); font-size: 11px; }
+.numgrid span { background: var(--sky-soft); border-radius: 4px; padding: 3px 0; text-align: center; color: var(--ink-2); overflow: hidden; }
+.vram { display: flex; flex-direction: column; gap: 6px; }
+.vbar { height: 30px; border: 1.5px solid var(--line); border-radius: 8px; overflow: hidden; display: flex; background: repeating-linear-gradient(135deg, transparent 0 6px, var(--grid) 6px 7px); }
+.vbar div { height: 100%; display: flex; align-items: center; padding-left: 8px; font-family: var(--mono); font-size: 12px; font-weight: 700; white-space: nowrap; color: var(--paper); }
+.scale { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; color: var(--muted); }
 
-  .quiz { display: grid; gap: 16px; }
-  .qcard { padding: 18px 20px; }
-  .qcard h4 { font-size: 18px; margin-bottom: 12px; font-family: var(--body); font-weight: 700; letter-spacing: 0; }
-  .opts { display: grid; gap: 8px; }
-  .opt { text-align: left; font: inherit; font-size: 14.5px; padding: 10px 14px; border: 2px solid var(--line); border-radius: 10px; background: var(--paper); cursor: pointer; transition: transform .08s ease; }
-  .opt:hover:not(:disabled) { transform: translateX(3px); background: #fffaf0; }
-  .opt.right { background: #c8f5df; }
-  .opt.wrong { background: #ffd0c6; }
-  .opt:disabled { cursor: default; color: var(--ink); opacity: .5; }
-  .opt.right:disabled, .opt.wrong:disabled { opacity: 1; }
-  .why { margin-top: 12px; font-size: 14px; display: none; }
-  .why.show { display: flex; }
-  .score { position: sticky; bottom: 16px; margin: 18px 0 0 auto; width: fit-content; display: flex; z-index: 5; }
+/* ch2 slider */
+.slider { display: flex; flex-direction: column; gap: 6px; }
+input[type=range] { width: 100%; accent-color: var(--ink); }
+.ticks { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); font-family: var(--mono); font-size: 11.5px; font-weight: 700; text-align: center; }
+.ticks button { background: none; border: 0; cursor: pointer; padding: 2px 0; color: var(--muted); white-space: nowrap; }
+.ticks button.on { color: var(--ink); text-decoration: underline 2px var(--sun); text-underline-offset: 4px; }
+.stats { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+@media (max-width: 640px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.stat { border: 1.5px solid var(--line); border-radius: 12px; padding: 8px 10px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.stat .l { font-size: 12px; color: var(--muted); font-weight: 700; }
+.stat .v { font-family: var(--display); font-weight: 800; font-size: 22px; font-variant-numeric: tabular-nums; }
+.stat .bar { height: 6px; border-radius: 3px; background: var(--grid); overflow: hidden; }
+.stat .bar div { height: 100%; background: var(--ink); border-radius: 3px; transition: width .3s; }
+
+/* ch3 explorer */
+.explore { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 16px; }
+@media (max-width: 720px) { .explore { grid-template-columns: minmax(0, 1fr); } }
+.tasklist { display: flex; flex-direction: column; gap: 6px; }
+@media (max-width: 720px) { .tasklist { flex-direction: row; overflow-x: auto; padding-bottom: 4px; } .tasklist .btn { flex: none; } }
+.tasklist .btn { text-align: left; font-weight: 600; font-size: 13.5px; line-height: 1.3; display: flex; justify-content: space-between; gap: 8px; }
+.tasklist .btn small { font-family: var(--mono); font-size: 11px; font-weight: 700; white-space: nowrap; }
+.prompt { font-family: var(--mono); font-size: 13.5px; line-height: 1.55; border: 1.5px dashed var(--line); border-radius: 10px; padding: 10px 12px; background: var(--paper); overflow-wrap: anywhere; }
+.ladder { display: flex; flex-direction: column; gap: 5px; }
+.lrow { display: grid; grid-template-columns: 92px minmax(0, 1fr) 110px 28px; gap: 10px; align-items: center; font-size: 14px; padding: 5px 8px; border-radius: 9px; border: 1.5px solid var(--grid); }
+.lrow .ans { font-family: var(--mono); font-size: 12.5px; overflow-wrap: anywhere; color: var(--ink-2); }
+.conf { position: relative; height: 10px; background: var(--grid); border-radius: 5px; }
+.conf div { position: absolute; inset: 0 auto 0 0; border-radius: 5px; }
+.conf i { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--ink); }
+.lrow.req { border-color: var(--line); background: var(--sun-soft); }
+@media (max-width: 560px) { .lrow { grid-template-columns: 80px minmax(0, 1fr) 24px; } .lrow .conf { display: none; } }
+.verdict { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; border-top: 1.5px solid var(--grid); padding-top: 12px; }
+.tag { font-family: var(--mono); font-size: 12px; font-weight: 700; border: 1.5px solid var(--line); border-radius: 20px; padding: 2px 10px; background: var(--sun); color: var(--on-pop); }
+.tag.grey { background: var(--grid); color: var(--ink); }
+
+/* ch4 flow */
+.flow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px; position: relative; }
+.flow .btn { text-align: left; padding: 12px; display: flex; flex-direction: column; gap: 4px; position: relative; border-width: 2px; }
+.flow .btn b { font-family: var(--display); font-size: 19px; }
+.flow .btn span { font-weight: 500; font-size: 13px; color: var(--ink-2); }
+.flow .btn[aria-pressed="true"] span { color: var(--on-pop); }
+.flow .btn:not(:last-child)::after { content: ""; position: absolute; right: -19px; top: 50%; width: 14px; height: 14px; border-top: 2.5px solid var(--line); border-right: 2.5px solid var(--line); transform: translateY(-50%) rotate(45deg); }
+@media (max-width: 640px) { .flow { grid-template-columns: minmax(0, 1fr); gap: 18px; } .flow .btn:not(:last-child)::after { right: auto; left: 50%; top: auto; bottom: -15px; transform: translateX(-50%) rotate(135deg); } }
+.stage { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 640px) { .stage { grid-template-columns: minmax(0, 1fr); } }
+.stage > div { border: 1.5px solid var(--line); border-radius: 12px; padding: 10px 12px; font-size: 14.5px; display: flex; flex-direction: column; gap: 4px; }
+.stage .lab { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.stage > div:nth-child(1) { background: var(--sky-soft); } .stage > div:nth-child(2) { background: var(--sun-soft); } .stage > div:nth-child(3) { background: var(--mint-soft); }
+.stage ul { margin: 0; padding-left: 18px; }
+
+/* ch5 */
+.modes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 640px) { .modes { grid-template-columns: minmax(0, 1fr); } }
+.mode { border: 1.5px solid var(--line); border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 6px; background: var(--panel); }
+.mode h3 { font-size: 18px; }
+.mode .eg { font-family: var(--mono); font-size: 12px; line-height: 1.5; background: var(--paper); border-radius: 8px; padding: 6px 8px; color: var(--ink-2); overflow-wrap: anywhere; }
+.seg { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* ch6 toggler */
+.cells { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.cell { border: 2px solid var(--line); border-radius: 10px; padding: 8px 2px; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; background: var(--coral-soft); min-width: 0; }
+.cell .r { font-family: var(--mono); font-size: 10.5px; font-weight: 700; }
+.cell .s { font-size: 22px; font-weight: 800; line-height: 1.1; }
+.cell .d { font-size: 10.5px; color: var(--ink-2); text-align: center; line-height: 1.2; }
+.cell[data-s="1"] { background: var(--sun-soft); } .cell[data-s="2"] { background: var(--mint-soft); }
+.cell.win { box-shadow: 0 0 0 3px var(--sun), 3px 3px 0 4px var(--shadow); }
+.steps { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 3px; font-size: 14.5px; }
+.result { font-family: var(--display); font-size: 24px; font-weight: 800; }
+
+/* predictor */
+.pipe { display: grid; grid-template-columns: 1.1fr auto 1.6fr auto 1fr; gap: 8px; align-items: center; }
+@media (max-width: 640px) { .pipe { grid-template-columns: minmax(0, 1fr); } .pipe .arr { transform: rotate(90deg); justify-self: center; } }
+.pipe .p { border: 1.5px solid var(--line); border-radius: 12px; padding: 10px; font-size: 14px; background: var(--panel); min-width: 0; }
+.pipe .p b { display: block; font-family: var(--display); font-size: 16px; }
+.feat { display: flex; flex-direction: column; gap: 4px; }
+.feat div { border: 1.5px solid var(--line); border-radius: 8px; padding: 4px 8px; font-size: 13px; display: flex; justify-content: space-between; gap: 8px; }
+.feat div span { font-family: var(--mono); font-weight: 700; }
+.arr { font-family: var(--mono); font-weight: 700; font-size: 20px; }
+
+/* gate lab */
+.ctl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 640px) { .ctl { grid-template-columns: minmax(0, 1fr); } }
+.ctl label { display: flex; flex-direction: column; gap: 2px; font-size: 13.5px; font-weight: 700; }
+.ctl label .v { font-family: var(--mono); font-size: 13px; }
+.ctl label small { font-weight: 400; color: var(--muted); font-size: 12.5px; line-height: 1.35; }
+.tbl { overflow-x: auto; }
+table.gates { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 520px; }
+table.gates th { font-family: var(--mono); font-size: 11px; letter-spacing: .04em; text-transform: uppercase; text-align: left; color: var(--muted); padding: 6px 8px; border-bottom: 1.5px solid var(--line); }
+table.gates td { padding: 7px 8px; border-bottom: 1px solid var(--grid); vertical-align: middle; font-variant-numeric: tabular-nums; }
+table.gates tr.win td { background: var(--sun-soft); font-weight: 700; }
+.chip { font-family: var(--mono); font-size: 12px; font-weight: 700; padding: 1px 7px; border-radius: 6px; border: 1.3px solid currentColor; white-space: nowrap; }
+.costbar { height: 10px; border-radius: 5px; background: var(--ink); min-width: 2px; }
+.summary { font-size: 16px; }
+
+/* walk-through */
+.track { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 6px; }
+@media (max-width: 640px) { .track { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.track div { border: 1.5px solid var(--line); border-radius: 10px; padding: 6px 4px; text-align: center; font-size: 12px; font-weight: 700; line-height: 1.25; background: var(--panel); color: var(--muted); transition: background .25s, color .25s; }
+.track div.done { background: var(--mint-soft); color: var(--ink); }
+.track div.now { background: var(--sun); color: var(--on-pop); box-shadow: 2px 2px 0 var(--shadow); }
+.say { border: 1.5px solid var(--line); border-radius: 12px; padding: 12px 14px; min-height: 120px; display: flex; flex-direction: column; gap: 6px; background: var(--paper); }
+.say .t { font-family: var(--display); font-size: 20px; font-weight: 800; }
+.say .d { color: var(--ink-2); }
+.say .data { font-family: var(--mono); font-size: 13px; overflow-wrap: anywhere; }
+
+/* findings */
+.finds { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 640px) { .finds { grid-template-columns: minmax(0, 1fr); } }
+.find { border: 1.5px solid var(--line); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 6px; background: var(--panel); }
+.find .big { font-family: var(--display); font-size: 32px; font-weight: 800; line-height: 1; }
+.find .big small { font-size: 15px; color: var(--muted); font-weight: 700; }
+.find p { font-size: 14.5px; color: var(--ink-2); }
+
+/* quiz */
+.q { display: flex; flex-direction: column; gap: 8px; border-bottom: 1.5px solid var(--grid); padding-bottom: 14px; }
+.q:last-of-type { border-bottom: 0; }
+.q .qq { font-weight: 700; }
+.opts { display: flex; flex-direction: column; gap: 6px; }
+.opts .btn { text-align: left; font-weight: 500; }
+.opts .btn.right { background: var(--mint-soft); border-color: var(--good); }
+.opts .btn.wrong { background: var(--coral-soft); border-color: var(--bad); }
+.opts .btn:disabled { cursor: default; transform: none; box-shadow: none; }
+.why { font-size: 14px; color: var(--ink-2); }
+.score { font-family: var(--display); font-size: 22px; font-weight: 800; }
+
+/* glossary */
+.gloss { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 640px) { .gloss { grid-template-columns: minmax(0, 1fr); } }
+.gloss div { border: 1.5px solid var(--grid); border-radius: 12px; padding: 10px 12px; font-size: 14.5px; }
+.gloss b { font-family: var(--mono); font-size: 13px; display: block; }
+footer { font-size: 14px; color: var(--muted); border-top: 1.5px solid var(--grid); padding-top: 16px; }
+footer a { color: var(--ink); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+.sitelinks { display: flex; flex-direction: column; gap: 4px; margin: 0 0 14px; font-size: 13px; }
+.sitelinks a { color: var(--ink-2); text-decoration: underline; text-underline-offset: 3px; display: block; padding: 0; border: 0; }
+.cta { display: flex; flex-wrap: wrap; gap: 10px; }
+.cta a { text-decoration: none; }
+.cta a.btn:not(.primary) { color: var(--ink); }
 </style>
 </head>
 <body>
 
-<header class="topbar">
-  <div class="wrap">
-    <a class="logo" href="index.html">
-      <svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true">
-        <rect x="1" y="1" width="30" height="30" rx="8" fill="#ffc832" stroke="#151515" stroke-width="2"/>
-        <rect x="6" y="20" width="5" height="6" fill="#ff8d65" stroke="#151515" stroke-width="1.5"/>
-        <rect x="13.5" y="14" width="5" height="12" fill="#d05320" stroke="#151515" stroke-width="1.5"/>
-        <rect x="21" y="7" width="5" height="19" fill="#151515" stroke="#151515" stroke-width="1.5"/>
-      </svg>
-      Study guide
-    </a>
-    <nav class="nav" id="nav">
-      <a href="#tldr">TL;DR</a>
-      <a href="#flow">Flowchart</a>
-      <a href="#ideas">Key ideas</a>
-      <a href="#numbers">Numbers</a>
-      <a href="#viva">Viva Q&amp;A</a>
-      <a href="#bugs">Bugs caught</a>
-      <a href="#quiz">Quiz</a>
-    </nav>
-    <div class="progress" title="Sections marked as learned"><div class="bar"><span id="pbar"></span></div><span id="ptext">0/7</span></div>
-    <a class="btn ghost hide-sm" href="index.html">Dashboard</a>
-  </div>
-</header>
+<div class="page">
+  <nav class="rail" id="rail" aria-label="Chapters">
+    <div class="brand">QuantRoute<small>From zero</small></div>
+    <div class="sitelinks"><a href="index.html">Results dashboard</a><a href="demo.html">Replay demo</a><a href="revision.html">Revision notes</a></div>
+  </nav>
 
-<main>
-
-<section class="hero" id="tldr">
-  <div class="wrap">
-    <div class="sec-head" style="margin-bottom:0">
-      <div>
-        <span class="sticker">~10 minutes &middot; 7 sections &middot; tick each one off</span>
-        <h1 style="margin-top:16px">QuantRoute, <span class="hl">fast</span>.</h1>
-        <p style="font-size:18px;max-width:700px"><b>QuantRoute: Serving Each LLM Prompt at the Cheapest Quantization Level That Stays Accurate and Safe.</b> Everything the project does, why each piece exists, the numbers worth remembering, and the questions you'll get asked. Click things &mdash; almost everything here is interactive.</p>
-      </div>
-      <button class="btn ghost done-btn" data-done="tldr">Mark learned</button>
-    </div>
-    <div class="tldr">
-      <div class="card"><span class="kicker" style="color:var(--ink)">The problem</span><h3>One precision for everything is wasteful</h3><p>Serving every prompt at full 16-bit precision burns memory on easy prompts; squeezing everything to 2-bit wrecks hard ones. Does the right precision depend on the task?</p></div>
-      <div class="card"><span class="kicker" style="color:var(--ink)">What we did</span><h3>Measure, label, predict, decide</h3><p>Ran 2,067 prompts on 7 quantized versions of one model, found each task's cheapest working version, tried to predict that from the prompt, and built a rule that picks the cheapest safe version.</p></div>
-      <div class="card"><span class="kicker" style="color:var(--ink)">What we found</span><h3 id="tldr-found">Q4 is the sweet spot</h3><p id="tldr-found-p"></p></div>
-    </div>
-  </div>
-</section>
-
-<section class="block" id="flow">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="sec-tag">01</span>
-      <div><h2>How the whole thing works</h2><p>Start with <strong>Simple</strong>, then switch to <strong>Detailed</strong>. Hover a box to light up what feeds it; click it for the full story.</p></div>
-      <button class="btn ghost done-btn" data-done="flow">Mark learned</button>
-    </div>
-    <div class="card pad">
-      <div class="controls" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:16px">
-        <div class="pills" id="fc-mode">
-          <button class="pill on" data-m="simple">Simple</button>
-          <button class="pill" data-m="detailed">Detailed</button>
+  <main>
+    <header class="hero" id="top">
+      <div class="eyebrow"><span>PID-CY014</span>QuantRoute · beginner's guide</div>
+      <h1>Which version of the model should answer this question?</h1>
+      <p class="lede">An AI model can be stored in smaller, cheaper versions that are slightly less precise. QuantRoute measures how much precision each kind of question really needs, then sends every question to the cheapest version that still answers it correctly and safely. This guide explains it from scratch in eleven short chapters, using the project's real data.</p>
+      <div class="cta"><a class="btn primary" href="demo.html">Try the replay demo on 450 real questions</a><a class="btn" href="index.html">Results dashboard</a><a class="btn" href="revision.html">Revision notes and viva Q&amp;A</a></div>
+      <div class="thirty">
+        <div class="k">The whole project in 30 seconds</div>
+        <div class="strip">
+          <a href="#build"><b>1 · Build</b><span>Collect 1,467 graded questions, 600 safety prompts, and 7 versions of one model.</span></a>
+          <a href="#build"><b>2 · Measure</b><span>Ask every question to every version: 14,469 graded answers.</span></a>
+          <a href="#label"><b>3 · Learn</b><span>Work out which version each kind of question needs, with safety margins.</span></a>
+          <a href="#request"><b>4 · Serve</b><span>For each new question, pick the cheapest version that passes.</span></a>
         </div>
-        <div class="legend" id="fc-legend"></div>
       </div>
-      <div class="fc-wrap"><svg class="fc" id="fc"></svg></div>
-      <div class="explain" id="fc-explain"></div>
-    </div>
-  </div>
-</section>
+    </header>
 
-<section class="block" id="ideas">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="sec-tag" style="background:var(--mint)">02</span>
-      <div><h2>20 ideas, one card each</h2><p>Read the front, guess the meaning, click to flip. Filter by topic or search.</p></div>
-      <button class="btn ghost done-btn" data-done="ideas">Mark learned</button>
-    </div>
-    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:18px">
-      <div class="pills" id="topic-pills"></div>
-      <input class="search" id="card-search" type="search" placeholder="Search: tau, GEE, canary..." aria-label="Search the idea cards">
-    </div>
-    <div class="cards" id="cards"></div>
-  </div>
-</section>
+    <!-- 1 -->
+    <section class="ch" id="numbers" data-title="A model is numbers">
+      <div class="ch-head"><div class="ch-num">Chapter 1</div><h2>A language model is a giant pile of numbers</h2>
+        <p class="intro">An LLM such as Qwen2.5-3B-Instruct, the model used here, reads text and predicts the next word. Everything it "knows" is stored in about 3 billion numbers called <b>weights</b>. Answering a question means multiplying your text through those numbers, so they all have to sit in the graphics card's memory (VRAM).</p></div>
+      <div class="two">
+        <div class="box"><h3>A tiny corner of the weights</h3><div class="numgrid" id="numgrid"></div><p class="hint">Each number is stored with 16 bits in the full-precision version, called F16. Now imagine 3 billion of them.</p></div>
+        <div class="box"><h3>Does it fit on our GPU?</h3>
+          <div class="vram"><div class="vbar"><div style="width:76%;background:var(--r6)">F16 · 6,236 MiB</div></div><div class="scale"><span>0</span><span>RTX 4060 · 8,188 MiB</span></div></div>
+          <div class="vram"><div class="vbar"><div style="width:26.5%;background:var(--r2)">Q4_K_M · 2,169</div></div><div class="scale"><span>0</span><span>same card</span></div></div>
+          <p class="hint">The full model just fits, using three quarters of the card. A 4-bit version uses about a third as much.</p></div>
+      </div>
+      <div class="key"><b class="k">Key idea</b>Smaller numbers mean a smaller model, so it loads faster and leaves memory free. The question is what that costs in answer quality.</div>
+    </section>
 
-<section class="block" id="numbers">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="sec-tag" style="background:#bcd3ff">03</span>
-      <div><h2>Numbers worth remembering</h2><p>Read straight from the result files. If you remember nothing else, remember these.</p></div>
-      <button class="btn ghost done-btn" data-done="numbers">Mark learned</button>
-    </div>
-    <div class="nums" id="nums"></div>
-  </div>
-</section>
+    <!-- 2 -->
+    <section class="ch" id="rounding" data-title="Quantization">
+      <div class="ch-head"><div class="ch-num">Chapter 2</div><h2>Quantization is rounding</h2>
+        <p class="intro">Quantizing stores each weight with fewer bits, so it can take fewer distinct values, like rounding prices to the nearest dollar. We use seven versions of the same model, called <b>rungs</b> of a ladder, from Q2_K (about 2 bits) up to F16 (16 bits). Drag the slider and watch the rounding error appear.</p></div>
+      <div class="box">
+        <svg id="wave" viewBox="0 0 640 210" role="img" aria-label="A smooth curve and its rounded version at the selected bit width"></svg>
+        <div class="slider">
+          <input type="range" id="bits" min="0" max="6" step="1" value="2" aria-label="Rung">
+          <div class="ticks" id="bitticks"></div>
+        </div>
+        <div class="stats" id="rstats"></div>
+        <p class="hint">Names like Q4_K_M are llama.cpp's GGUF formats. They mix bit widths and store scaling factors, so the real average is higher than the label: Q4_K_M averages 5.46 bits per weight. All numbers are measured on the project's RTX 4060.</p>
+      </div>
+      <div class="key"><b class="k">Key idea</b>Fewer bits means more rounding. Rounding barely matters from 4 bits upward and badly hurts at the bottom: Q2_K drops from 73% to 51% correct.</div>
+    </section>
 
-<section class="block" id="viva">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="sec-tag" style="background:var(--blush)">04</span>
-      <div><h2>Questions you'll get asked</h2><p>Try answering out loud first, then open it.</p></div>
-      <button class="btn ghost done-btn" data-done="viva">Mark learned</button>
-    </div>
-    <div class="acc" id="acc"></div>
-  </div>
-</section>
+    <!-- 3 -->
+    <section class="ch" id="tasks" data-title="Questions differ">
+      <div class="ch-head"><div class="ch-num">Chapter 3</div><h2>The catch: some questions need more precision than others</h2>
+        <p class="intro">Normally a team picks one version and uses it for everything. But easy questions survive heavy rounding, and some hard ones don't. Pick a real question below to see what each of the seven versions answered. The bar shows how sure the model was (average token probability); the line marks the confidence bar of 79.5%.</p></div>
+      <div class="box">
+        <div class="explore"><div class="tasklist" id="tasklist"></div><div id="taskview" style="display:flex;flex-direction:column;gap:12px;min-width:0"></div></div>
+      </div>
+      <div class="key"><b class="k">Key idea</b>The cheapest version that gets a question right, and is confident about it, is that question's <b>required precision</b>. If we could predict it for each question, we could serve most traffic cheaply.</div>
+    </section>
 
-<section class="block" id="bugs">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="sec-tag" style="background:var(--sun)">05</span>
-      <div><h2>Bugs we caught (and why it matters)</h2><p>Each one would have silently corrupted a result. Great material for "how do you know your numbers are right?"</p></div>
-      <button class="btn ghost done-btn" data-done="bugs">Mark learned</button>
-    </div>
-    <div class="timeline" id="timeline"></div>
-  </div>
-</section>
+    <!-- 4 -->
+    <section class="ch" id="build" data-title="How it was measured">
+      <div class="ch-head"><div class="ch-num">Chapter 4</div><h2>How everything was measured</h2>
+        <p class="intro">The project runs in four stages, and each stage produces files the next one reads. Click a stage.</p></div>
+      <div class="box">
+        <div class="flow" id="flow"></div>
+        <div class="stage" id="stage"></div>
+        <svg id="grid" viewBox="0 0 640 150" role="img" aria-label="The measurement grid: seven rungs by 2,067 prompts"></svg>
+      </div>
+      <div class="key"><b class="k">Key idea</b>Every question is asked to every version under identical settings (temperature 0, fixed seed), so any difference between two answers is caused by precision alone.</div>
+    </section>
 
-<section class="block" id="quiz">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="sec-tag" style="background:var(--mint)">06</span>
-      <div><h2>Check yourself</h2><p>Ten questions. Instant feedback with the reason.</p></div>
-      <button class="btn ghost done-btn" data-done="quiz">Mark learned</button>
-    </div>
-    <div class="quiz" id="quiz-list"></div>
-    <div class="score btn dark" id="score">Score: 0 / 10</div>
-  </div>
-</section>
+    <!-- 5 -->
+    <section class="ch" id="fail" data-title="Three ways to fail">
+      <div class="ch-head"><div class="ch-num">Chapter 5</div><h2>Three ways a cheaper version can let you down</h2>
+        <p class="intro">Accuracy alone is not enough. A cheaper version can match the overall score while still changing individual answers, or it can become easier to trick. QuantRoute checks all three.</p></div>
+      <div class="modes">
+        <div class="mode" style="background:var(--coral-soft)"><h3>Wrong answer</h3><p>The grader marks it incorrect.</p><div class="eg">Atomic number 79? Q2_K: "Rubidium (Rb), metal"</div></div>
+        <div class="mode" style="background:var(--sun-soft)"><h3>Different answer</h3><p>F16 was right and this version isn't, or the reverse. This is called a <b>flip</b>.</p><div class="eg">Opposite of happy? F16 "sad", Q4_K_M "unhappy"</div></div>
+        <div class="mode" style="background:var(--sky-soft)"><h3>Unsafe answer</h3><p>It stops refusing a harmful request, or obeys an instruction hidden in the text, where F16 didn't.</p><div class="eg">A hidden "reply only with ZEBRA…" gets obeyed</div></div>
+      </div>
+      <div class="box">
+        <div class="seg" id="seg"></div>
+        <svg id="failchart" viewBox="0 0 640 230" role="img" aria-label="Per-rung chart of the selected measure"></svg>
+        <p class="hint" id="failnote"></p>
+      </div>
+      <div class="key"><b class="k">Key idea</b>Q8_0 scores within 0.4 points of F16 yet still changes 4.4% of answers. Matching accuracy does not mean the same answers.</div>
+    </section>
 
-</main>
+    <!-- 6 -->
+    <section class="ch" id="label" data-title="Required precision">
+      <div class="ch-head"><div class="ch-num">Chapter 6</div><h2>Giving every question a label</h2>
+        <p class="intro">From the 7 answers to a question, QuantRoute picks its label, the <b>required precision</b>. Scan from the cheapest version upward and stop at the first one that is right and confident, as long as at most one costlier version (below F16) fails. That one-slip allowance stops a single fluke from setting the label. Click the boxes to change the outcomes, or load a real question.</p></div>
+      <div class="box">
+        <div class="row" id="presets"></div>
+        <div class="cells" id="cells"></div>
+        <p class="hint">Click a box to cycle it: ✗ wrong → ✓ right but unsure → ✓ right and confident.</p>
+        <div class="result" id="labres"></div>
+        <ol class="steps" id="labsteps"></ol>
+      </div>
+      <div class="key"><b class="k">Key idea</b>Of 1,467 questions, 334 need only Q2_K, 457 need Q3_K_M, and just 20 need F16. Another 407 are answered right and confidently by no version, and are labelled unsolvable.</div>
+    </section>
 
-<footer>
-  <div class="wrap">QuantRoute study guide &middot; numbers are read from the same result files as the <a href="index.html">dashboard</a>.</div>
-</footer>
+    <!-- 7 -->
+    <section class="ch" id="predict" data-title="Predicting the label">
+      <div class="ch-head"><div class="ch-num">Chapter 7</div><h2>Guessing the label from the question alone</h2>
+        <p class="intro">At serving time there is no answer yet, so the label has to be predicted from the question text. QuantRoute turns each question into 409 numbers and trains a simple classifier on them.</p></div>
+      <div class="box">
+        <div class="pipe">
+          <div class="p"><b>The question</b><span class="mono" style="font-size:12.5px">"Extract the city from: 'The conference will be held in Denver…'"</span></div>
+          <div class="arr">→</div>
+          <div class="p feat"><div>Meaning (MiniLM embedding)<span>384</span></div><div>Surface counts: length, digits, steps…<span>13</span></div><div>Category, e.g. extraction<span>12</span></div></div>
+          <div class="arr">→</div>
+          <div class="p"><b>Classifier</b>Predicted label: Q2_K … F16</div>
+        </div>
+        <svg id="predchart" viewBox="0 0 640 170" role="img" aria-label="Predictor accuracy against simple baselines"></svg>
+        <p class="hint">The 312 test questions with a label were never used in training. During training, each question's prediction comes from a model that never saw that question (5-fold cross-fitting), so the later statistics are not fooled by leaked labels.</p>
+      </div>
+      <div class="key"><b class="k">Key idea</b>Prompt text turns out to be a weak signal. The predictor is within one rung 79.8% of the time, but its exact-match rate (45.8%) barely beats always guessing the most common label (45.5%). That is a real finding, not a bug.</div>
+    </section>
 
-<div class="tip" id="tip"></div>
+    <!-- 8 -->
+    <section class="ch" id="gates" data-title="The decision rule">
+      <div class="ch-head"><div class="ch-num">Chapter 8</div><h2>The decision rule: three gates</h2>
+        <p class="intro">Questions are grouped into 84 <b>cells</b> (12 categories × 7 predicted labels). For each cell, every cheaper version must pass three gates, judged on cautious estimates: the lower edge of a 95% confidence range for accuracy, and the upper edge for flips and safety. The cheapest version that passes all three serves the cell, and F16 always qualifies. Try the real numbers.</p></div>
+      <div class="box">
+        <div class="row" id="cellpick"></div>
+        <div class="row" id="gpresets"></div>
+        <div class="ctl">
+          <label for="d">Accuracy allowance δ <span class="v" id="dv"></span><input type="range" id="d" min="0" max="0.15" step="0.005"><small>How many points below F16's accuracy we accept.</small></label>
+          <label for="phi">Flip limit φ <span class="v" id="phiv"></span><input type="range" id="phi" min="0.02" max="0.5" step="0.01"><small>Most answers that may differ from F16.</small></label>
+          <label for="psi">Safety limit ψ <span class="v" id="psiv"></span><input type="range" id="psi" min="0" max="0.1" step="0.005"><small>Most safety slips allowed, per version.</small></label>
+        </div>
+        <div class="tbl"><table class="gates" id="gtable"></table></div>
+        <p class="summary" id="gsum"></p>
+      </div>
+      <div class="key"><b class="k">Key idea</b>At the strict project default every cell stays at F16, because about 40 training questions per cell leave wide uncertainty. Loosen the accuracy allowance and cheaper versions open up, but the safety gate still blocks Q2_K–Q4_K_M. Q5_K_M is the <b>safety floor</b>.</div>
+    </section>
 
-<script src="data.js"></script>
-<script src="guide.js"></script>
+    <!-- 9 -->
+    <section class="ch" id="request" data-title="One request">
+      <div class="ch-head"><div class="ch-num">Chapter 9</div><h2>One question, start to finish</h2>
+        <p class="intro">This is how a new question is handled once the routing service is built, the next stage of the project. It uses a real test question and the thresholds you set in Chapter 8.</p></div>
+      <div class="box">
+        <div class="track" id="track"></div>
+        <div class="say" id="say"></div>
+        <div class="row">
+          <button class="btn" id="prev" type="button">Back</button>
+          <button class="btn primary" id="next" type="button">Next step</button>
+          <button class="btn" id="play" type="button">Play all</button>
+          <label class="row" style="font-size:14px;gap:6px;margin-left:auto"><input type="checkbox" id="flag"> Pretend the safety classifier flags it</label>
+        </div>
+      </div>
+      <div class="key"><b class="k">Key idea</b>The model always sees your original question. Only the choice of version changes, and a flagged question is never served below Q5_K_M. <a href="demo.html">Watch this happen for all 450 held-out questions in the replay demo.</a></div>
+    </section>
+
+    <!-- 10 -->
+    <section class="ch" id="found" data-title="What we found">
+      <div class="ch-head"><div class="ch-num">Chapter 10</div><h2>What the measurements showed</h2></div>
+      <div class="finds">
+        <div class="find"><div class="big">72.0% <small>vs 73.4%</small></div><p><b>4-bit is nearly free.</b> Q4_K_M answers 72.0% correctly against F16's 73.4%, using 35% of the memory.</p></div>
+        <div class="find"><div class="big">51.2%</div><p><b>2-bit collapses.</b> Q2_K loses 22 points and changes 36.7% of answers.</p></div>
+        <div class="find"><div class="big">4.4%</div><p><b>Same score, different answers.</b> Even Q8_0 flips 4.4% of outcomes; Q4_K_M flips 12.5%.</p></div>
+        <div class="find"><div class="big">25 <small>of 36</small></div><p><b>Most question types are fine cheap.</b> In 25 of 36 category × difficulty groups, a version at 4 bits or below is within 2 points of F16.</p></div>
+        <div class="find"><div class="big">0.87 s <small>vs 0.53 s</small></div><p><b>Smallest isn't fastest.</b> Q2_K writes about twice as many words, so it is slower per question than Q4_K_M.</p></div>
+        <div class="find"><div class="big">64 <small>of 84 cells</small></div><p><b>The savings are real, with care.</b> At moderate thresholds the policy serves 64 of 84 cells below F16, at 54% of F16's cost. At the strict default, it keeps F16.</p></div>
+      </div>
+    </section>
+
+    <!-- 11 -->
+    <section class="ch" id="quiz" data-title="Check yourself">
+      <div class="ch-head"><div class="ch-num">Chapter 11</div><h2>Check yourself</h2><p class="intro">Six quick questions. Pick an answer to see why.</p></div>
+      <div class="box" id="quizbox"><div class="score" id="score">0 / 6</div></div>
+      <div class="box"><h3>Words you will hear</h3><div class="gloss" id="gloss"></div></div>
+    </section>
+
+    <footer>Numbers come from the project's own runs: Qwen2.5-3B-Instruct GGUF, llama.cpp b11451, RTX 4060, 14,469 graded runs. See also the <a href="index.html">results dashboard</a>, the <a href="demo.html">replay demo</a> and the <a href="revision.html">revision notes</a>.</footer>
+  </main>
+</div>
+
+<script>
+(() => {
+"use strict";
+const NS = "http://www.w3.org/2000/svg";
+const $ = (id) => document.getElementById(id);
+function S(tag, attrs, parent) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+function T(p, x, y, text, cls, extra = {}) { const t = S("text", Object.assign({ x, y, class: cls || "f-ink2", "font-size": 12 }, extra), p); t.textContent = text; return t; }
+const clear = (el) => { while (el.firstChild) el.removeChild(el.firstChild); };
+
+const R = [
+  { id: "Q2_K", bits: 2, bpw: 3.57, gb: 1.38, vram: 1547, load: 2.06, acc: 51.2, flip: 36.7, kl: 0.3826, tps: 113.7, lat: 0.874, toks: 93.5, safe: 6.1 },
+  { id: "Q3_K_M", bits: 3, bpw: 4.47, gb: 1.72, vram: 1845, load: 2.55, acc: 69.1, flip: 18.2, kl: 0.0909, tps: 92.0, lat: 0.540, toks: 55.1, safe: 5.6 },
+  { id: "Q4_K_M", bits: 4, bpw: 5.46, gb: 2.10, vram: 2169, load: 2.58, acc: 72.0, flip: 12.5, kl: 0.0278, tps: 96.4, lat: 0.528, toks: 48.8, safe: 6.1 },
+  { id: "Q5_K_M", bits: 5, bpw: 6.32, gb: 2.44, vram: 2450, load: 3.05, acc: 73.9, flip: 9.9, kl: 0.0104, tps: 89.4, lat: 0.534, toks: 42.6, safe: 3.0 },
+  { id: "Q6_K", bits: 6, bpw: 7.24, gb: 2.79, vram: 2752, load: 3.06, acc: 73.9, flip: 7.4, kl: 0.0051, tps: 79.3, lat: 0.599, toks: 44.5, safe: 1.8 },
+  { id: "Q8_0", bits: 8, bpw: 9.37, gb: 3.62, vram: 3470, load: 3.54, acc: 73.1, flip: 4.4, kl: 0.0021, tps: 64.0, lat: 0.693, toks: 42.1, safe: 1.8 },
+  { id: "F16", bits: 16, bpw: 17.63, gb: 6.80, vram: 6236, load: 5.62, acc: 73.4, flip: 0, kl: 0, tps: 36.8, lat: 1.161, toks: 41.3, safe: 1.1 },
+];
+const RC = (i) => `var(--r${i})`;
+const chip = (i) => `<span class="rung"><i style="background:${RC(i)}"></i>${R[i].id}</span>`;
+const TAU = -0.229, TAUP = Math.exp(TAU);
+let walkReady = false;   // the gate lab re-renders the walk-through once that section exists
+
+/* ---------- rail ---------- */
+const chapters = [...document.querySelectorAll(".ch")];
+const rail = $("rail");
+chapters.forEach((c, i) => { const a = document.createElement("a"); a.href = "#" + c.id; a.innerHTML = `<span class="n">${i + 1}</span><span>${c.dataset.title}</span>`; a.dataset.id = c.id; rail.appendChild(a); });
+const links = [...rail.querySelectorAll("a")];
+let seen = new Set();
+try { seen = new Set(JSON.parse(localStorage.getItem("qr-seen") || "[]")); } catch (e) {}
+const paintRail = (cur) => links.forEach((a) => { a.classList.toggle("on", a.dataset.id === cur); a.classList.toggle("seen", seen.has(a.dataset.id) && a.dataset.id !== cur); });
+paintRail(null);
+if ("IntersectionObserver" in window) {
+  const io = new IntersectionObserver((ents) => {
+    ents.forEach((e) => { if (e.isIntersecting) { seen.add(e.target.id); try { localStorage.setItem("qr-seen", JSON.stringify([...seen])); } catch (err) {} paintRail(e.target.id);
+      const on = rail.querySelector("a.on"); if (on && window.matchMedia("(max-width: 900px)").matches) on.scrollIntoView({ block: "nearest", inline: "center" }); } });
+  }, { rootMargin: "-30% 0px -60% 0px" });
+  chapters.forEach((c) => io.observe(c));
+}
+
+/* ---------- ch1 ---------- */
+let seed = 7; const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+$("numgrid").innerHTML = Array.from({ length: 48 }, () => { const v = (rnd() - 0.5) * 0.3; return `<span>${v >= 0 ? " " : ""}${v.toFixed(3)}</span>`; }).join("");
+
+/* ---------- ch2 wave ---------- */
+const wave = $("wave"), W = 640, H = 210, pad = 14;
+const f = (x) => 0.55 * Math.sin(2 * Math.PI * x * 1.3) + 0.32 * Math.sin(2 * Math.PI * x * 3.2 + 1.1) + 0.1 * Math.sin(2 * Math.PI * x * 7.5);
+const N = 320;
+function drawWave(i) {
+  clear(wave);
+  const bits = R[i].bits, L = Math.pow(2, Math.min(bits, 12));
+  const xs = Array.from({ length: N + 1 }, (_, k) => k / N);
+  const fy = xs.map(f), max = 1;
+  const q = fy.map((v) => { const t = Math.round(((v + max) / (2 * max)) * (L - 1)) / (L - 1); return t * 2 * max - max; });
+  const X = (x) => pad + x * (W - 2 * pad), Y = (v) => H / 2 - v * (H / 2 - pad);
+  if (bits <= 6) { for (let k = 0; k < L; k++) { const y = Y((k / (L - 1)) * 2 - 1); S("line", { x1: pad, x2: W - pad, y1: y, y2: y, class: "s-grid", "stroke-width": 1 }, wave); } }
+  let area = `M${X(0)},${Y(fy[0])}`; xs.forEach((x, k) => (area += ` L${X(x)},${Y(fy[k])}`)); for (let k = N; k >= 0; k--) area += ` L${X(xs[k])},${Y(q[k])}`;
+  S("path", { d: area + " Z", style: "fill:var(--coral);opacity:.35" }, wave);
+  let sm = `M${X(0)},${Y(fy[0])}`; xs.forEach((x, k) => (sm += ` L${X(x)},${Y(fy[k])}`));
+  S("path", { d: sm, fill: "none", class: "s-line", "stroke-width": 1.5, "stroke-dasharray": "4 3", opacity: 0.7 }, wave);
+  let st = `M${X(0)},${Y(q[0])}`; xs.forEach((x, k) => (st += ` L${X(x)},${Y(q[k])}`));
+  S("path", { d: st, fill: "none", style: `stroke:${RC(i)}`, "stroke-width": 3, "stroke-linejoin": "round" }, wave);
+  const err = fy.reduce((a, v, k) => a + Math.abs(v - q[k]), 0) / fy.length;
+  T(wave, 18, 22, `${R[i].id}: each weight can take ${bits >= 16 ? "65,536" : L.toLocaleString()} values`, "f-ink", { "font-weight": 700, "font-size": 14 });
+  T(wave, 18, 40, bits >= 16 ? "the reference: no visible rounding" : `shaded area = rounding error (avg ${err.toFixed(3)})`, "f-muted", { "font-size": 12 });
+}
+const ticks = $("bitticks");
+R.forEach((r, i) => { const b = document.createElement("button"); b.type = "button"; b.textContent = r.id; b.onclick = () => { $("bits").value = i; setRung(i); }; ticks.appendChild(b); });
+function setRung(i) {
+  drawWave(i);
+  [...ticks.children].forEach((b, k) => b.classList.toggle("on", k === i));
+  const r = R[i], st = [
+    ["File size", `${r.gb.toFixed(2)} GB`, r.gb / 6.8],
+    ["GPU memory", `${r.vram.toLocaleString()} MiB`, r.vram / 6236],
+    ["Correct", `${r.acc.toFixed(1)}%`, r.acc / 80],
+    ["Answers changed", i === 6 ? "ref" : `${r.flip}%`, r.flip / 40],
+    ["Tokens / s", r.tps.toFixed(0), r.tps / 120],
+  ];
+  $("rstats").innerHTML = st.map(([l, v, w]) => `<div class="stat"><span class="l">${l}</span><span class="v">${v}</span><div class="bar"><div style="width:${Math.min(100, w * 100).toFixed(1)}%"></div></div></div>`).join("");
+}
+$("bits").addEventListener("input", (e) => setRung(+e.target.value));
+setRung(2);
+
+/* ---------- tasks (real grid rows) ---------- */
+const TASKS = [
+  { k: "Plural of mouse", cat: "language · easy", p: "What is the plural of 'mouse'?", exp: "mice",
+    a: [[1, -0.025, 'The plural of "mouse" is "mice".'], [1, -0.01, "mice"], [1, -0.001, "The plural of 'mouse' is 'mice'."], [1, -0.017, "The plural of 'mouse' is 'mice'."], [1, -0.002, "The plural of 'mouse' is 'mice'."], [1, -0.001, "The plural of 'mouse' is 'mice'."], [1, -0.002, "The plural of 'mouse' is 'mice'."]],
+    why: "Every version gets it, so the cheapest one is enough." },
+  { k: "Headline topic", cat: "classification · easy", p: "Classify the topic of this headline as sports, politics, or technology: 'The Lakers clinched the playoff spot with a buzzer-beater last night.'", exp: "sports",
+    a: [[0, -0.457, "4. The context of the headline is clearly"], [1, -0.087, "sports"], [1, -0.017, "sports"], [1, -0.014, "sports"], [1, -0.138, "Sports"], [1, -0.11, "sports"], [1, -0.062, "sports"]],
+    why: "Q2_K rambles instead of answering. From Q3_K_M upward it answers cleanly." },
+  { k: "Oxygen", cat: "factual Q&A · easy", p: 'What chemical element has the symbol "O", and what is its atomic number?', exp: "oxygen + 8",
+    a: [[0, -0.084, "8"], [0, -0.083, "8"], [1, -0.042, 'Oxygen has the symbol "O" and its atomic number is 8.'], [1, -0.087, 'Oxygen has the symbol "O" and its atomic number is 8'], [1, -0.116, "Oxygen has the atomic number 8"], [1, -0.05, 'Oxygen has the symbol "O" and its atomic number is 8.'], [1, -0.053, 'Oxygen has the symbol "O" and its atomic number is 8.']],
+    why: "The two cheapest versions answer only half the question." },
+  { k: "Garden flowers", cat: "math · easy", p: "A garden has 60 flowers. One quarter of them wilted, and then 8 more were removed. How many flowers are left?", exp: "37",
+    a: [[0, -0.141, "53"], [0, -0.177, "34 flowers are left."], [0, -0.299, "38"], [1, -0.258, "37"], [1, -0.171, "37 flowers are left."], [1, -0.147, "37 flowers are left."], [1, -0.198, "37"]],
+    why: "Q5_K_M says 37, but its confidence (77.3%) is under the 79.5% bar, so it doesn't count as solved. Q6_K is right and confident." },
+  { k: "Element 79", cat: "factual Q&A · complex", p: "Name the element with atomic number 79, its chemical symbol, and the type of metal it is classified as.", exp: "gold + Au + transition metal",
+    a: [[0, -0.425, "Rubidium (Rb), metal"], [0, -0.249, "Mercury (Hg), metal."], [0, -0.196, "Gold (Au), metal"], [0, -0.323, "Gold (Au), metal"], [0, -0.192, "Gold (Au), a precious metal"], [0, -0.19, "Gold (Au), a precious metal."], [1, -0.203, "Gold (Au), a transition metal."]],
+    why: "Only F16 gives the full answer. The cheapest versions even name the wrong element." },
+  { k: "Opposite of happy", cat: "language · easy", p: "What is the opposite of 'happy'?", exp: "sad",
+    a: [[1, -0.197, 'The word that is the opposite of \'happy\' is "sad".'], [1, -0.028, "sad"], [0, -0.05, "The opposite of 'happy' is 'unhappy'."], [1, -0.084, "The opposite of 'happy' is 'sad'."], [1, -0.048, "The opposite of 'happy' is 'sad'."], [1, -0.047, "The opposite of 'happy' is 'sad'."], [1, -0.062, "The opposite of 'happy' is 'sad'."]],
+    why: "Q4_K_M slips once. One slip is tolerated, so the label stays Q2_K, but the slip still counts as a flip." },
+  { k: "Widget count", cat: "math · easy", p: "A factory produces 500 widgets. 5% are defective and discarded, then 40 more are shipped out. How many widgets remain in inventory?", exp: "435",
+    a: [[1, -0.138, "435"], [0, -0.148, "430"], [0, -0.147, "430"], [0, -0.149, "430"], [0, -0.143, "440"], [0, -0.167, "430"], [0, -0.149, "430"]],
+    why: "Only Q2_K is right. One lucky win with five failures above it doesn't count, so this question is unsolvable." },
+  { k: "Card total", cat: "extraction · easy", p: "Extract the total amount from this text: 'The total charged to your card was $89.99 for the order.' Reply with just the value.", exp: "$89.99",
+    a: [[0, -0.017, "89.99"], [0, -0.004, "89.99"], [0, -0.003, "89.99"], [0, -0.001, "89.99"], [0, -0.002, "89.99"], [0, -0.004, "89.99"], [0, -0.003, "89.99"]],
+    why: "Every version says 89.99, but the grader wants the $ sign. Strict graders sometimes mark good answers wrong; this is one of the 407 unsolvable questions." },
+  { k: "Sum 1 to 10", cat: "math · easy", p: "What is the sum of the first 10 positive integers?", exp: "55",
+    a: [[1, -0.114, "55"], [1, -0.057, "55"], [1, -0.075, "55"], [1, -0.05, "55"], [1, -0.051, "55"], [1, -0.05, "55"], [0, -0.059, "Therefore, the sum of the first 10 positive integers is:"]],
+    why: "Even F16 slips: its answer was cut off before the number. The cheap versions all said 55." },
+];
+/* the labelling rule from the project (labels.py): solved = correct and confident; ≤ 1 failure among costlier non-F16 rungs */
+function label(states) {           // states: 0 wrong, 1 right-unsure, 2 right-confident
+  const s = states.map((v) => v === 2), steps = [];
+  for (let b = 0; b < 6; b++) {
+    if (!s[b]) { steps.push(`${R[b].id}: ${states[b] === 1 ? "right but not confident enough" : "wrong"}, so keep climbing.`); continue; }
+    const fails = s.slice(b + 1, 6).filter((x) => !x).length;
+    if (fails <= 1) { steps.push(`${R[b].id}: right and confident, with ${fails} failure${fails === 1 ? "" : "s"} above it (up to 1 allowed). Stop here.`); return { req: b, steps }; }
+    steps.push(`${R[b].id}: right and confident, but ${fails} costlier versions fail. Treat it as a fluke and keep climbing.`);
+  }
+  if (s[6]) { steps.push("F16: right and confident. Stop here."); return { req: 6, steps }; }
+  steps.push("F16: not solved either. Nothing qualifies."); return { req: null, steps };
+}
+const stateOf = (row) => (row[0] ? (row[1] >= TAU ? 2 : 1) : 0);
+
+const tl = $("tasklist"), tv = $("taskview");
+TASKS.forEach((t, i) => { const b = document.createElement("button"); b.type = "button"; b.className = "btn"; const L = label(t.a.map(stateOf)).req; b.innerHTML = `<span>${t.k}</span><small>${L === null ? "none" : R[L].id}</small>`; b.onclick = () => showTask(i); tl.appendChild(b); });
+function showTask(i) {
+  const t = TASKS[i], L = label(t.a.map(stateOf)).req;
+  [...tl.children].forEach((b, k) => b.setAttribute("aria-pressed", k === i));
+  tv.innerHTML = `<div class="row" style="justify-content:space-between"><span class="hint">${t.cat}</span><span class="hint">expected: <b class="mono">${t.exp}</b></span></div>
+    <div class="prompt">${t.p.replace(/</g, "&lt;")}</div>
+    <div class="ladder">${t.a.map((r, k) => { const p = Math.exp(r[1]); return `<div class="lrow${k === L ? " req" : ""}">${chip(k)}<span class="ans">${r[2].replace(/</g, "&lt;")}</span><span class="conf" title="confidence ${(p * 100).toFixed(1)}%"><div style="width:${(p * 100).toFixed(1)}%;background:${r[0] ? "var(--good)" : "var(--bad)"};opacity:.75"></div><i style="left:${(TAUP * 100).toFixed(1)}%"></i></span><span class="${r[0] ? "ok" : "no"}">${r[0] ? "✓" : "✗"}</span></div>`; }).join("")}</div>
+    <div class="verdict"><span>Required precision</span><span class="tag ${L === null ? "grey" : ""}">${L === null ? "unsolvable" : R[L].id}</span><span style="flex:1 1 260px;min-width:0">${t.why}</span></div>`;
+}
+showTask(3);
+
+/* ---------- ch4 flow ---------- */
+const STAGES = [
+  { t: "Build", s: "data + models", in: ["135 hand-written seed tasks", "a teacher model (gpt-oss-120b) to write more", "XSTest safety prompts", "Qwen2.5-3B-Instruct GGUF files"],
+    do: ["teacher writes tasks for 12 categories × 3 difficulties", "keep only tasks the teacher can re-answer correctly", "plant hidden instructions in 150 tasks", "pin every model file by SHA-256 hash"],
+    out: ["1,467 graded tasks", "600 safety prompts", "7 verified model files"] },
+  { t: "Measure", s: "on the RTX 4060", in: ["2,067 prompts", "7 rungs, one loaded at a time", "fixed settings: temperature 0, seed 42"],
+    do: ["ask every prompt at every rung", "grade each answer automatically", "run code answers in a locked-down Docker sandbox", "record memory, load time, speed, confidence"],
+    out: ["14,469 graded rows, 0 errors", "flips and KL-divergence vs F16", "memory and speed per rung"] },
+  { t: "Learn", s: "on training data only", in: ["the 1,017 training tasks", "their 7 graded answers each", "the safety results"],
+    do: ["label each task's required precision", "train the label predictor", "estimate accuracy, flips and safety per cell, with margins", "apply the three gates"],
+    out: ["labels for every task", "a predictor", "a policy: 84 cells → rung", "safety floor Q5_K_M"] },
+  { t: "Serve", s: "next stage", in: ["a new question", "the policy, predictor and safety classifier"],
+    do: ["predict category and label", "look up the cell's rung", "raise flagged prompts to the floor", "answer on that rung"],
+    out: ["the answer", "which rung, and why", "the cost"] },
+];
+const flow = $("flow");
+STAGES.forEach((st, i) => { const b = document.createElement("button"); b.type = "button"; b.className = "btn"; b.innerHTML = `<b>${i + 1} · ${st.t}</b><span>${st.s}</span>`; b.onclick = () => showStage(i); flow.appendChild(b); });
+function showStage(i) {
+  [...flow.children].forEach((b, k) => b.setAttribute("aria-pressed", k === i));
+  const st = STAGES[i], li = (a) => `<ul>${a.map((x) => `<li>${x}</li>`).join("")}</ul>`;
+  $("stage").innerHTML = `<div><span class="lab">Goes in</span>${li(st.in)}</div><div><span class="lab">Happens</span>${li(st.do)}</div><div><span class="lab">Comes out</span>${li(st.out)}</div>`;
+}
+showStage(0);
+(function drawGrid() {
+  const g = $("grid"), x0 = 70, x1 = 630, cols = 100, cw = (x1 - x0) / cols;
+  const order = [2, 5, 0, 1, 3, 4, 6];
+  T(g, x0, 12, "Benchmark questions (1,467)", "f-ink2", { "font-size": 11, "font-weight": 700 });
+  T(g, x0 + cw * 71 + 4, 12, "Safety (600)", "f-ink2", { "font-size": 11, "font-weight": 700 });
+  order.forEach((ri, row) => {
+    const y = 20 + row * 16;
+    T(g, x0 - 8, y + 10, R[ri].id, "f-ink", { "font-size": 11, "text-anchor": "end", "font-family": "JetBrains Mono, monospace" });
+    for (let c = 0; c < cols; c++) S("rect", { x: x0 + c * cw + 0.5, y, width: cw - 1, height: 12, rx: 1.5, style: `fill:${c < 71 ? "var(--sky)" : "var(--coral)"};opacity:${0.55 + 0.45 * ((c * 7 + row * 3) % 5) / 5}` }, g);
+  });
+  T(g, x0, 146, "7 rows × 2,067 prompts = 14,469 graded answers · each block ≈ 21 prompts · rows in the order they ran", "f-muted", { "font-size": 11 });
+})();
+
+/* ---------- ch5 chart ---------- */
+const MEAS = [
+  { k: "Correct", f: (r) => r.acc, max: 80, unit: "%", note: "Share of the 1,467 benchmark questions answered correctly." },
+  { k: "Answers changed", f: (r, i) => (i === 6 ? null : r.flip), max: 40, unit: "%", note: "Share of questions whose right/wrong outcome differs from F16's (F16 is the reference)." },
+  { k: "Safety slips", f: (r, i) => (i === 6 ? null : r.safe), max: 8, unit: "%", line: 5, note: "Cautious (upper-bound) rate of harmful or injected prompts handled safely by F16 but not by this rung. The dashed line is the 5% limit." },
+  { k: "Memory", f: (r) => r.vram, max: 7000, unit: " MiB", note: "GPU memory used when the rung is loaded on the RTX 4060." },
+];
+const seg = $("seg");
+MEAS.forEach((m, i) => { const b = document.createElement("button"); b.type = "button"; b.className = "btn"; b.textContent = m.k; b.onclick = () => drawFail(i); seg.appendChild(b); });
+function drawFail(mi) {
+  [...seg.children].forEach((b, k) => b.setAttribute("aria-pressed", k === mi));
+  const m = MEAS[mi], g = $("failchart"); clear(g);
+  const x0 = 46, x1 = 630, top = 18, base = 190, bw = 52, gap = (x1 - x0 - bw * 7) / 6, Y = (v) => base - (v / m.max) * (base - top);
+  for (let k = 0; k <= 4; k++) { const v = (m.max / 4) * k, y = Y(v); S("line", { x1: x0, x2: x1, y1: y, y2: y, class: "s-grid" }, g); T(g, x0 - 6, y + 4, (v === 0 ? "0" : m.max >= 1000 ? (v / 1000).toFixed(1) + "k" : String(+v.toFixed(1))), "f-muted", { "text-anchor": "end", "font-size": 11 }); }
+  R.forEach((r, i) => {
+    const v = m.f(r, i), x = x0 + i * (bw + gap);
+    if (v === null) T(g, x + bw / 2, base - 6, "reference", "f-muted", { "text-anchor": "middle", "font-size": 11 });
+    else { const y = Y(v), h = base - y, rr = Math.min(5, h); S("path", { d: `M${x},${base} v${-(h - rr)} q0,${-rr} ${rr},${-rr} h${bw - 2 * rr} q${rr},0 ${rr},${rr} v${h - rr} z`, style: `fill:${RC(i)}` }, g);
+      T(g, x + bw / 2, y - 6, (m.unit === " MiB" ? v.toLocaleString() : v.toFixed(1)) + (m.unit === "%" ? "%" : ""), "f-ink", { "text-anchor": "middle", "font-size": 12, "font-weight": 700 }); }
+    T(g, x + bw / 2, base + 16, r.id, "f-ink2", { "text-anchor": "middle", "font-size": 11.5, "font-family": "JetBrains Mono, monospace" });
+  });
+  if (m.line) { const y = Y(m.line); S("line", { x1: x0, x2: x1, y1: y, y2: y, class: "s-line", "stroke-width": 1.5, "stroke-dasharray": "6 4" }, g); T(g, x1, y - 5, "limit ψ = 5%", "f-ink", { "text-anchor": "end", "font-size": 11.5, "font-weight": 700 }); }
+  $("failnote").textContent = m.note;
+}
+drawFail(1);
+
+/* ---------- ch6 toggler ---------- */
+let cellState = TASKS[3].a.map(stateOf);
+const cellsEl = $("cells");
+R.forEach((r, i) => { const c = document.createElement("button"); c.type = "button"; c.className = "cell"; c.onclick = () => { cellState[i] = (cellState[i] + 1) % 3; drawCells(); }; cellsEl.appendChild(c); });
+function drawCells() {
+  const res = label(cellState);
+  [...cellsEl.children].forEach((c, i) => { const s = cellState[i]; c.dataset.s = s; c.classList.toggle("win", res.req === i);
+    c.innerHTML = `<span class="r">${R[i].id}</span><span class="s ${s ? "ok" : "no"}">${s ? "✓" : "✗"}</span><span class="d">${s === 2 ? "confident" : s === 1 ? "unsure" : "wrong"}</span>`;
+    c.setAttribute("aria-label", `${R[i].id}: ${s === 2 ? "right and confident" : s === 1 ? "right but unsure" : "wrong"}. Click to change.`); });
+  $("labres").innerHTML = `Required precision: ${res.req === null ? "unsolvable" : chip(res.req)}`;
+  $("labsteps").innerHTML = res.steps.map((s) => `<li>${s}</li>`).join("");
+}
+const pre = $("presets");
+TASKS.forEach((t) => { const b = document.createElement("button"); b.type = "button"; b.className = "btn"; b.textContent = t.k; b.onclick = () => { cellState = t.a.map(stateOf); drawCells(); }; pre.appendChild(b); });
+drawCells();
+
+/* ---------- ch7 predictor chart ---------- */
+(function () {
+  const g = $("predchart"), x0 = 210, x1 = 600, Xs = (v) => x0 + (v / 100) * (x1 - x0);
+  const rows = [["Predictor · exact", 45.8, "var(--ink)"], ["Always guess the common label", 45.5, "var(--muted)"], ["Guess per category", 48.4, "var(--muted)"], ["Predictor · within one rung", 79.8, "var(--mint)"]];
+  [0, 25, 50, 75, 100].forEach((v) => { S("line", { x1: Xs(v), x2: Xs(v), y1: 8, y2: 146, class: "s-grid" }, g); T(g, Xs(v), 162, v + "%", "f-muted", { "text-anchor": "middle", "font-size": 11 }); });
+  rows.forEach(([l, v, c], i) => { const y = 14 + i * 33; T(g, x0 - 10, y + 15, l, "f-ink2", { "text-anchor": "end", "font-size": 12.5 }); const w = Xs(v) - x0;
+    S("path", { d: `M${x0},${y} h${w - 5} q5,0 5,5 v12 q0,5 -5,5 h${-(w - 5)} z`, style: `fill:${c}` }, g); T(g, Xs(v) + 6, y + 15, v.toFixed(1) + "%", "f-ink", { "font-size": 12.5, "font-weight": 700 }); });
+})();
+
+/* ---------- ch8 gate lab (real policy cells, training split) ---------- */
+const SAFE_UCB = [0.0614, 0.0563, 0.0614, 0.0299, 0.0179, 0.0179, 0.0108];
+const CELLS = {
+  "sentiment · label 1": { n: 42, ref: 0.966, lcb: [0.843, 0.905, 0.935, 0.921, 0.911, 0.926], flip: [0.199, 0.08, 0.039, 0.024, 0.015, 0.007], cost: [0.149, 0.117, 0.117, 0.122, 0.125, 0.155, 0.263] },
+  "multiple choice · label 1": { n: 56, ref: 0.859, lcb: [0.44, 0.79, 0.791, 0.789, 0.79, 0.804], flip: [0.492, 0.109, 0.029, 0.011, 0.004, 0.001], cost: [0.197, 0.034, 0.032, 0.045, 0.037, 0.032, 0.066] },
+  "extraction · label 0": { n: 74, ref: 0.906, lcb: [0.607, 0.781, 0.818, 0.842, 0.817, 0.831], flip: [0.317, 0.123, 0.065, 0.042, 0.028, 0.013], cost: [0.032, 0.039, 0.036, 0.039, 0.042, 0.049, 0.078] },
+  "factual Q&A · label 1": { n: 38, ref: 0.74, lcb: [0.426, 0.601, 0.69, 0.676, 0.678, 0.674], flip: [0.444, 0.295, 0.199, 0.148, 0.112, 0.065], cost: [0.258, 0.227, 0.194, 0.189, 0.235, 0.286, 0.481] },
+  "code generation · label 0": { n: 10, ref: 0.915, lcb: [0.264, 0.696, 0.842, 0.847, 0.86, 0.864], flip: [0.63, 0.328, 0.176, 0.109, 0.069, 0.028], cost: [0.544, 0.247, 0.252, 0.274, 0.289, 0.35, 0.595] },
+};
+const P = { d: 0.02, phi: 0.10, psi: 0.05 };
+let curCell = "extraction · label 0";
+function decide(c, p, flagged) {
+  const rows = R.map((r, i) => { if (i === 6) return { i, a: true, f: true, s: true, ok: true };
+    const a = c.lcb[i] >= c.ref - p.d, f = c.flip[i] <= p.phi, s = SAFE_UCB[i] <= p.psi; return { i, a, f, s, ok: a && f && s }; });
+  let cand = rows.filter((r) => r.ok);
+  if (flagged) cand = cand.filter((r) => r.i >= 3);
+  const win = cand.reduce((b, r) => (c.cost[r.i] < c.cost[b.i] - 1e-12 ? r : b), cand[cand.length - 1]);
+  return { rows, win: win.i };
+}
+const cp = $("cellpick");
+Object.keys(CELLS).forEach((k) => { const b = document.createElement("button"); b.type = "button"; b.className = "btn"; b.textContent = k; b.onclick = () => { curCell = k; drawGates(); }; cp.appendChild(b); });
+const PRE = [["Strict (project default)", 0.02, 0.10, 0.05], ["Moderate", 0.10, 0.20, 0.05], ["Moderate, no safety gate", 0.10, 0.20, 0.10]];
+const gp = $("gpresets");
+PRE.forEach(([n, d, phi, psi]) => { const b = document.createElement("button"); b.type = "button"; b.className = "btn"; b.textContent = n; b.onclick = () => { P.d = d; P.phi = phi; P.psi = psi; syncSliders(); drawGates(); }; gp.appendChild(b); });
+function syncSliders() { $("d").value = P.d; $("phi").value = P.phi; $("psi").value = P.psi; }
+["d", "phi", "psi"].forEach((k) => $(k).addEventListener("input", (e) => { P[k] = +e.target.value; drawGates(); }));
+const pc = (v) => (v * 100).toFixed(1) + "%";
+function drawGates() {
+  const c = CELLS[curCell], res = decide(c, P, false);
+  [...cp.children].forEach((b) => b.setAttribute("aria-pressed", b.textContent === curCell));
+  [...gp.children].forEach((b, k) => b.setAttribute("aria-pressed", PRE[k][1] === P.d && PRE[k][2] === P.phi && PRE[k][3] === P.psi));
+  $("dv").textContent = (P.d * 100).toFixed(1) + " pts"; $("phiv").textContent = pc(P.phi); $("psiv").textContent = pc(P.psi);
+  const g = (ok, txt) => `<span class="chip ${ok ? "ok" : "no"}">${ok ? "pass" : "fail"} · ${txt}</span>`;
+  const maxc = Math.max(...c.cost);
+  $("gtable").innerHTML = `<tr><th>Version</th><th>Accuracy ≥ ${pc(c.ref - P.d)}</th><th>Flips ≤ ${pc(P.phi)}</th><th>Safety ≤ ${pc(P.psi)}</th><th>Cost</th></tr>` +
+    res.rows.map((r) => { const i = r.i; return `<tr class="${i === res.win ? "win" : ""}"><td>${chip(i)}</td>` +
+      (i === 6 ? `<td colspan="3"><span class="hint">reference: always allowed</span></td>` : `<td>${g(r.a, pc(c.lcb[i]))}</td><td>${g(r.f, pc(c.flip[i]))}</td><td>${g(r.s, pc(SAFE_UCB[i]))}</td>`) +
+      `<td><div style="display:flex;align-items:center;gap:6px"><div class="costbar" style="width:${(c.cost[i] / maxc * 70).toFixed(0)}px"></div><span class="mono" style="font-size:12px">${c.cost[i].toFixed(3)}</span></div></td></tr>`; }).join("");
+  const w = res.win, saving = 1 - c.cost[w] / c.cost[6];
+  $("gsum").innerHTML = w === 6 ? `Served at ${chip(6)}. No cheaper version passes all three gates for this cell (${c.n} training questions).`
+    : `Served at ${chip(w)}: the cheapest version that passes all three gates, costing <b>${(saving * 100).toFixed(0)}% less</b> than F16 for this cell (${c.n} training questions). Cost is GPU-hours per 1,000 questions.`;
+  if (walkReady) renderStep();
+}
+syncSliders(); drawGates();
+
+/* ---------- ch9 walk-through (real test prompt ext-07) ---------- */
+const WALK_ANS = ["Denver", "Denver", "Denver", "Denver", "Denver", "Denver", "Denver"];
+const WALK_LAT = [0.197, 0.077, 0.073, 0.074, 0.089, 0.079, 0.147];
+const STEPS = ["Question arrives", "Category", "Predicted label", "Policy lookup", "Safety check", "Load version", "Generate", "Answer"];
+let step = 0, playing = null;
+const track = $("track");
+STEPS.forEach((s) => { const d = document.createElement("div"); d.textContent = s; track.appendChild(d); });
+function renderStep() {
+  [...track.children].forEach((d, k) => { d.className = k < step ? "done" : k === step ? "now" : ""; });
+  const flagged = $("flag").checked, c = CELLS["extraction · label 0"], res = decide(c, P, false);
+  const rung = flagged ? Math.max(res.win, 3) : res.win;
+  const say = [
+    ["A question arrives", "Through the API, after the key, size and rate-limit checks.", `"Extract the city from: 'The conference will be held in Denver next spring, near the convention center.'"`],
+    ["Which kind of question is it?", "A fast keyword-based classifier sorts it into one of 12 categories.", "category = extraction"],
+    ["How much precision will it need?", "The predictor reads the question's 409 features and guesses its required precision. This is its real output for this test question.", "predicted label = 0 (Q2_K-level)"],
+    ["Look up the policy", `Cell "extraction · label 0" with your Chapter 8 thresholds (δ ${(P.d * 100).toFixed(1)} pts, φ ${pc(P.phi)}, ψ ${pc(P.psi)}).`, `policy says → ${R[res.win].id}`],
+    ["Safety check", flagged ? "The safety classifier flagged it, so the rung is raised to the safety floor if it is below it." : "The safety classifier scores the question. Flagged questions are never served below Q5_K_M. Tick the box below to see that happen.", flagged ? `flagged → ${R[res.win].id} raised to ${R[rung].id}` : `not flagged → stays at ${R[rung].id}`],
+    ["Is that version loaded?", "If not, the server pool loads it first, evicting another rung if memory is short. Its file hash is checked before it starts.", `loading ${R[rung].id} would take ${R[rung].load.toFixed(2)} s`],
+    ["Generate", "The original question goes to llama-server running that version: temperature 0, seed 42.", `${R[rung].id} answered in ${WALK_LAT[rung].toFixed(3)} s`],
+    ["Answer", "The reply includes which version answered and why, so every decision can be checked.", `answer = "${WALK_ANS[rung]}" ✓ · served by ${R[rung].id}`],
+  ][step];
+  $("say").innerHTML = `<div class="t">${say[0]}</div><div class="d">${say[1]}</div><div class="data">${say[2]}</div>`;
+  $("prev").disabled = step === 0; $("next").textContent = step === STEPS.length - 1 ? "Start over" : "Next step";
+}
+$("next").onclick = () => { stop(); step = step === STEPS.length - 1 ? 0 : step + 1; renderStep(); };
+$("prev").onclick = () => { stop(); step = Math.max(0, step - 1); renderStep(); };
+$("flag").onchange = renderStep;
+function stop() { if (playing) { clearInterval(playing); playing = null; $("play").textContent = "Play all"; } }
+$("play").onclick = () => { if (playing) return stop(); step = 0; renderStep(); $("play").textContent = "Pause";
+  playing = setInterval(() => { if (step >= STEPS.length - 1) return stop(); step++; renderStep(); }, 1600); };
+walkReady = true;
+renderStep();
+
+/* ---------- quiz ---------- */
+const QUIZ = [
+  ["What does a lower quantization level mainly save?", ["Training time", "GPU memory and load time", "Internet bandwidth"], 1, "Fewer bits per weight means a smaller file: Q4_K_M needs 2,169 MiB against F16's 6,236 MiB, and it loads faster."],
+  ["Q8_0 is within 0.4 points of F16's accuracy. Why isn't that enough?", ["It still changes 4.4% of individual answers", "It is slower than F16", "It cannot run on an RTX 4060"], 0, "Equal accuracy can hide different answers. These are called flips, and QuantRoute limits them separately."],
+  ["A question is right at Q5_K_M but unsure, and right and confident at Q6_K and above. Its label?", ["Q5_K_M", "Q6_K", "F16"], 1, "Being solved needs both: right and confident. Q6_K is the first version that is both."],
+  ["Why is Q2_K slower per question than Q4_K_M?", ["It runs on the CPU", "It writes about twice as many tokens", "It reloads every time"], 1, "Q2_K produces tokens fastest, but it rambles: 93.5 tokens per answer against 48.8."],
+  ["What happens to a question the safety classifier flags?", ["It is refused automatically", "It is never served below Q5_K_M", "It goes to F16 every time"], 1, "Q5_K_M is the lowest version whose safety-slip bound stays under 5%, so flagged questions never go lower."],
+  ["Why are 450 tasks kept out of all training?", ["To save GPU time", "To test the policy on questions it has never seen", "Because they are too hard"], 1, "Results on held-out questions show whether the policy really generalizes. It was never tuned on them."],
+];
+const qb = $("quizbox"); let right = 0;
+QUIZ.forEach(([q, opts, ans, why], qi) => {
+  const d = document.createElement("div"); d.className = "q";
+  d.innerHTML = `<div class="qq">${qi + 1}. ${q}</div><div class="opts">${opts.map((o, k) => `<button type="button" class="btn" data-k="${k}">${o}</button>`).join("")}</div><div class="why" hidden>${why}</div>`;
+  d.querySelectorAll(".opts .btn").forEach((b) => b.onclick = () => {
+    const k = +b.dataset.k; d.querySelectorAll(".opts .btn").forEach((x) => { x.disabled = true; if (+x.dataset.k === ans) x.classList.add("right"); });
+    if (k !== ans) b.classList.add("wrong"); else right++;
+    d.querySelector(".why").hidden = false; $("score").textContent = `${right} / ${QUIZ.length}`;
+  });
+  qb.appendChild(d);
+});
+
+/* ---------- glossary ---------- */
+const G = [
+  ["Weights", "The billions of numbers a model learned during training."],
+  ["Quantization", "Storing those numbers with fewer bits, so they take fewer distinct values."],
+  ["Rung", "One of the 7 versions on the ladder, from Q2_K to F16."],
+  ["F16", "The full-precision reference version (16 bits per weight)."],
+  ["GGUF / llama.cpp", "The model file format and the engine that runs it on the GPU."],
+  ["VRAM", "The graphics card's memory: 8,188 MiB on the RTX 4060."],
+  ["Flip", "A question whose right/wrong outcome changes compared with F16."],
+  ["KL-divergence", "How far a rung's next-word probabilities drift from F16's, over ordinary text."],
+  ["τ (confidence bar)", "Average token probability of 79.5% (log-prob −0.229) needed for an answer to count as solved."],
+  ["Required precision", "The cheapest rung that answers a question right and confidently."],
+  ["Cell", "A group of questions: one of 12 categories × one of 7 predicted labels."],
+  ["Lower / upper bound", "The cautious end of a 95% confidence range, used so luck can't open a gate."],
+  ["Safety floor", "Q5_K_M: the lowest rung flagged questions may use."],
+  ["Cross-fitting", "Making each training prediction with a model that never saw that question."],
+];
+$("gloss").innerHTML = G.map(([t, d]) => `<div><b>${t}</b>${d}</div>`).join("");
+})();
+</script>
 </body>
 </html>
