@@ -213,6 +213,11 @@ class ServerPool:
             self._lru.append(rung)
             return server.client(), True, swap_s
 
+    def resident(self) -> list[str]:
+        """Rungs currently loaded, least recently used first."""
+        with self._lock:
+            return list(self._lru)
+
     def shutdown(self) -> None:
         with self._lock:
             for server in self._servers.values():

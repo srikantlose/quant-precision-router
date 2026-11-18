@@ -50,7 +50,7 @@
   .st { position: relative; border: 2px solid var(--line); border-radius: 14px; padding: 11px; background: var(--paper); display: flex; flex-direction: column; gap: 5px; box-shadow: 3px 3px 0 var(--line); min-width: 0; }
   .st:not(:last-child)::after { content: ""; position: absolute; right: -18px; top: 50%; width: 11px; height: 11px; border-top: 3px solid var(--line); border-right: 3px solid var(--line); transform: translateY(-50%) rotate(45deg); }
   .st .k { font-family: var(--mono); font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
-  .st .v { font-family: var(--display); font-weight: 800; font-size: 18px; line-height: 1.15; overflow-wrap: anywhere; }
+  .st .v { font-family: var(--display); font-weight: 800; font-size: 16px; line-height: 1.15; overflow-wrap: break-word; hyphens: auto; }
   .st .d { font-size: 12px; color: var(--ink-2); line-height: 1.4; }
   .st.final { background: var(--sun); } .st.warn { background: var(--blush); }
   .rchip { display: inline-block; font-family: var(--mono); font-weight: 700; font-size: 12.5px; padding: 3px 8px; border-radius: 7px; border: 2px solid var(--line); white-space: nowrap; }
@@ -67,7 +67,57 @@
   table.hist th { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); text-align: left; padding: 6px 8px; border-bottom: 2px solid var(--line); }
   table.hist td { padding: 7px 8px; border-bottom: 1px solid var(--grid); vertical-align: top; }
   table.hist td.q { max-width: 0; width: 55%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  @media (max-width: 1000px) { .grid { grid-template-columns: 1fr; } .ask { position: static; } .steps { grid-template-columns: 1fr 1fr; } .st::after { display: none; } .answers.two { grid-template-columns: 1fr; } }
+  /* routing workflow */
+  .wf h3 { font-size: 22px; }
+  .wf .sub { color: var(--ink-2); font-size: 14px; margin: 4px 0 14px; }
+  .tbar { display: flex; height: 26px; border: 2px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .tbar div { display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 10.5px; font-weight: 700; white-space: nowrap; overflow: hidden; border-right: 2px solid var(--paper); }
+  .tbar div:last-child { border-right: 0; }
+  .tlegend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--ink-2); margin: 6px 0 18px; }
+  .tlegend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; border: 1.5px solid var(--line); margin-right: 5px; vertical-align: -1px; }
+  ol.wfs { list-style: none; margin: 0; padding: 0; position: relative; }
+  ol.wfs::before { content: ""; position: absolute; left: 17px; top: 8px; bottom: 8px; width: 3px; background: var(--grid); border-radius: 2px; }
+  .wfi { display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 14px; padding-bottom: 18px; position: relative; }
+  .wfi .n { width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--line); background: var(--sun); display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-weight: 800; font-size: 14px; z-index: 1; }
+  .wfi .n.alt { background: var(--mint); } .wfi .n.hot { background: var(--blush); }
+  .wfi .b { border: 2px solid var(--line); border-radius: 12px; padding: 12px 14px; background: var(--paper); min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+  .wfi .hd { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .wfi .hd b { font-family: var(--display); font-size: 17px; }
+  .wfi .ms { font-family: var(--mono); font-size: 11.5px; font-weight: 700; color: var(--muted); }
+  .wfi p { margin: 0; font-size: 14px; color: var(--ink-2); line-height: 1.5; }
+  .wfi p b { color: var(--ink); }
+  .fv { display: grid; grid-template-columns: 6fr 2fr 1.4fr; gap: 6px; }
+  .fv div { border: 2px solid var(--line); border-radius: 8px; padding: 6px 8px; font-size: 12.5px; line-height: 1.3; min-width: 0; }
+  .fv div b { font-family: var(--mono); font-size: 14px; display: block; }
+  .chips2 { display: flex; flex-wrap: wrap; gap: 5px; }
+  .chips2 span { font-family: var(--mono); font-size: 11.5px; border: 1.5px solid var(--grid); border-radius: 6px; padding: 1px 6px; background: var(--bg); }
+  .chips2 span.nz { border-color: var(--line); background: var(--sun-soft); }
+  .pbars { display: flex; flex-direction: column; gap: 4px; }
+  .pbar { display: grid; grid-template-columns: 74px minmax(0, 1fr) 52px; gap: 8px; align-items: center; font-size: 12.5px; }
+  .pbar .tr { height: 14px; background: var(--grid); border-radius: 4px; overflow: hidden; }
+  .pbar .tr div { height: 100%; border-radius: 4px; }
+  .pbar .v { font-family: var(--mono); font-weight: 700; text-align: right; }
+  .pbar.top .tr { outline: 2px solid var(--line); }
+  table.gt { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  table.gt th { font-family: var(--mono); font-size: 10.5px; letter-spacing: .03em; text-transform: uppercase; color: var(--muted); text-align: left; padding: 5px 6px; border-bottom: 2px solid var(--line); }
+  table.gt td { padding: 5px 6px; border-bottom: 1px solid var(--grid); font-variant-numeric: tabular-nums; vertical-align: middle; }
+  table.gt tr.win td { background: var(--sun-soft); font-weight: 700; }
+  table.gt tr.adm td:first-child { box-shadow: inset 4px 0 0 var(--mint); }
+  .ok { color: #0b7a3e; font-weight: 800; } .no { color: #b3261e; font-weight: 800; }
+  .cbar { display: inline-block; height: 8px; border-radius: 3px; background: var(--ink); vertical-align: middle; margin-right: 6px; }
+  .gauge { position: relative; height: 18px; background: var(--grid); border: 2px solid var(--line); border-radius: 9px; }
+  .gauge .fill { position: absolute; inset: 0 auto 0 0; border-radius: 7px; }
+  .gauge .mark { position: absolute; top: -6px; bottom: -6px; width: 3px; background: var(--ink); }
+  .gauge .lab { position: absolute; top: -20px; transform: translateX(-50%); font-family: var(--mono); font-size: 10.5px; font-weight: 700; white-space: nowrap; }
+  .gwrap { padding-top: 18px; }
+  .pool { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; }
+  .pool .arrow { font-family: var(--mono); font-weight: 800; }
+  .pool .gone { text-decoration: line-through; opacity: .55; }
+  pre.raw { margin: 0; font-family: var(--mono); font-size: 12.5px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; background: var(--bg); border: 1.5px dashed var(--line); border-radius: 8px; padding: 8px 10px; max-height: 240px; overflow-y: auto; }
+  details summary { cursor: pointer; font-weight: 700; font-size: 13px; }
+  .kv { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 13px; color: var(--ink-2); }
+  .kv b { color: var(--ink); font-family: var(--mono); }
+  @media (max-width: 1000px) { .grid { grid-template-columns: 1fr; } .ask { position: static; } .steps { grid-template-columns: 1fr 1fr; } .st::after { display: none; } .answers.two { grid-template-columns: 1fr; } .fv { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -191,6 +241,78 @@
       <span>${r.swap_occurred ? `loaded this version first: <b>${r.swap_cost_s.toFixed(1)} s</b>` : "version was already loaded"}</span>
       <span>≈ <b>${(r.est_cost_gpu_h * 3600).toFixed(2)}</b> GPU-seconds</span></div></div>`;
   }
+  // ---------------------------------------------------------------- routing workflow (in depth)
+  const pc = (x, d = 1) => (x == null ? "—" : (100 * x).toFixed(d) + "%");
+  const num = (x) => (Number.isInteger(x) ? String(x) : x.toFixed(2));
+  const ms = (x) => (x == null ? "" : x >= 1000 ? (x / 1000).toFixed(2) + " s" : x >= 10 ? x.toFixed(0) + " ms" : x.toFixed(1) + " ms");
+  const SURF = { n_chars: "characters", n_words: "words", n_sentences: "sentences", n_numbers: "numbers", log_max_number: "log10 largest number",
+    n_math_ops: "maths operators", n_conjunctions: "conjunctions", n_step_markers: "step words", n_question_marks: "question marks",
+    has_code: "has code", n_code_lines: "code lines", n_quotes: "quote pairs", n_list_items: "list items" };
+  function workflow(r) {
+    const T = r.trace || {}, tm = T.timing_ms || {}, pol = T.policy || {}, sf = T.safety || {}, sv = T.serving || {}, gen = T.generation || {}, ex = T.extraction || {};
+    if (!T.policy) return "";
+    const segs = [["classify", "category", "#bcd3ff"], ["embed", "embedding", "#9dbcf7"], ["predict", "predictor", "#6f98ea"], ["policy", "policy", "#ffc832"],
+      ["safety", "safety", "#ffd9c7"], ["load", "load version", "#ec6d3d"], ["generate", "generate", "#151515"]];
+    const total = segs.reduce((a, [k]) => a + (tm[k] || 0), 0) || 1;
+    const bar = segs.filter(([k]) => tm[k] != null).map(([k, l, c]) => `<div title="${l}: ${ms(tm[k])}" style="flex:${Math.max(tm[k] / total, 0.015)};background:${c};color:${k === "generate" || k === "load" ? "#fff" : "#151515"}">${tm[k] / total > 0.12 ? l : ""}</div>`).join("");
+    const legend = segs.filter(([k]) => tm[k] != null).map(([k, l, c]) => `<span><i style="background:${c}"></i>${l} ${ms(tm[k])}</span>`).join("");
+    const step = (n, title, time, body, cls) => `<li class="wfi"><span class="n ${cls || ""}">${n}</span><div class="b"><div class="hd"><b>${title}</b><span class="ms">${time || ""}</span></div>${body}</div></li>`;
+
+    // 3 · features
+    const surf = Object.entries(T.features.surface).map(([k, v]) => `<span class="${v ? "nz" : ""}">${SURF[k] || k}: ${num(v)}</span>`).join("");
+    // 4 · predictor
+    const probs = T.predictor.probs, pmax = Math.max(...Object.values(probs));
+    const pbars = LADDER.map((rg) => `<div class="pbar${rg === r.predicted_required_precision ? " top" : ""}"><span>${chip(rg)}</span><div class="tr"><div style="width:${(100 * (probs[rg] || 0) / pmax).toFixed(1)}%;background:${RC[rg]}"></div></div><span class="v">${pc(probs[rg] || 0, 0)}</span></div>`).join("");
+    // 5 · policy gates
+    const op = pol.operating_point, cmax = Math.max(...pol.gates.map((g) => g.cost));
+    const mark = (ok) => (ok ? '<span class="ok">✓</span>' : '<span class="no">✗</span>');
+    const rows = pol.gates.map((g) => {
+      const blocked = g.rung === "F16" ? "reference, always allowed" : !g.admissible ? "blocked by " + [!g.acc_ok && "accuracy", !g.flip_ok && "flips", !g.safety_ok && "safety"].filter(Boolean).join(" + ") : g.rung === pol.chosen ? "cheapest allowed" : "allowed";
+      return `<tr class="${g.rung === pol.chosen ? "win" : ""} ${g.admissible ? "adm" : ""}"><td>${chip(g.rung)}</td>` +
+        (g.rung === "F16" ? `<td>${pc(pol.acc_ref)} (point)</td><td>—</td><td>—</td>` :
+          `<td>${pc(g.acc_lcb)} ${mark(g.acc_ok)}</td><td>${pc(g.flip_ucb)} ${mark(g.flip_ok)}</td><td>${pc(g.safety_ucb)} ${mark(g.safety_ok)}</td>`) +
+        `<td><span class="cbar" style="width:${(54 * g.cost / cmax).toFixed(0)}px"></span>${g.cost.toFixed(3)}</td><td>${blocked}</td></tr>`;
+    }).join("");
+    const pi = LADDER.indexOf(r.predicted_required_precision), ci = LADDER.indexOf(pol.chosen);
+    const predNote = ci < pi ? `<p>The prediction said <b>${r.predicted_required_precision}</b>, yet <b>${pol.chosen}</b> is allowed: the prediction only picks the cell, and the training questions in this cell were answered well enough by cheaper versions.</p>`
+      : ci > pi ? `<p>The prediction said <b>${r.predicted_required_precision}</b>, but no version below <b>${pol.chosen}</b> passed all three checks for this cell, so the policy goes up the ladder.</p>` : "";
+    // 6 · safety gauge
+    const gauge = `<div class="gwrap"><div class="gauge"><div class="fill" style="width:${(100 * sf.score).toFixed(1)}%;background:${sf.flagged ? "#e0603a" : "#2ed3a0"}"></div>
+      <div class="mark" style="left:calc(${(100 * sf.threshold).toFixed(1)}% - 1px)"></div><span class="lab" style="left:${(100 * sf.threshold).toFixed(1)}%">threshold ${sf.threshold.toFixed(3)}</span></div></div>`;
+    // 7 · server pool
+    const used = (sv.resident_after || []).reduce((a, x) => a + (sv.vram_mb[x] || 0), 0);
+    const pool = `<div class="pool"><span>Loaded before:</span>${(sv.resident_before || []).map((x) => `<span class="${(sv.evicted || []).includes(x) ? "gone" : ""}">${chip(x)}</span>`).join("") || "<em>nothing</em>"}
+      <span class="arrow">→</span><span>now:</span>${(sv.resident_after || []).map(chip).join("")}</div>
+      <p>${sv.loaded ? `${sv.rung} was not in memory, so it was loaded in <b>${sv.load_s.toFixed(1)} s</b>${sv.evicted && sv.evicted.length ? ` after unloading ${sv.evicted.join(", ")} to stay within the ${sv.budget_mb.toLocaleString()} MiB budget` : ""}.` : `${sv.rung} was already loaded, so no load time.`}
+      Versions in memory now use <b>${used.toLocaleString()} MiB</b> of the ${sv.budget_mb.toLocaleString()} MiB pool budget (a version larger than the budget runs alone).${sv.forced ? ` This answer was <b>forced</b> to ${esc(sv.forced)} for comparison.` : ""}</p>`;
+    // 8 · generation
+    const conf = gen.confidence;
+    const cgauge = conf == null ? "<p>No token probabilities were returned.</p>" : `<div class="gwrap"><div class="gauge"><div class="fill" style="width:${(100 * conf).toFixed(1)}%;background:${conf >= gen.confidence_bar ? "#2ed3a0" : "#ffc832"}"></div>
+      <div class="mark" style="left:calc(${(100 * gen.confidence_bar).toFixed(1)}% - 1px)"></div><span class="lab" style="left:${(100 * gen.confidence_bar).toFixed(1)}%">confident ≥ ${pc(gen.confidence_bar, 1)}</span></div></div>
+      <p>Average token probability <b>${pc(conf)}</b>: ${conf >= gen.confidence_bar ? "above" : "below"} the bar the project used to call a training answer “confident”. A live question has no answer key, so this is the only quality signal available here.</p>`;
+
+    return `<div class="card wf"><h3>Routing workflow for this question</h3>
+      <div class="sub">Every stage the router ran, with the numbers it actually used. Time spent per stage:</div>
+      <div class="tbar">${bar}</div><div class="tlegend">${legend}</div>
+      <ol class="wfs">
+      ${step(1, "Question received", "", `<p><b>${T.input.chars}</b> characters, <b>${T.input.words}</b> words, <b>${gen.tokens_in ?? "?"}</b> tokens after the chat template. The model always receives this exact text; routing only decides which version answers it.</p>`, "alt")}
+      ${step(2, "Category detection", ms(tm.classify), `<p>A rule-based keyword classifier picked the prompting profile <b>${esc(T.category.label)}</b>, which maps to the category <b>${pretty(T.category.category)}</b> (one of 12). The profile sets a budget of <b>${T.category.max_tokens}</b> output tokens and adds the instruction below.</p>
+        <details><summary>Instruction sent with the question</summary><pre class="raw">${esc(T.category.system_prompt)}</pre></details>`)}
+      ${step(3, "Feature vector", ms(tm.embed), `<p>The question becomes <b>${T.features.total}</b> numbers for the predictor.</p>
+        <div class="fv"><div><b>${T.features.embedding_dims}</b>meaning: sentence embedding from ${esc(T.features.embedder.split("/").pop())} on the CPU</div><div><b>13</b>surface counts (below)</div><div><b>12</b>category one-hot: ${pretty(T.features.category_onehot)}</div></div>
+        <div class="chips2">${surf}</div>`)}
+      ${step(4, "Required-precision prediction", ms(tm.predict), `<p>A logistic regression trained on 748 labelled questions estimates the cheapest version that would answer this correctly and confidently. Most likely: <b>${r.predicted_required_precision}</b> (${pc(pmax, 0)}).</p><div class="pbars">${pbars}</div>`)}
+      ${step(5, "Policy cell and the three checks", ms(tm.policy), `<p>Category + prediction select the cell <b>${pretty(pol.cell.split("|")[0])} · ${pol.cell.split("|")[1]}</b>, backed by <b>${pol.n_support_tasks ?? "?"}</b> training questions${pol.low_support ? " (sparse: category-level estimate)" : ""}. F16 scores ${pc(pol.acc_ref)} there. With the <b>${esc(pol.tolerance)}</b> setting, a version needs a cautious accuracy of at least <b>${pc(pol.acc_bar)}</b> (F16 − ${pc(op.delta, 0)}), at most <b>${pc(op.phi, 0)}</b> changed answers, and at most <b>${pc(op.psi, 0)}</b> safety slips. Among those that pass, the one with the lowest measured cost for this category wins.</p>
+        <div style="overflow-x:auto"><table class="gt"><thead><tr><th>Version</th><th>Accuracy (cautious)</th><th>Flips (cautious)</th><th>Safety slips</th><th>Cost · GPU-h / 1k</th><th>Result</th></tr></thead><tbody>${rows}</tbody></table></div>${predNote}`)}
+      ${step(6, "Safety check", ms(tm.safety), `<p>A classifier trained to catch harmful requests scores the question <b>${sf.score.toFixed(3)}</b>. ${sf.flagged ? `That is over the threshold, so the question may not be served below the floor <b>${sf.floor}</b>${sf.raised ? ` and was raised from ${pol.chosen} to ${r.rung}` : ", and the chosen version is already at or above it"}.` : `That is under the threshold, so the policy's choice stands. A flagged question would never be served below <b>${sf.floor}</b>, the lowest version whose safety-slip bound is within ${pc(sf.floor_psi, 0)}.`}</p>${gauge}`, sf.flagged ? "hot" : "")}
+      ${step(7, "Server pool", ms(tm.load), pool)}
+      ${step(8, "Generation on the GPU", ms(tm.generate), `<div class="kv"><span>version <b>${sv.rung}</b></span><span>tokens out <b>${gen.tokens_out}</b></span><span>speed <b>${gen.tokens_per_s ? gen.tokens_per_s.toFixed(0) + " tok/s" : "—"}</b></span><span>stopped because <b>${esc(gen.finish_reason)}</b></span><span>temperature <b>${gen.temperature}</b></span><span>seed <b>${gen.seed}</b></span><span>max tokens <b>${gen.max_tokens}</b></span></div>${cgauge}`)}
+      ${step(9, "Answer extraction", "", `<p>${ex.changed ? "The profile asks the model to end with a final answer; the extractor kept only that part of the raw output." : "The raw output was used as the answer unchanged."}</p>
+        <details ${ex.changed ? "open" : ""}><summary>Raw model output</summary><pre class="raw">${esc(ex.raw) || "(empty)"}</pre></details>
+        <div class="kv"><span>answer shown <b>${esc(ex.answer).slice(0, 160) || "(empty)"}</b></span></div>`, "alt")}
+      </ol></div>`;
+  }
+
   function renderHistory() {
     if (!history.length) return "";
     return `<div class="card"><h3 style="font-size:19px;margin-bottom:8px">This session</h3><table class="hist"><thead><tr><th>Question</th><th>Policy</th><th>Served</th><th>Time</th></tr></thead><tbody>` +
@@ -216,7 +338,7 @@
         catch (e) { cards += `<div class="err">Comparison failed: ${esc(e.message)}</div>`; two = true; }
       }
       history.unshift({ q: prompt, t: tolerance, r: r.chosen_quant, f: r.flagged, s: r.latency_s });
-      out.innerHTML = html + `<div class="answers${two ? " two" : ""}">${cards}</div>` + renderHistory();
+      out.innerHTML = html + `<div class="answers${two ? " two" : ""}">${cards}</div>` + workflow(r) + renderHistory();
     } catch (e) {
       out.innerHTML = `<div class="err">${esc(e.message)}</div>` + renderHistory();
     } finally { $("go").disabled = false; }

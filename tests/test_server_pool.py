@@ -96,3 +96,12 @@ def test_shutdown_stops_all_residents(pool):
     pool.shutdown()
     assert len(pool._servers) == 0
     assert all(inst.stopped for inst in FakeLlamaServer.instances)
+
+
+def test_resident_lists_loaded_rungs_in_lru_order():
+    from quantlab.server import ServerPool
+    pool = ServerPool(budget_mb=4000, vram_mb={"Q4_K_M": 2000}, ngl={"Q4_K_M": 37})
+    assert pool.resident() == []
+    pool._lru = ["Q5_K_M", "Q4_K_M"]
+    assert pool.resident() == ["Q5_K_M", "Q4_K_M"]
+    assert pool.resident() is not pool._lru   # a copy, so callers cannot mutate the pool

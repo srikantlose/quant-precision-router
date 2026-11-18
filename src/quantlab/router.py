@@ -25,6 +25,7 @@ request can lower it.
 from __future__ import annotations
 
 import json
+import math
 import threading
 import time
 from dataclasses import asdict, dataclass, field
@@ -36,7 +37,7 @@ import numpy as np
 
 from . import pipeline
 from .config import load_config
-from .features import one_hot_category, surface_features
+from .features import SURFACE_FEATURE_NAMES, one_hot_category, surface_features
 from .policy import apply_floor, choose, compute_safety_floor
 from .quants import LADDER
 from .tasktype import CATEGORIES
@@ -70,6 +71,7 @@ class Decision:
     rung: str
     why: str
     operating_point: dict[str, float] = field(default_factory=dict)
+    trace: dict[str, Any] = field(default_factory=dict)   # every stage's inputs, outputs and timing
 
     def public(self) -> dict[str, Any]:
         d = asdict(self)
@@ -104,6 +106,7 @@ class Router:
         self._clf, self.threshold = clf["model"], float(clf["threshold"])
 
         self.profiles = json.loads((results / "profiles.json").read_text(encoding="utf-8"))
+        self.tau = float(json.loads((results / "labels.json").read_text(encoding="utf-8"))["tau"])
         self.gpu_hourly_rate = float(self.cfg["cost"]["gpu_hourly_rate"])
         self._embedder = embedder
         self._pool = pool
@@ -142,11 +145,25 @@ class Router:
 
     # ------------------------------------------------------------------ decide / route
     def decide(self, prompt: str, tolerance: str = "strict") -> Decision:
+        ms: dict[str, float] = {}
+        tick = time.perf_counter()
+
+        def lap(name: str) -> None:
+            nonlocal tick
+            now = time.perf_counter()
+            ms[name] = round((now - tick) * 1000, 2)
+            tick = now
+
         category, label, system, max_tokens = pipeline.prepare(prompt)
+        lap("classify")
         emb = self._embed(prompt)
-        surf = self._pred_scaler.transform(np.asarray([surface_features(prompt)], dtype=np.float64))
+        lap("embed")
+        surf_raw = surface_features(prompt)
+        surf = self._pred_scaler.transform(np.asarray([surf_raw], dtype=np.float64))
         x = np.hstack([emb[None, :], surf, np.asarray([one_hot_category(category, CATEGORIES)])])
         pred_class = int(self._pred_model.predict(x)[0])
+        probs = self._pred_model.predict_proba(x)[0]
+        lap("predict")
 
         op = self.operating_point(tolerance)
         key = f"{category}|{pred_class}"
@@ -157,10 +174,23 @@ class Router:
             cell["acc_ref"], cell["acc_lcb"], cell["flip_ucb"], self.safety_ucb, cell["cost"],
             op["delta"], op["phi"], op["psi"],
         )
+        acc_bar = cell["acc_ref"] - op["delta"]
+        gates = []
+        for r in LADDER:
+            row = {"rung": r, "cost": float(cell["cost"][r]), "admissible": r in admissible}
+            if r != "F16":
+                row.update({
+                    "acc_lcb": float(cell["acc_lcb"][r]), "acc_ok": cell["acc_lcb"][r] >= acc_bar,
+                    "flip_ucb": float(cell["flip_ucb"][r]), "flip_ok": cell["flip_ucb"][r] <= op["phi"],
+                    "safety_ucb": self.safety_ucb[r], "safety_ok": self.safety_ucb[r] <= op["psi"],
+                })
+            gates.append(row)
+        lap("policy")
 
         score = float(self._clf.predict_proba(emb[None, :])[0, 1])
         flagged = score >= self.threshold
         rung = resolve_rung(cell_rung, self.floor, flagged)
+        lap("safety")
 
         why = f"{key} -> {cell_rung} (cheapest of {len(admissible)} admissible)"
         if flagged:
@@ -168,12 +198,26 @@ class Router:
         else:
             why += f"; not flagged (score {score:.2f})"
 
+        trace = {
+            "timing_ms": ms,
+            "input": {"chars": len(prompt), "words": len(prompt.split())},
+            "category": {"label": label, "category": category, "max_tokens": max_tokens, "system_prompt": system},
+            "features": {"embedding_dims": int(emb.shape[0]), "surface": dict(zip(SURFACE_FEATURE_NAMES, map(float, surf_raw))),
+                         "category_onehot": category, "total": int(x.shape[1]), "embedder": self.cfg["predictor"]["embedding_model"]},
+            "predictor": {"probs": {LADDER[int(c)]: float(p) for c, p in zip(self._pred_model.classes_, probs)},
+                          "pred_class": pred_class},
+            "policy": {"cell": key, "n_support_tasks": cell.get("n_support_tasks"), "low_support": bool(cell.get("low_support")),
+                       "acc_ref": float(cell["acc_ref"]), "acc_bar": float(acc_bar), "operating_point": op, "tolerance": tolerance,
+                       "gates": gates, "admissible": admissible, "chosen": cell_rung},
+            "safety": {"score": score, "threshold": self.threshold, "flagged": flagged, "floor": self.floor,
+                       "floor_psi": self.default_op["psi"], "raised": rung != cell_rung},
+        }
         return Decision(
             category=category, label=label, system=system, max_tokens=max_tokens,
             pred_class=pred_class, predicted_required_precision=LADDER[pred_class],
             cell=key, cell_rung=cell_rung, admissible=admissible,
             safety_score=round(score, 4), flagged=flagged, floor=self.floor, rung=rung,
-            why=why, operating_point=op,
+            why=why, operating_point=op, trace=trace,
         )
 
     def route(self, prompt: str, tolerance: str = "strict", force_quant: Optional[str] = None,
@@ -181,12 +225,32 @@ class Router:
         d = decision or self.decide(prompt, tolerance)
         rung = resolve_rung(d.rung, d.floor, d.flagged, force_quant)
         with self._lock:
-            client, swapped, swap_s = self.pool().get(rung)
+            pool = self.pool()
+            before = pool.resident() if hasattr(pool, "resident") else []
+            client, swapped, swap_s = pool.get(rung)
+            after = pool.resident() if hasattr(pool, "resident") else [rung]
             t0 = time.time()
             result = client.generate(prompt, system_prompt=d.system, max_tokens=d.max_tokens)
             latency = time.time() - t0
         answer = pipeline.extract(d.label, result.text)
         out = d.public()
+        timings = result.timings or {}
+        conf = math.exp(result.mean_logprob) if result.mean_logprob is not None else None
+        out["trace"]["timing_ms"].update({"load": round(swap_s * 1000, 1), "generate": round(latency * 1000, 1)})
+        out["trace"]["serving"] = {
+            "rung": rung, "forced": force_quant, "resident_before": before, "resident_after": after,
+            "evicted": [r for r in before if r not in after], "loaded": bool(swapped), "load_s": round(swap_s, 2),
+            "budget_mb": self.profiles["budget_mb"],
+            "vram_mb": {r: self.profiles["rungs"][r]["vram_mb"] for r in after},
+        }
+        out["trace"]["generation"] = {
+            "tokens_in": result.tokens_in, "tokens_out": result.tokens_out, "finish_reason": result.finish_reason,
+            "tokens_per_s": timings.get("predicted_per_second"), "prompt_tokens_per_s": timings.get("prompt_per_second"),
+            "mean_logprob": result.mean_logprob, "confidence": conf, "confidence_bar": math.exp(self.tau),
+            "temperature": self.cfg["request"]["temperature"], "seed": self.cfg["request"]["seed"], "max_tokens": d.max_tokens,
+        }
+        out["trace"]["extraction"] = {"raw": (result.text or "")[:4000], "answer": answer,
+                                      "changed": (result.text or "").strip() != answer}
         out.update({
             "answer": answer,
             "chosen_quant": rung,
