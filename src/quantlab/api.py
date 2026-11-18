@@ -9,6 +9,8 @@ Endpoints:
     GET  /info      public settings the page needs (limits, whether force_quant is on), no auth
     GET  /policy    which rung every cell serves at each tolerance, auth required
     POST /route     {prompt, tolerance?, force_quant?} -> answer + full decision, auth required
+                    (tolerance "strict" = the fitted policy, "balanced" = looser per-cell bounds;
+                    the floor for flagged prompts is the same in both)
 
 Rules (plan P12): the server refuses to start without QUANTLAB_API_KEY (32+ characters);
 the key travels in X-API-Key and is compared in constant time; oversized prompts get 413;
@@ -45,7 +47,7 @@ PAGE = Path(__file__).resolve().parent / "static" / "ask.html"
 
 class RouteRequest(BaseModel):
     prompt: str = Field(min_length=1)
-    tolerance: Literal["strict", "relaxed"] = "strict"
+    tolerance: Literal["strict", "balanced"] = "strict"
     force_quant: Optional[Rung] = None
 
 
@@ -122,7 +124,7 @@ def create_app(router: Any = None, cfg: Optional[dict] = None, api_key: Optional
     def info() -> dict:
         return {"allow_force_quant": allow_force, "max_prompt_chars": max_chars,
                 "rate_per_min": api["rate_per_min"], "f16_rate_per_min": api["f16_rate_per_min"],
-                "tolerances": ["strict", "relaxed"]}
+                "tolerances": ["strict", "balanced"]}
 
     @app.get("/", response_class=HTMLResponse)
     def page() -> str:

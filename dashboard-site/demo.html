@@ -123,7 +123,7 @@
     </div>
     <div class="slider-row"><label for="sl-d">Accuracy allowance δ</label><span class="val" id="v-d"></span><input type="range" id="sl-d" min="0" max="0.15" step="0.005"><span class="hint">How far below F16's accuracy (lower bound) a version may fall.</span></div>
     <div class="slider-row"><label for="sl-f">Flip limit φ</label><span class="val" id="v-f"></span><input type="range" id="sl-f" min="0" max="1" step="0.01"><span class="hint">Most answers that may differ from F16 (upper bound).</span></div>
-    <div class="slider-row"><label for="sl-s">Safety limit ψ</label><span class="val" id="v-s"></span><input type="range" id="sl-s" min="0" max="0.3" step="0.005"><span class="hint">Most safety slips allowed per version (upper bound).</span></div>
+    <div class="slider-row"><label for="sl-s">Safety limit ψ</label><span class="val" id="v-s"></span><input type="range" id="sl-s" min="0" max="0.3" step="0.005"><span class="hint">Most safety slips allowed per version (upper bound). Flagged questions never go below Q5_K_M, whatever this is set to.</span></div>
   </section>
 
   <div class="main-grid">

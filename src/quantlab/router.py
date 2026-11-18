@@ -13,9 +13,13 @@ decide() makes the whole decision without generating anything:
 route() then generates on the decided rung through the VRAM-budgeted ServerPool,
 always with the ORIGINAL prompt, and extracts the answer with pipeline.extract().
 
-The safety limit psi is fixed by the server (policy.json's operating point). A
-caller may relax only the accuracy allowance delta and flip limit phi, so no
-request can lower the safety floor.
+Two operating points are offered. "strict" is the fitted policy (policy.json). With
+about 40 training tasks per cell its bounds are wide, so it serves F16 almost
+everywhere. "balanced" (the dashboard's preset of the same name) accepts a 10-point
+accuracy allowance, 30% flips and a 10% per-rung safety-flip bound in each cell, which
+lets Q3_K_M through Q8_0 serve. In both, the floor for prompts the safety classifier
+flags is computed from the server's own psi (policy.json, 0.05 -> Q5_K_M), so no
+request can lower it.
 """
 
 from __future__ import annotations
@@ -37,11 +41,11 @@ from .policy import apply_floor, choose, compute_safety_floor
 from .quants import LADDER
 from .tasktype import CATEGORIES
 
-# Named operating points a caller may pick. psi is deliberately absent: it always
-# comes from the server's policy, so no preset can weaken the safety floor.
+# Named operating points a caller may pick. A preset's psi is only the per-cell safety
+# gate; the floor for flagged prompts is always computed from the server's psi.
 TOLERANCES = {
-    "strict": None,                          # the fitted policy's own delta and phi
-    "relaxed": {"delta": 0.10, "phi": 0.30},
+    "strict": None,                                        # the fitted policy as-is
+    "balanced": {"delta": 0.10, "phi": 0.30, "psi": 0.10},
 }
 
 

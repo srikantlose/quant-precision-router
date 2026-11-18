@@ -95,10 +95,10 @@
       <div>
         <span class="l">Policy</span>
         <div class="seg" id="tol">
-          <button class="pill on" data-t="strict" type="button">Strict (default)</button>
-          <button class="pill" data-t="relaxed" type="button">Relaxed</button>
+          <button class="pill on" data-t="balanced" type="button">Balanced</button>
+          <button class="pill" data-t="strict" type="button">Strict</button>
         </div>
-        <div class="hint">Strict is the project's fitted policy; with about 40 training questions per cell its margins are wide, so it usually keeps F16. Relaxed accepts up to 10 points lower accuracy (lower bound) and 30% flips. The safety limit never changes, so flagged questions still never go below the safety floor.</div>
+        <div class="hint"><b>Balanced</b> lets a version serve a kind of question if it stays within 10 points of F16's accuracy, changes at most 30% of answers, and slips on safety at most 10% of the time (all judged cautiously), so Q3_K_M to Q8_0 get to answer. <b>Strict</b> is the project's fitted policy: with about 40 training questions per cell it cannot be sure enough, so it keeps F16. In both, a question the safety classifier flags is never served below Q5_K_M.</div>
       </div>
       <div id="cmpbox" hidden>
         <label class="l" for="cmp">Also answer with (comparison)</label>
@@ -129,15 +129,19 @@
   const esc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const chip = (r) => `<span class="rchip" style="background:${RC[r]};color:${r === "Q2_K" || r === "Q3_K_M" ? "#151515" : "#fff"}">${r}</span>`;
   const pretty = (c) => String(c).replace(/_/g, " ");
-  let tolerance = "strict", info = { max_prompt_chars: 8000, allow_force_quant: false };
+  let tolerance = "balanced", info = { max_prompt_chars: 8000, allow_force_quant: false };
   const history = [];
 
+  // Each was checked live on Balanced; the version in the label is what served it then.
   const EXAMPLES = [
-    ["Extraction", "Extract the city from: 'The conference will be held in Denver next spring, near the convention center.'"],
-    ["Maths", "A store has 200 items. It sells 10% on Monday and 15 more on Tuesday. How many items remain?"],
-    ["Code", "Write a Python function that returns the second largest number in a list."],
-    ["Sentiment", "Classify the sentiment of this review as positive or negative: 'The battery died after two days.'"],
-    ["Multiple choice", "Who wrote the novel '1984'? A) Aldous Huxley B) George Orwell C) Ernest Hemingway D) Mark Twain. Answer with the letter."],
+    ["2 + 2 · Q5_K_M", "What is 2 + 2?"],
+    ["Sentiment · Q4_K_M", "Classify the sentiment of this review as positive or negative: 'The battery died after two days.'"],
+    ["Invoice date · Q4_K_M", "Extract the date from: 'The invoice was issued on 2024-03-18 and is due in 30 days.' Reply with just the date."],
+    ["Spam check · Q6_K", "Classify this email as spam or not spam: 'Congratulations! You won a free cruise, click here to claim.'"],
+    ["Names · Q6_K", "List the named entities in: 'Sundar Pichai announced the new office in Bengaluru on Monday.'"],
+    ["Multiple choice · Q8_0", "Who wrote the novel '1984'? A) Aldous Huxley B) George Orwell C) Ernest Hemingway D) Mark Twain. Answer with the letter."],
+    ["Summary · F16", "Summarize in one sentence: The city council voted to expand the bike-lane network after a year of rising cycling numbers and fewer accidents."],
+    ["Word problem", "A store has 200 items. It sells 10% on Monday and 15 more on Tuesday. How many items remain?"],
     ["Looks risky, isn't", "How do I kill a Python process that is stuck?"],
   ];
   $("examples").innerHTML = EXAMPLES.map(([l], i) => `<button class="chip" type="button" data-i="${i}">${l}</button>`).join("");
@@ -154,7 +158,8 @@
   fetch("info").then((r) => r.json()).then((j) => {
     info = j; $("q").maxLength = j.max_prompt_chars;
     $("qhint").textContent = `Up to ${j.max_prompt_chars.toLocaleString()} characters · ${j.rate_per_min} questions per minute · ${j.f16_rate_per_min} per minute may be served at F16`;
-    if (j.allow_force_quant) { $("cmpbox").hidden = false; $("cmp").innerHTML += LADDER.map((r) => `<option value="${r}">${r}</option>`).join(""); }
+    const NOTE = { Q2_K: " (smallest; the policy never picks it)", Q5_K_M: " (best single version on held-out tests)", F16: " (full precision)" };
+    if (j.allow_force_quant) { $("cmpbox").hidden = false; $("cmp").innerHTML += LADDER.map((r) => `<option value="${r}">${r}${NOTE[r] || ""}</option>`).join(""); }
   }).catch(() => {});
 
   async function ask(prompt, force) {

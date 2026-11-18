@@ -212,7 +212,7 @@
   <h3 class="sec" style="margin-top:0"><span class="m">1.2</span>System Block Diagram</h3>
   <figure id="fig-arch" data-fig style="margin-top:4px">
     <div class="panel"><div class="fc" id="fc-arch"></div></div>
-    <figcaption>System architecture: fifteen modules in five layers, from external sources on the left to serving and presentation on the right. Arrows show the files and calls that connect them. Dashed modules (M13, M14) are designed and specified but not yet built.</figcaption>
+    <figcaption>System architecture: fifteen modules in five layers, from external sources on the left to serving and presentation on the right. Arrows show the files and calls that connect them. The dashed module (M14) is designed and specified but not yet built.</figcaption>
   </figure>
 </div>
 
@@ -231,7 +231,7 @@
 
 <figure id="fig-seq" data-fig>
   <div class="panel"><div class="fc" id="fc-seq"></div></div>
-  <figcaption>Interaction for one live request through the routing service (designed for the next stage, P12). Checks that reject a request return early with the HTTP status shown; the model always receives the original prompt.</figcaption>
+  <figcaption>Interaction for one live request through the routing service, as implemented in <code>quantlab serve</code> (P12). Checks that reject a request return early with the HTTP status shown; the model always receives the original prompt.</figcaption>
 </figure>
 
 <!-- ============================ 2. MODULES ============================ -->
@@ -308,11 +308,11 @@
 </figure>
 
 <h3 class="sec"><span class="m">3.3</span>Implementation Status and Code Organisation</h3>
-<p>The work follows a 16-phase plan (P0–P15). The measurement and learning layers are complete: 24 source modules, 5,083 lines of Python, and 1,653 lines of tests. The unit suite has 138 tests and all pass. A further 7 tests need Docker or the GPU and are run explicitly. The grid run finished with 0 errors in 14,469 rows. The remaining analysis (held-out baselines, sweep, bootstrap and audits), the routing API and the adversarial evaluation are the next stage (<span class="fref" data-r="fig-phases"></span>).</p>
+<p>The work follows a 16-phase plan (P0–P15). The measurement, learning and serving layers are complete: 26 source modules, 5,507 lines of Python, and 1,792 lines of tests. The unit suite has 150 tests and all pass. A further 7 tests need Docker or the GPU and are run explicitly. The grid run finished with 0 errors in 14,469 rows, and the routing service (<code>quantlab serve</code>) has been run live on the RTX 4060, including from another machine through a tunnel. The remaining analysis (formal sweep, bootstrap intervals and the refusal audit) and the adversarial evaluation are the next stage (<span class="fref" data-r="fig-phases"></span>).</p>
 <figure id="fig-phases" data-fig>
   <div class="panel pad"><div class="phases" id="phases"></div>
     <div class="legend"><span><i style="background:var(--mint-soft)"></i>complete</span><span><i style="background:var(--sun-soft)"></i>in progress</span><span><i style="background:#fff;border-style:dashed"></i>next stage</span></div></div>
-  <figcaption>Implementation status by plan phase. P0–P10 are complete; P11 has labels, predictor, pooled models, safety and policy done; P12–P15 follow.</figcaption>
+  <figcaption>Implementation status by plan phase. P0–P10 and P12 are complete; P11 has labels, predictor, pooled models, safety, policy and a first held-out replay done; P13–P15 follow.</figcaption>
 </figure>
 
 <!-- ============================ 4. DATA & SETUP ============================ -->
@@ -457,6 +457,7 @@
 <h4>Operating point, sweep and statistical analysis</h4>
 <ul class="tight">
   <li><b>Default operating point.</b> δ = 0.02: a rung may lose at most 2 points of accuracy against F16, measured by its lower bound. φ = 0.10: at most 10% flipped answers, by the upper bound. ψ = 0.05: at most 5% safety flips, by the upper bound.</li>
+  <li><b>Balanced operating point.</b> The strict default serves F16 in all 84 cells, because about 40 training tasks per cell leave wide bounds. The service therefore also offers Balanced (δ = 0.10, φ = 0.30, per-cell safety bound 0.10), under which Q3_K_M through Q8_0 each serve some cells. The floor for flagged prompts stays at Q5_K_M (ψ = 0.05) under every setting.</li>
   <li><b>Sweep.</b> The policy is refitted for 8 × 6 × 5 = 240 (δ, φ, ψ) combinations to trace the cost–accuracy frontier.</li>
   <li><b>Pooled models.</b> Accuracy and flip bounds use one-sided 95% intervals (z = 1.645) from GEE <span class="cite">[9]</span> with task-clustered correlation, fitted in statsmodels <span class="cite">[11]</span>.</li>
   <li><b>Safety bounds.</b> Safety-flip rates use Wilson score bounds <span class="cite">[10]</span>.</li>
@@ -469,11 +470,30 @@
   <figcaption>Sample outputs of the setup (benchmark slice, all 1,467 tasks). Accuracy is flat from Q4_K_M upward and collapses at Q2_K, but flips and KL rise steadily as precision falls. Even Q8_0, within 0.4 points of F16’s accuracy, changes 4.4% of outcomes <span class="cite">[6]</span>. These are the signals the selection rule combines.</figcaption>
 </figure>
 
+<h4>First held-out results</h4>
+<p>Each policy was replayed on the 450 test tasks using the recorded answers: the served rung’s grade and answer time come from the grid. None of these tasks was used to fit the predictor, the bounds or the policy (<span class="fref" data-r="tab-heldout"></span>).</p>
+<div class="tablefig" id="tab-heldout" data-tab>
+  <p class="tcap">Held-out replay on 450 test tasks. GPU time is the sum of recorded answer times; model loading is not included.</p>
+  <table class="t">
+    <thead><tr><th style="width:44%">Policy</th><th class="num" style="width:14%">Correct</th><th class="num" style="width:18%">GPU time vs F16</th><th style="width:24%">Rungs used</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Always F16</td><td class="num">71.1%</td><td class="num">100%</td><td>F16</td></tr>
+      <tr><td class="k">Always Q4_K_M</td><td class="num">69.6%</td><td class="num">44%</td><td>Q4_K_M (fails the 5% safety bound)</td></tr>
+      <tr><td class="k">Always Q5_K_M (best safe single rung)</td><td class="num">69.8%</td><td class="num">45%</td><td>Q5_K_M</td></tr>
+      <tr><td class="k">QuantRoute, strict default</td><td class="num">71.1%</td><td class="num">100%</td><td>F16 in all 84 cells</td></tr>
+      <tr><td class="k">QuantRoute, Balanced</td><td class="num">70.4%</td><td class="num">52%</td><td>Q3_K_M to F16 (390 of 450 below F16)</td></tr>
+      <tr><td class="k">Q4_K_M first, F16 when its confidence is low</td><td class="num">69.8%</td><td class="num">48%</td><td>5% re-asked at F16</td></tr>
+      <tr><td class="k">Cheapest rung that was right (hindsight)</td><td class="num">84.7%</td><td class="num">74%</td><td>not achievable; a bound</td></tr>
+    </tbody>
+  </table>
+</div>
+<p>The gap between F16 and the best safe single rung is only 1.3 points, and neither prompt text nor the answer’s own confidence picks out the questions that make up that gap. On this model and GPU, per-prompt routing therefore does not beat simply serving Q5_K_M. Balanced buys 0.6 points over it for 7 points more GPU time. This matches the finding of <span class="cite">[16]</span> that routers often fail to beat the best single model. The remaining analysis (sweep, bootstrap intervals) will put confidence intervals on these differences.</p>
+
 <div class="note warm"><b class="k">Expected outcomes and how they will be judged</b>
   <ul class="tight" style="margin:2px 0 0">
     <li><b>Cheap rungs suffice for many cells.</b> A rung at or below 4 bits stays within δ of F16 in most category × tier cells. Current data: 25 of 36 cells, consistent with the 4-bit result of Dettmers and Zettlemoyer <span class="cite">[13]</span>.</li>
     <li><b>Required precision is predictable from the prompt.</b> The predictor should beat the majority-class and per-category baselines. Current data: 45.8% exact versus 45.5% and 48.4%, and 79.8% within one level, so prompt text alone is a weak signal.</li>
-    <li><b>Lower cost on held-out tasks.</b> On the test split, the learned policy should cost less than the best fixed rung at equal accuracy and flip rate. This is the first test of the next stage.</li>
+    <li><b>Lower cost on held-out tasks.</b> On the test split, the learned policy should cost less than the best fixed rung at equal accuracy and flip rate. First replay: it does not. Balanced costs 52% of F16 against 45% for always-Q5_K_M, for 0.6 points more accuracy, so the best safe single rung is the practical recommendation for this model.</li>
     <li><b>Safety holds.</b> Served safety flips should stay within ψ, and flagged prompts should never be served below the floor (currently Q5_K_M), including under downgrade attacks.</li>
   </ul></div>
 

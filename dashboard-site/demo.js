@@ -38,8 +38,11 @@
     }
     return { rung: best, gates: g, nAllowed: adm.length - 1 };
   }
+  // The floor for flagged questions uses the project's own safety limit (policy.json psi),
+  // not the slider, exactly as the live service does: no setting can lower it.
+  const FLOOR_PSI = D.policy.operating_point.psi;
   function floorRung() {
-    for (const b of NONREF) if (D.rungs[b].safety_flip_ucb <= pol.s) return b;
+    for (const b of NONREF) if (D.rungs[b].safety_flip_ucb <= FLOOR_PSI) return b;
     return "F16";
   }
   function route(t, pretendFlag) {
@@ -127,8 +130,7 @@
         d: `${r.nAllowed} of 6 cheaper versions pass all three checks${r.cell.low_support ? " (sparse cell: category-level estimate)" : ""}. Cheapest allowed: ${r.choice}.` },
       { k: "4 · Safety check", v: r.flagged ? "Flagged" : "Not flagged", warn: r.flagged,
         d: `Classifier score ${t.score.toFixed(3)} vs threshold ${X.meta.threshold.toFixed(3)}${$("flag").checked && !r.realFlag ? " (flag forced by the switch)" : ""}.` +
-           (r.flagged ? (r.served !== r.choice ? ` Raised to the safety floor ${r.floor}.` : ` Already at or above the floor ${r.floor}.`) : "") +
-           (r.flagged && r.floor === "Q2_K" ? " At this safety limit every version passes, so the floor is the bottom rung; choose Strict to see the floor rise to Q5_K_M." : "") },
+           (r.flagged ? (r.served !== r.choice ? ` Raised to the safety floor ${r.floor}.` : ` Already at or above the floor ${r.floor}.`) : "") },
       { k: "5 · Served by", v: chip(r.served), final: true, d: `Answered in ${s.lat.toFixed(3)} s with ${s.tok} tokens. ${mark(s.ok)}` },
     ];
     $("pipe").innerHTML = steps.map((st) => `<div class="st${st.final ? " final" : ""}${st.warn ? " warn" : ""}"><span class="k">${st.k}</span><span class="v">${st.v}</span><span class="d">${st.d}</span></div>`).join("");

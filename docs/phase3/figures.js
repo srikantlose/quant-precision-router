@@ -266,7 +266,7 @@ function arch() {
     { id: "l4", x: c[3], y: 345, w: 170, cls: "mint", html: mt("M11", "Safety Evaluator", "→ floor Q5_K_M · classifier") },
     { id: "l5", x: c[3], y: 455, w: 170, cls: "mint", html: mt("M12", "Selection Policy Engine", "→ policy.json · 84 cells") },
     { id: "v0", t: "ext", x: 930, y: 76, w: 110, html: tt("Client application") },
-    { id: "v1", x: c[4], y: 165, w: 150, cls: "blush", dash: true, html: mt("M13", "Routing Service", "POST /route · next stage") },
+    { id: "v1", x: c[4], y: 165, w: 150, cls: "blush", html: mt("M13", "Routing Service", "POST /route · quantlab serve") },
     { id: "v2", x: c[4], y: 285, w: 150, cls: "blush", dash: true, html: mt("M14", "Adversarial Evaluation", "→ adversarial.json · next stage") },
     { id: "v3", x: c[4], y: 463, w: 150, cls: "blush", html: mt("M15", "Dashboard &amp; Study Guide", "Vercel · Chart.js") },
   ];
@@ -374,7 +374,7 @@ function stepsAndMatrix() {
     ["Fit the pooled models", "P11", "pooled_models.joblib", "d"],
     ["Safety floor and classifier", "P11", "safety.json", "d"],
     ["Fit the policy; sweep; held-out test", "P11", "policy.json · sweep.csv · baselines", "w"],
-    ["Serve through the routing API", "P12", "POST /route", "n"],
+    ["Serve through the routing API", "P12", "quantlab serve · POST /route", "d"],
     ["Attack the router", "P13", "adversarial.json", "n"],
     ["Present and report", "P14 · P15", "dashboard · study guide · report", "w"],
   ];
@@ -679,12 +679,12 @@ const MODS = [
       { t: "term", h: tt("policy.json", "84 cells → rung") },
     ] }) },
 
-  { code: "M13", name: "Routing Service & API", layer: "Serving & presentation", files: "router.py · api.py (FastAPI)", status: "next", phase: "P12",
-    para: "Exposes the policy as a local HTTP service. <code>POST /route</code> authenticates the caller with an API key compared in constant time, enforces a prompt-size limit and per-key rate limits (30 requests per minute, of which at most 5 may be served at F16), decides the rung with the same pipeline, predictor, policy and safety classifier, raises flagged prompts to the safety floor, and generates with the <i>original</i> prompt. A request over the F16 quota is rejected rather than silently downgraded, which could otherwise bypass the safety floor. Logs keep a SHA-256 of each prompt and never the raw text of a flagged one.",
-    i: ["HTTP <code>POST /route</code> with <code>{prompt, force_quant?}</code>", "<code>X-API-Key</code> header; key from the environment (≥ 32 characters)", "Policy, predictor, classifier and profiles loaded at start-up"],
+  { code: "M13", name: "Routing Service & API", layer: "Serving & presentation", files: "router.py · api.py · static/ask.html", status: "built",
+    para: "Exposes the policy as a local HTTP service, started with <code>quantlab serve</code>. <code>POST /route</code> authenticates the caller with an API key compared in constant time, enforces a prompt-size limit and per-key rate limits (30 requests per minute, of which at most 5 may be served at F16), decides the rung with the same pipeline, predictor, policy and safety classifier the benchmark used, raises flagged prompts to the safety floor, and generates with the <i>original</i> prompt. Callers choose the strict fitted policy or the Balanced operating point; neither can lower the floor. A request over the F16 quota is rejected rather than silently downgraded. Logs keep a SHA-256 of each prompt, never its text. The same service serves an <i>Ask QuantRoute</i> page that shows the decision and the live answer, and it has been run on the RTX 4060 from another machine.",
+    i: ["HTTP <code>POST /route</code> with <code>{prompt, tolerance?, force_quant?}</code>", "<code>X-API-Key</code> header; key from the environment (≥ 32 characters)", "Policy, predictor, classifier and profiles loaded at start-up"],
     p: ["Auth (401) → size (413) → rate limit (429)", "Category → class → policy cell → rung", "Safety classifier → floor", "F16 quota (429); <code>force_quant</code> off by default (403)", "Server pool → generate → extract"],
     o: ["JSON: answer, category, predicted precision, chosen rung, why, flagged, latency, estimated cost, swap info", "<code>service.jsonl</code> log (prompt hash only)"],
-    cap: "Routing service request flow (to be built in P12).",
+    cap: "Routing service request flow (<code>quantlab serve</code>).",
     flow: () => autoFlow({ gap: 13, steps: [
       { t: "term", h: "POST /route · X-API-Key" },
       { t: "dec", h: "Key valid (constant-time compare)?", side: { h: "401", w: 52, cls: "coral" } },
@@ -901,7 +901,8 @@ function softwareTables() {
       ["Teacher LLM", "Fireworks AI API · gpt-oss-120b", "hosted", "Task generation and verification; refusal audit"],
     ]],
     ["Serving and presentation", [
-      ["Web API (next stage)", "FastAPI · uvicorn", "0.142.2 · 0.54.0", "POST /route routing service"],
+      ["Web API", "FastAPI · uvicorn", "0.142.2 · 0.54.0", "POST /route routing service and the Ask QuantRoute page"],
+      ["Public demo tunnel", "cloudflared (Cloudflare quick tunnel)", "2026.10.7", "Optional: temporary HTTPS link to the local service"],
       ["Plots and local app", "matplotlib · plotly · Streamlit", "3.11.2 · 7.1.0 · 1.65.0", "Report figures; local results app"],
       ["Web dashboard", "HTML / CSS / JavaScript · Chart.js", "Chart.js 4.4.4", "Interactive results site and study guide"],
       ["Hosting and documents", "Vercel CLI · Node.js · puppeteer-core", "57.0.0 · 24.15.0", "Static deployment; PDF rendering from HTML"],
@@ -913,7 +914,7 @@ function softwareTables() {
   document.getElementById("sw-body").innerHTML = G.map(([g, rows]) => `<tr><td class="grp" colspan="4">${g}</td></tr>` + rows.map((r) => `<tr><td class="k">${r[0]}</td><td>${r[1]}</td><td class="m">${r[2]}</td><td>${r[3]}</td></tr>`).join("")).join("");
 
   const L = [
-    ["Interfaces", C.blush, ["CLI · quantlab …", "REST API · POST /route <i>next</i>", "Web dashboard", "Study guide", "PDF reports"]],
+    ["Interfaces", C.blush, ["CLI · quantlab …", "REST API · POST /route", "Ask QuantRoute page", "Web dashboard + replay demo", "Study guide", "PDF reports"]],
     ["QuantRoute", C.mintSoft, ["M1–M3 build", "M4–M7 measure", "M8–M12 learn &amp; decide", "M13–M15 serve &amp; present"]],
     ["Libraries", C.skySoft, ["statsmodels <i>0.15</i>", "scikit-learn <i>1.9</i>", "sentence-transformers <i>6.1</i>", "pandas <i>3.0</i>", "NumPy <i>2.5</i>", "SciPy <i>1.18</i>", "pydantic <i>2.13</i>", "FastAPI <i>0.142</i>", "Chart.js <i>4.4</i>"]],
     ["Engines", C.sunSoft, ["llama-server <i>b11451</i>", "llama-perplexity <i>b11451</i>", "Docker sandbox <i>python:3.13-slim</i>", "PyTorch CPU <i>2.14</i>"]],
@@ -927,7 +928,7 @@ function softwareTables() {
     ["P0", "Bootstrap repository and environment", "d"], ["P1", "Port core modules", "d"], ["P2", "Survey security additions", "d"], ["P3", "Consolidate seed tasks", "d"],
     ["P4", "Docker sandbox", "d"], ["P5", "llama.cpp + first models", "d"], ["P6", "Server pool + grid runner", "d"], ["P7", "Generate 1,332 tasks", "d"],
     ["P8", "Safety slice", "d"], ["P9", "Full ladder + profiling", "d"], ["P10", "Full grid + KL", "d"], ["P11", "Analysis: 5 of 9 parts done", "w"],
-    ["P12", "Router + hardened API", "n"], ["P13", "Adversarial evaluation", "n"], ["P14", "Dashboard (web version live)", "w"], ["P15", "Report, README, final checks", "n"],
+    ["P12", "Router + hardened API", "d"], ["P13", "Adversarial evaluation", "n"], ["P14", "Dashboard (web version live)", "w"], ["P15", "Report, README, final checks", "n"],
   ];
   document.getElementById("phases").innerHTML = P.map(([c, t, s]) => `<div class="ph ${s}"><b>${c}</b>${t}</div>`).join("");
 }
@@ -1210,6 +1211,7 @@ const REFS = [
   "T. Dettmers and L. Zettlemoyer, “The Case for 4-bit Precision: k-bit Inference Scaling Laws,” in <i>Proc. ICML</i>, 2023.",
   "A. Shafran, R. Schuster, T. Ristenpart and V. Shmatikov, “Rerouting LLM Routers,” arXiv:2501.01818, 2025.",
   "K. Egashira, M. Vero, R. Staab, J. He and M. Vechev, “Exploiting LLM Quantization,” in <i>Proc. NeurIPS</i>, 2024.",
+  "H. Li, Y. Zhang, Z. Guo, C. Wang, S. Tang, Q. Zhang, Y. Chen, B. Qi, P. Ye, L. Bai, Z. Wang, and S. Hu, “LLMRouterBench: A Massive Benchmark and Unified Framework for LLM Routing,” in <i>Findings of ACL</i>, pp. 37733–37754, 2026. arXiv:2601.07206.",
 ];
 function finish() {
   document.getElementById("refs").innerHTML = REFS.map((r, i) => `<p><span class="rn">[${i + 1}]</span>${r}</p>`).join("");
