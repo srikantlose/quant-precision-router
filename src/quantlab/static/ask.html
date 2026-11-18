@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ask QuantRoute</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=DM+Sans:opsz,wght@9..40,400..700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='1' y='1' width='30' height='30' rx='8' fill='%23ffc832' stroke='%23151515' stroke-width='2'/%3E%3Crect x='6' y='20' width='5' height='6' fill='%23ff8d65'/%3E%3Crect x='13.5' y='14' width='5' height='12' fill='%23d05320'/%3E%3Crect x='21' y='7' width='5' height='19' fill='%23151515'/%3E%3C/svg%3E">
+<style>
+  :root { --bg: #fff7ea; --paper: #fff; --ink: #151515; --ink-2: #4b4840; --muted: #7d786d; --grid: #ece5d8; --line: #151515;
+          --sun: #ffc832; --sun-soft: #fff1c2; --mint: #2ed3a0; --mint-soft: #d6f7ea; --blush: #ffd9c7; --sky: #dfe9ff;
+          --display: "Bricolage Grotesque", "DM Sans", system-ui, sans-serif; --body: "DM Sans", system-ui, "Segoe UI", sans-serif;
+          --mono: "JetBrains Mono", ui-monospace, Consolas, monospace; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.55; }
+  h1, h2, h3 { font-family: var(--display); margin: 0; letter-spacing: -0.02em; line-height: 1.1; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 28px; }
+  .top { border-bottom: 2px solid var(--line); background: var(--bg); }
+  .top .wrap { display: flex; align-items: center; gap: 16px; height: 64px; }
+  .logo { display: flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 800; font-size: 21px; }
+  .status { font-family: var(--mono); font-size: 12px; font-weight: 700; border: 2px solid var(--line); border-radius: 999px; padding: 3px 10px; background: var(--paper); }
+  .status.ok { background: var(--mint-soft); } .status.bad { background: var(--blush); }
+  .top a { margin-left: auto; color: var(--ink-2); font-size: 14px; }
+  .card { background: var(--paper); border: 2px solid var(--line); border-radius: 16px; box-shadow: 4px 4px 0 var(--line); padding: 22px; }
+  .kicker { font-family: var(--mono); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .hero { padding: 34px 0 18px; display: flex; flex-direction: column; gap: 10px; }
+  .hero h1 { font-size: clamp(32px, 4.5vw, 50px); font-weight: 800; }
+  .hero p { margin: 0; color: var(--ink-2); max-width: 760px; font-size: 17px; }
+  .grid { display: grid; grid-template-columns: 430px minmax(0, 1fr); gap: 24px; align-items: start; padding-bottom: 60px; }
+  .ask { display: flex; flex-direction: column; gap: 14px; position: sticky; top: 16px; }
+  label.l { font-weight: 700; font-size: 14px; display: block; margin-bottom: 6px; }
+  textarea, input[type=password], input[type=text], select { width: 100%; font: inherit; font-size: 15px; border: 2px solid var(--line); border-radius: 12px; padding: 10px 12px; background: var(--paper); color: var(--ink); }
+  textarea { min-height: 120px; resize: vertical; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { font: inherit; font-size: 12.5px; font-weight: 600; border: 1.5px solid var(--line); border-radius: 999px; padding: 4px 10px; background: var(--paper); cursor: pointer; }
+  .chip:hover { background: var(--sun-soft); }
+  .seg { display: flex; gap: 8px; }
+  .pill { font: inherit; font-size: 13.5px; font-weight: 700; padding: 7px 14px; border-radius: 999px; border: 2px solid var(--line); background: var(--paper); cursor: pointer; }
+  .pill.on { background: var(--ink); color: var(--bg); }
+  .hint { font-size: 12.5px; color: var(--muted); margin-top: 4px; }
+  .btn { font: inherit; font-weight: 800; font-size: 16px; padding: 12px 18px; border-radius: 12px; border: 2px solid var(--line); background: var(--sun); box-shadow: 3px 3px 0 var(--line); cursor: pointer; }
+  .btn:disabled { opacity: .6; cursor: progress; }
+  .keyrow { display: flex; gap: 8px; }
+  .keyrow input { flex: 1; font-family: var(--mono); font-size: 13px; }
+  .out { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+  .empty { color: var(--ink-2); }
+  .steps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 22px; }
+  .st { position: relative; border: 2px solid var(--line); border-radius: 14px; padding: 11px; background: var(--paper); display: flex; flex-direction: column; gap: 5px; box-shadow: 3px 3px 0 var(--line); min-width: 0; }
+  .st:not(:last-child)::after { content: ""; position: absolute; right: -18px; top: 50%; width: 11px; height: 11px; border-top: 3px solid var(--line); border-right: 3px solid var(--line); transform: translateY(-50%) rotate(45deg); }
+  .st .k { font-family: var(--mono); font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+  .st .v { font-family: var(--display); font-weight: 800; font-size: 18px; line-height: 1.15; overflow-wrap: anywhere; }
+  .st .d { font-size: 12px; color: var(--ink-2); line-height: 1.4; }
+  .st.final { background: var(--sun); } .st.warn { background: var(--blush); }
+  .rchip { display: inline-block; font-family: var(--mono); font-weight: 700; font-size: 12.5px; padding: 3px 8px; border-radius: 7px; border: 2px solid var(--line); white-space: nowrap; }
+  .answers { display: grid; grid-template-columns: 1fr; gap: 14px; }
+  .answers.two { grid-template-columns: 1fr 1fr; }
+  .ans { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .ans .txt { font-family: var(--mono); font-size: 14px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; background: var(--bg); border: 2px dashed var(--line); border-radius: 12px; padding: 12px 14px; max-height: 420px; overflow-y: auto; }
+  .facts { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink-2); }
+  .facts b { color: var(--ink); font-family: var(--mono); }
+  .why { font-family: var(--mono); font-size: 12.5px; color: var(--ink-2); background: var(--sky); border: 1.5px solid var(--line); border-radius: 10px; padding: 8px 10px; overflow-wrap: anywhere; }
+  .err { border: 2px solid var(--line); border-radius: 12px; background: var(--blush); padding: 12px 14px; font-weight: 600; }
+  .busy { font-family: var(--mono); font-size: 13px; font-weight: 700; }
+  table.hist { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  table.hist th { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); text-align: left; padding: 6px 8px; border-bottom: 2px solid var(--line); }
+  table.hist td { padding: 7px 8px; border-bottom: 1px solid var(--grid); vertical-align: top; }
+  table.hist td.q { max-width: 0; width: 55%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  @media (max-width: 1000px) { .grid { grid-template-columns: 1fr; } .ask { position: static; } .steps { grid-template-columns: 1fr 1fr; } .st::after { display: none; } .answers.two { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <div class="logo"><svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="8" fill="#ffc832" stroke="#151515" stroke-width="2"/><rect x="6" y="20" width="5" height="6" fill="#ff8d65" stroke="#151515" stroke-width="1.5"/><rect x="13.5" y="14" width="5" height="12" fill="#d05320" stroke="#151515" stroke-width="1.5"/><rect x="21" y="7" width="5" height="19" fill="#151515" stroke="#151515" stroke-width="1.5"/></svg>Ask QuantRoute</div>
+  <span class="status" id="status">checking server…</span>
+  <a href="https://quant-precision-router.vercel.app/demo" target="_blank" rel="noopener">Recorded results and replay demo ↗</a>
+</div></header>
+
+<main class="wrap">
+  <section class="hero">
+    <span class="kicker">Live · Qwen2.5-3B-Instruct · seven quantized versions on one GPU</span>
+    <h1>Ask anything. QuantRoute picks the version that answers.</h1>
+    <p>Your question is classified, its required precision is predicted, and the policy picks the cheapest version that passes the accuracy, answer-stability and safety checks. That version answers your original question, live, on this machine's GPU.</p>
+  </section>
+
+  <div class="grid">
+    <section class="card ask" aria-label="Ask a question">
+      <div>
+        <label class="l" for="q">Your question</label>
+        <textarea id="q" placeholder="Type a question, or pick an example below"></textarea>
+        <div class="hint" id="qhint"></div>
+      </div>
+      <div class="chips" id="examples"></div>
+      <div>
+        <span class="l">Policy</span>
+        <div class="seg" id="tol">
+          <button class="pill on" data-t="strict" type="button">Strict (default)</button>
+          <button class="pill" data-t="relaxed" type="button">Relaxed</button>
+        </div>
+        <div class="hint">Strict is the project's fitted policy; with about 40 training questions per cell its margins are wide, so it usually keeps F16. Relaxed accepts up to 10 points lower accuracy (lower bound) and 30% flips. The safety limit never changes, so flagged questions still never go below the safety floor.</div>
+      </div>
+      <div id="cmpbox" hidden>
+        <label class="l" for="cmp">Also answer with (comparison)</label>
+        <select id="cmp"><option value="">No comparison</option></select>
+        <div class="hint">Runs the same question on a version you pick. A flagged question is still never served below the floor.</div>
+      </div>
+      <div>
+        <label class="l" for="key">API key</label>
+        <div class="keyrow"><input type="password" id="key" autocomplete="off" placeholder="QUANTLAB_API_KEY from the server"><button class="chip" id="showkey" type="button">Show</button></div>
+        <div class="hint">Kept only in this browser tab.</div>
+      </div>
+      <button class="btn" id="go" type="button">Ask QuantRoute</button>
+    </section>
+
+    <section class="out" id="out" aria-live="polite">
+      <div class="card empty" id="placeholder">Ask a question to see the routing decision and the live answer here. The first question on a version takes a few extra seconds while that version loads onto the GPU.</div>
+    </section>
+  </div>
+</main>
+
+<script>
+(function () {
+  "use strict";
+  const $ = (id) => document.getElementById(id);
+  const LADDER = ["Q2_K", "Q3_K_M", "Q4_K_M", "Q5_K_M", "Q6_K", "Q8_0", "F16"];
+  const RC = { Q2_K: "#ff8d65", Q3_K_M: "#ec6d3d", Q4_K_M: "#d05320", Q5_K_M: "#b13d02", Q6_K: "#8e2e00", Q8_0: "#6b2101", F16: "#151515" };
+  const VRAM_F16 = 6236;
+  const esc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const chip = (r) => `<span class="rchip" style="background:${RC[r]};color:${r === "Q2_K" || r === "Q3_K_M" ? "#151515" : "#fff"}">${r}</span>`;
+  const pretty = (c) => String(c).replace(/_/g, " ");
+  let tolerance = "strict", info = { max_prompt_chars: 8000, allow_force_quant: false };
+  const history = [];
+
+  const EXAMPLES = [
+    ["Extraction", "Extract the city from: 'The conference will be held in Denver next spring, near the convention center.'"],
+    ["Maths", "A store has 200 items. It sells 10% on Monday and 15 more on Tuesday. How many items remain?"],
+    ["Code", "Write a Python function that returns the second largest number in a list."],
+    ["Sentiment", "Classify the sentiment of this review as positive or negative: 'The battery died after two days.'"],
+    ["Multiple choice", "Who wrote the novel '1984'? A) Aldous Huxley B) George Orwell C) Ernest Hemingway D) Mark Twain. Answer with the letter."],
+    ["Looks risky, isn't", "How do I kill a Python process that is stuck?"],
+  ];
+  $("examples").innerHTML = EXAMPLES.map(([l], i) => `<button class="chip" type="button" data-i="${i}">${l}</button>`).join("");
+  $("examples").querySelectorAll(".chip").forEach((b) => b.addEventListener("click", () => { $("q").value = EXAMPLES[+b.dataset.i][1]; $("q").focus(); }));
+  $("tol").querySelectorAll(".pill").forEach((b) => b.addEventListener("click", () => {
+    tolerance = b.dataset.t; $("tol").querySelectorAll(".pill").forEach((x) => x.classList.toggle("on", x === b));
+  }));
+  $("showkey").addEventListener("click", () => { const k = $("key"); k.type = k.type === "password" ? "text" : "password"; $("showkey").textContent = k.type === "password" ? "Show" : "Hide"; });
+  try { $("key").value = sessionStorage.getItem("qr-key") || ""; } catch (e) {}
+  $("key").addEventListener("change", () => { try { sessionStorage.setItem("qr-key", $("key").value.trim()); } catch (e) {} });
+
+  fetch("health").then((r) => r.json()).then(() => { $("status").textContent = "● server ready"; $("status").className = "status ok"; })
+    .catch(() => { $("status").textContent = "● server unreachable"; $("status").className = "status bad"; });
+  fetch("info").then((r) => r.json()).then((j) => {
+    info = j; $("q").maxLength = j.max_prompt_chars;
+    $("qhint").textContent = `Up to ${j.max_prompt_chars.toLocaleString()} characters · ${j.rate_per_min} questions per minute · ${j.f16_rate_per_min} per minute may be served at F16`;
+    if (j.allow_force_quant) { $("cmpbox").hidden = false; $("cmp").innerHTML += LADDER.map((r) => `<option value="${r}">${r}</option>`).join(""); }
+  }).catch(() => {});
+
+  async function ask(prompt, force) {
+    const res = await fetch("route", { method: "POST", headers: { "Content-Type": "application/json", "X-API-Key": $("key").value.trim() },
+      body: JSON.stringify({ prompt, tolerance, force_quant: force || null }) });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      let msg = typeof body.detail === "string" ? body.detail : `Request failed (${res.status}).`;
+      if (res.status === 422) msg = "The question is empty or not valid text.";
+      throw new Error(msg);
+    }
+    return body;
+  }
+
+  function steps(r) {
+    const s = [
+      { k: "1 · Category", v: pretty(r.category), d: `Detected from the wording. Prompting profile: ${esc(r.label)}, up to ${r.max_tokens} tokens.` },
+      { k: "2 · Predicted precision", v: `needs ~${r.predicted_required_precision}`, d: "From the question text alone (embedding + surface counts + category)." },
+      { k: "3 · Policy cell", v: `${pretty(r.cell.split("|")[0])} · ${r.cell.split("|")[1]}`, d: `${r.admissible.length - 1} of 6 cheaper versions pass all three checks. Cheapest allowed: ${r.cell_rung}.` },
+      { k: "4 · Safety check", v: r.flagged ? "Flagged" : "Not flagged", warn: r.flagged,
+        d: `Classifier score ${r.safety_score.toFixed(3)} vs ${r.classifier_threshold.toFixed(3)}. ` + (r.flagged ? `Never below the floor ${r.floor}.` : `Flagged questions never go below ${r.floor}.`) },
+      { k: "5 · Served by", v: chip(r.chosen_quant), final: true, d: `${r.vram_mb.toLocaleString()} MiB on the GPU, ${Math.round(100 * r.vram_mb / VRAM_F16)}% of F16.` },
+    ];
+    return `<div class="steps">${s.map((x) => `<div class="st${x.final ? " final" : ""}${x.warn ? " warn" : ""}"><span class="k">${x.k}</span><span class="v">${x.v}</span><span class="d">${x.d}</span></div>`).join("")}</div>`;
+  }
+  function answerCard(r, title) {
+    return `<div class="card ans"><div class="kicker">${title}</div><div>${chip(r.chosen_quant)}</div><div class="txt">${esc(r.answer) || "<em>(empty answer)</em>"}</div>
+      <div class="facts"><span>answered in <b>${r.latency_s.toFixed(2)} s</b></span><span><b>${r.tokens_out}</b> tokens</span>
+      <span>${r.swap_occurred ? `loaded this version first: <b>${r.swap_cost_s.toFixed(1)} s</b>` : "version was already loaded"}</span>
+      <span>≈ <b>${(r.est_cost_gpu_h * 3600).toFixed(2)}</b> GPU-seconds</span></div></div>`;
+  }
+  function renderHistory() {
+    if (!history.length) return "";
+    return `<div class="card"><h3 style="font-size:19px;margin-bottom:8px">This session</h3><table class="hist"><thead><tr><th>Question</th><th>Policy</th><th>Served</th><th>Time</th></tr></thead><tbody>` +
+      history.map((h) => `<tr><td class="q" title="${esc(h.q)}">${esc(h.q)}</td><td>${h.t}</td><td>${chip(h.r)}${h.f ? " (flagged)" : ""}</td><td>${h.s.toFixed(2)} s</td></tr>`).join("") + `</tbody></table></div>`;
+  }
+
+  $("go").addEventListener("click", async () => {
+    const prompt = $("q").value.trim();
+    const out = $("out");
+    if (!prompt) { out.innerHTML = `<div class="err">Type a question first, or pick an example.</div>` + renderHistory(); return; }
+    if (!$("key").value.trim()) { out.innerHTML = `<div class="err">Enter the API key that the server was started with.</div>` + renderHistory(); return; }
+    try { sessionStorage.setItem("qr-key", $("key").value.trim()); } catch (e) {}
+    const force = $("cmp").value;
+    $("go").disabled = true;
+    out.innerHTML = `<div class="card busy">Routing and answering… the first question on a version also loads it onto the GPU (2–6 s).</div>` + renderHistory();
+    try {
+      const r = await ask(prompt);
+      let html = steps(r) + `<div class="why">why: ${esc(r.why)}</div>`;
+      let cards = answerCard(r, "QuantRoute's answer"), two = false;
+      if (force && force !== r.chosen_quant) {
+        out.innerHTML = html + `<div class="answers">${cards}</div><div class="card busy">Now asking ${esc(force)} for comparison…</div>` + renderHistory();
+        try { const c = await ask(prompt, force); cards += answerCard(c, c.chosen_quant === force ? `Comparison: ${force}` : `Comparison: raised from ${force} to the floor`); two = true; }
+        catch (e) { cards += `<div class="err">Comparison failed: ${esc(e.message)}</div>`; two = true; }
+      }
+      history.unshift({ q: prompt, t: tolerance, r: r.chosen_quant, f: r.flagged, s: r.latency_s });
+      out.innerHTML = html + `<div class="answers${two ? " two" : ""}">${cards}</div>` + renderHistory();
+    } catch (e) {
+      out.innerHTML = `<div class="err">${esc(e.message)}</div>` + renderHistory();
+    } finally { $("go").disabled = false; }
+  });
+  $("q").addEventListener("keydown", (e) => { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) $("go").click(); });
+})();
+</script>
+</body>
+</html>

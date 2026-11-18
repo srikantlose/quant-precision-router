@@ -108,7 +108,7 @@
     <span class="kicker">Replay demo · 450 held-out questions · no model download needed</span>
     <h1>Pick a question. Watch QuantRoute choose <span class="hl">which version of the model</span> answers it.</h1>
     <p class="lede">QuantRoute keeps seven versions of Qwen2.5-3B-Instruct, from tiny Q2_K to full-precision F16. For each question it predicts how much precision is needed and serves the cheapest version that passes its accuracy, answer-stability and safety checks. Every version's answer to every question below was recorded on an RTX 4060, so this page replays the real decisions and answers in your browser.</p>
-    <div class="note info"><span class="note-tag">HOW THIS WORKS</span><span>The detected category and predicted precision are the predictor's real outputs, and the safety score comes from the trained classifier. The answers shown are the ones each version actually gave. None of these 450 questions were used to fit the policy. The live routing service, which would answer new questions you type in, is the project's next stage.</span></div>
+    <div class="note info"><span class="note-tag">HOW THIS WORKS</span><span>The detected category and predicted precision are the predictor's real outputs, and the safety score comes from the trained classifier. The answers shown are the ones each version actually gave. None of these 450 questions were used to fit the policy. To ask your own questions, the live routing service (<code>quantlab serve</code>) runs on the GPU machine and serves an "Ask QuantRoute" page that other computers on the network can open.</span></div>
   </section>
 
   <section class="card pad controls-card" aria-label="Policy thresholds">

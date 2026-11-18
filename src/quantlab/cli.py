@@ -68,7 +68,7 @@ def _cmd_setup_llama(args: argparse.Namespace) -> int:
         resp = requests.get(url, timeout=180)
         if resp.status_code != 200:
             print(f"setup-llama failed: {url} returned HTTP {resp.status_code}",
-                 file=sys.stderr)
+                 file=sys.stderr, flush=True)
             return 1
         with zipfile.ZipFile(io.BytesIO(resp.content)) as zf:
             zf.extractall(llama_dir)
@@ -254,6 +254,32 @@ def _cmd_verify_models(args: argparse.Namespace) -> int:
     return 0 if all_ok else 1
 
 
+def _cmd_serve(args: argparse.Namespace) -> int:
+    import uvicorn
+
+    from .api import create_app
+    from .router import Router
+
+    cfg = load_config(args.config)
+    host = args.host or cfg["api"]["host"]
+    port = args.port or int(cfg["api"]["port"])
+    router = Router(cfg=cfg)
+    try:
+        app = create_app(router=router, cfg=cfg)
+    except RuntimeError as exc:
+        print(f"serve: {exc}", file=sys.stderr)
+        return 2
+    print("loading the predictor's sentence embedder ...", flush=True)
+    router.decide("Warm-up question.")
+    if host not in ("127.0.0.1", "localhost", "::1"):
+        print(f"serve: listening on {host}; anyone on the network who has the API key can use this GPU",
+              file=sys.stderr, flush=True)
+    print(f"QuantRoute is serving on http://{'localhost' if host in ('0.0.0.0', '::') else host}:{port}/ "
+          f"(safety floor {router.floor}, default operating point {router.default_op})", flush=True)
+    uvicorn.run(app, host=host, port=port, log_level="warning")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="quantlab")
     parser.add_argument("--config", default=None, help="path to config.yaml")
@@ -314,6 +340,12 @@ def main(argv: list[str] | None = None) -> int:
     p_verify.add_argument("--rungs", default=None, help="comma-separated rung names (default: all)")
     p_verify.add_argument("--full", action="store_true", help="always re-hash, ignore the cache")
     p_verify.set_defaults(func=_cmd_verify_models)
+
+    p_serve = subparsers.add_parser(
+        "serve", help="run the routing service and the Ask QuantRoute page (needs QUANTLAB_API_KEY)")
+    p_serve.add_argument("--host", default=None, help="bind address (default: api.host in config.yaml)")
+    p_serve.add_argument("--port", type=int, default=None, help="port (default: api.port in config.yaml)")
+    p_serve.set_defaults(func=_cmd_serve)
 
     args = parser.parse_args(argv)
     if args.command is None:

@@ -401,7 +401,7 @@ footer a { color: var(--ink); }
     <!-- 9 -->
     <section class="ch" id="request" data-title="One request">
       <div class="ch-head"><div class="ch-num">Chapter 9</div><h2>One question, start to finish</h2>
-        <p class="intro">This is how a new question is handled once the routing service is built, the next stage of the project. It uses a real test question and the thresholds you set in Chapter 8.</p></div>
+        <p class="intro">This is how the routing service (<code>quantlab serve</code>) handles a new question. It uses a real test question and the thresholds you set in Chapter 8.</p></div>
       <div class="box">
         <div class="track" id="track"></div>
         <div class="say" id="say"></div>
@@ -589,7 +589,7 @@ const STAGES = [
   { t: "Learn", s: "on training data only", in: ["the 1,017 training tasks", "their 7 graded answers each", "the safety results"],
     do: ["label each task's required precision", "train the label predictor", "estimate accuracy, flips and safety per cell, with margins", "apply the three gates"],
     out: ["labels for every task", "a predictor", "a policy: 84 cells → rung", "safety floor Q5_K_M"] },
-  { t: "Serve", s: "next stage", in: ["a new question", "the policy, predictor and safety classifier"],
+  { t: "Serve", s: "quantlab serve", in: ["a new question", "the policy, predictor and safety classifier"],
     do: ["predict category and label", "look up the cell's rung", "raise flagged prompts to the floor", "answer on that rung"],
     out: ["the answer", "which rung, and why", "the cost"] },
 ];
