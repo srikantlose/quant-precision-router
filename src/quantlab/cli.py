@@ -254,6 +254,61 @@ def _cmd_verify_models(args: argparse.Namespace) -> int:
     return 0 if all_ok else 1
 
 
+def _cmd_analyze(args: argparse.Namespace) -> int:
+    from .analysis import STEPS, run_analysis
+
+    steps = args.steps.split(",") if args.steps else None
+    try:
+        print(f"analysis steps: {', '.join(steps or (STEPS[STEPS.index(args.start):] if args.start else STEPS))}", flush=True)
+        run_analysis(steps=steps, start=args.start, log=lambda m: print(m, flush=True))
+    except ValueError as exc:
+        print(f"analyze: {exc}", file=sys.stderr)
+        return 2
+    return 0
+
+
+def _cmd_audit_refusals(args: argparse.Namespace) -> int:
+    from .audit import AuditBudgetExhausted, run_audit
+
+    try:
+        result = run_audit()
+    except AuditBudgetExhausted as exc:
+        print(f"audit-refusals: {exc}", file=sys.stderr)
+        return 1
+    print(json.dumps({k: result[k] for k in ("n_judged", "agreement", "cohen_kappa", "matcher_false_negative_rate",
+                                             "matcher_false_positive_rate", "api_calls_used")}, indent=2))
+    return 0
+
+
+def _cmd_adversarial(args: argparse.Namespace) -> int:
+    from .adversarial import run_adversarial
+
+    parts = args.parts.split(",")
+    bad = [x for x in parts if x not in ("offline", "transfer", "e2e", "ratelimit")]
+    if bad:
+        print(f"adversarial: unknown part(s) {bad}", file=sys.stderr)
+        return 2
+    run_adversarial(parts, log=lambda m: print(m, flush=True))
+    print("wrote results/adversarial.json", flush=True)
+    return 0
+
+
+def _cmd_service_check(args: argparse.Namespace) -> int:
+    from .service_check import run_service_check
+
+    result = run_service_check(log=lambda m: print(m, flush=True))
+    print(json.dumps({k: result[k] for k in ("passed", "determinism_exact_match_rate")}, indent=2))
+    return 0 if result["passed"] else 1
+
+
+def _cmd_report(args: argparse.Namespace) -> int:
+    from .report import build_report
+
+    build_report()
+    print("wrote results/REPORT.md", flush=True)
+    return 0
+
+
 def _cmd_serve(args: argparse.Namespace) -> int:
     import uvicorn
 
@@ -340,6 +395,29 @@ def main(argv: list[str] | None = None) -> int:
     p_verify.add_argument("--rungs", default=None, help="comma-separated rung names (default: all)")
     p_verify.add_argument("--full", action="store_true", help="always re-hash, ignore the cache")
     p_verify.set_defaults(func=_cmd_verify_models)
+
+    p_an = subparsers.add_parser(
+        "analyze", help="labels, predictor, pooled models, safety, policy, baselines, sweep, bootstrap, figures")
+    p_an.add_argument("--steps", default=None, help="comma-separated steps to run (default: all, in order)")
+    p_an.add_argument("--from", dest="start", default=None, help="run this step and every later one")
+    p_an.set_defaults(func=_cmd_analyze)
+
+    p_audit = subparsers.add_parser(
+        "audit-refusals", help="LLM-judged audit of the refusal matcher (uses at most safety.audit_api_cap API calls)")
+    p_audit.set_defaults(func=_cmd_audit_refusals)
+
+    p_adv = subparsers.add_parser(
+        "adversarial", help="cost-inflation and downgrade attacks on the router, with and without defences")
+    p_adv.add_argument("--parts", default="offline,e2e,ratelimit",
+                       help="comma-separated: offline and transfer (no GPU), e2e and ratelimit (need the GPU)")
+    p_adv.set_defaults(func=_cmd_adversarial)
+
+    p_sc = subparsers.add_parser(
+        "service-check", help="live check of the routing API on the GPU; writes results/service_check.json")
+    p_sc.set_defaults(func=_cmd_service_check)
+
+    p_rep = subparsers.add_parser("report", help="build results/REPORT.md from the files in results/")
+    p_rep.set_defaults(func=_cmd_report)
 
     p_serve = subparsers.add_parser(
         "serve", help="run the routing service and the Ask QuantRoute page (needs QUANTLAB_API_KEY)")

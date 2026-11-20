@@ -54,6 +54,28 @@ class RouterError(Exception):
     pass
 
 
+_ZERO_WIDTH_RE = __import__("re").compile("[​‌‍⁠﻿]")
+_SENTENCE_RE = __import__("re").compile(r"(?<=[.!?])\s+")
+
+
+def normalize_routing_input(text: str, max_words: int = 256) -> str:
+    """Routing-input normalisation (plan Sec 9.13), a defence measured in P13 and off by
+    default: NFKC, drop zero-width and control characters, collapse whitespace, drop
+    exact-duplicate sentences (keep the first), keep the first max_words words. Applied
+    to the routing input only; the model always receives the original prompt."""
+    import unicodedata
+    t = unicodedata.normalize("NFKC", text or "")
+    t = _ZERO_WIDTH_RE.sub("", t)
+    t = "".join(ch for ch in t if ch in "\n\t" or unicodedata.category(ch)[0] != "C")
+    t = " ".join(t.split())
+    seen, kept = set(), []
+    for s in _SENTENCE_RE.split(t):
+        if s and s not in seen:
+            seen.add(s)
+            kept.append(s)
+    return " ".join(" ".join(kept).split()[:max_words])
+
+
 @dataclass
 class Decision:
     category: str
@@ -144,7 +166,43 @@ class Router:
         return op
 
     # ------------------------------------------------------------------ decide / route
-    def decide(self, prompt: str, tolerance: str = "strict") -> Decision:
+    def routing_input(self, prompt: str, normalize: Optional[bool] = None) -> str:
+        on = self.cfg["routing"]["normalize"] if normalize is None else normalize
+        return normalize_routing_input(prompt, int(self.cfg["routing"]["normalize_max_words"])) if on else prompt
+
+    def decide_many(self, prompts: list[str], tolerance: str = "strict", normalize: Optional[bool] = None,
+                    floor_on: bool = True) -> list[dict[str, Any]]:
+        """Batch decisions without traces (adversarial search, evaluation): one embedding
+        pass and one predictor call for all prompts; the same rule as decide()."""
+        if not prompts:
+            return []
+        inputs = [self.routing_input(p, normalize) for p in prompts]
+        prep = [pipeline.prepare(t) for t in inputs]
+        if self._embedder is None:
+            self._embed("warm-up")
+        emb = np.asarray(self._embedder.encode(inputs, batch_size=64, normalize_embeddings=True, show_progress_bar=False),
+                         dtype=np.float32)
+        surf = self._pred_scaler.transform(np.asarray([surface_features(t) for t in inputs], dtype=np.float64))
+        cat = np.asarray([one_hot_category(p[0], CATEGORIES) for p in prep])
+        classes = self._pred_model.predict(np.hstack([emb, surf, cat]))
+        scores = self._clf.predict_proba(emb)[:, 1]
+        op = self.operating_point(tolerance)
+        cache: dict[str, str] = {}
+        out = []
+        for (category, label, _s, _m), cls, score in zip(prep, classes, scores):
+            key = f"{category}|{int(cls)}"
+            if key not in cache:
+                c = self.cells[key]
+                cache[key] = choose(c["acc_ref"], c["acc_lcb"], c["flip_ucb"], self.safety_ucb, c["cost"],
+                                    op["delta"], op["phi"], op["psi"])[0]
+            flagged = float(score) >= self.threshold
+            rung = resolve_rung(cache[key], self.floor, flagged and floor_on)
+            out.append({"category": category, "pred_class": int(cls), "cell": key, "cell_rung": cache[key],
+                        "score": float(score), "flagged": flagged, "rung": rung})
+        return out
+
+    def decide(self, prompt: str, tolerance: str = "strict", normalize: Optional[bool] = None,
+               floor_on: bool = True) -> Decision:
         ms: dict[str, float] = {}
         tick = time.perf_counter()
 
@@ -154,6 +212,8 @@ class Router:
             ms[name] = round((now - tick) * 1000, 2)
             tick = now
 
+        original = prompt
+        prompt = self.routing_input(original, normalize)
         category, label, system, max_tokens = pipeline.prepare(prompt)
         lap("classify")
         emb = self._embed(prompt)
@@ -189,18 +249,19 @@ class Router:
 
         score = float(self._clf.predict_proba(emb[None, :])[0, 1])
         flagged = score >= self.threshold
-        rung = resolve_rung(cell_rung, self.floor, flagged)
+        rung = resolve_rung(cell_rung, self.floor, flagged and floor_on)
         lap("safety")
 
         why = f"{key} -> {cell_rung} (cheapest of {len(admissible)} admissible)"
-        if flagged:
+        if flagged and floor_on:
             why += f"; flagged (score {score:.2f}) -> floor {self.floor}" + ("" if rung == cell_rung else f" -> {rung}")
         else:
             why += f"; not flagged (score {score:.2f})"
 
         trace = {
             "timing_ms": ms,
-            "input": {"chars": len(prompt), "words": len(prompt.split())},
+            "input": {"chars": len(original), "words": len(original.split()), "normalized": prompt != original,
+                      "routing_chars": len(prompt), "routing_words": len(prompt.split())},
             "category": {"label": label, "category": category, "max_tokens": max_tokens, "system_prompt": system},
             "features": {"embedding_dims": int(emb.shape[0]), "surface": dict(zip(SURFACE_FEATURE_NAMES, map(float, surf_raw))),
                          "category_onehot": category, "total": int(x.shape[1]), "embedder": self.cfg["predictor"]["embedding_model"]},
@@ -210,7 +271,7 @@ class Router:
                        "acc_ref": float(cell["acc_ref"]), "acc_bar": float(acc_bar), "operating_point": op, "tolerance": tolerance,
                        "gates": gates, "admissible": admissible, "chosen": cell_rung},
             "safety": {"score": score, "threshold": self.threshold, "flagged": flagged, "floor": self.floor,
-                       "floor_psi": self.default_op["psi"], "raised": rung != cell_rung},
+                       "floor_psi": self.default_op["psi"], "raised": rung != cell_rung, "floor_on": floor_on},
         }
         return Decision(
             category=category, label=label, system=system, max_tokens=max_tokens,
