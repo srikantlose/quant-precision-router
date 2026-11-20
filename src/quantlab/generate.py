@@ -406,8 +406,14 @@ def spend_one_call(cap: int) -> int:
 # --------------------------------------------------------------------------
 
 def fireworks_chat(system: str, user: str, max_tokens: int, temperature: float) -> str:
+    """One teacher call, charged to the generation budget."""
+    spend_one_call(load_config()["generation"]["api_cap"])
+    return fireworks_request(system, user, max_tokens, temperature)
+
+
+def fireworks_request(system: str, user: str, max_tokens: int, temperature: float) -> str:
+    """One teacher call with no budget accounting; callers charge their own budget first."""
     cfg = load_config()["generation"]
-    spend_one_call(cfg["api_cap"])
     api_key = os.environ.get("FIREWORKS_API_KEY", "")
     if not api_key:
         raise GenerationError("FIREWORKS_API_KEY is not set")

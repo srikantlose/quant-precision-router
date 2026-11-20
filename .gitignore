@@ -13,3 +13,6 @@ data/kl/
 results/raw/
 results/logs/
 results/kl/
+
+# local dataset bundle (contains XSTest, which is not redistributed)
+QuantRoute-Dataset.zip

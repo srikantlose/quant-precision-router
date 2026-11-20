@@ -92,6 +92,64 @@ def cost_fn_factory(
     return cost
 
 
+MIN_SUPPORT_TASKS = 5
+
+
+def cell_bounds(models: dict, log_bpp: dict[str, float], z: float, cost_fn: Any) -> dict[str, dict]:
+    """Accuracy point/LCB and flip UCB for every (category, predicted class) cell from
+    fitted pooled models; sparse cells use the category-level (coarse) models.
+    Shared by fit_policy and the bootstrap refits so both apply the identical rule."""
+    import pandas as pd
+
+    from .pooled import predict_with_bounds, predict_with_bounds_coarse
+    from .tasktype import CATEGORIES
+
+    acc_res, flip_res = models["acc_res"], models["flip_res"]
+    acc_levels, flip_levels = models["acc_levels"], models["flip_levels"]
+    acc_coarse_res, flip_coarse_res = models["acc_coarse_res"], models["flip_coarse_res"]
+    cell_support = models["cell_support"]
+    out: dict[str, dict] = {}
+    seen = set(acc_levels["categories"]) & set(flip_levels["categories"])
+    for category in CATEGORIES:
+        for pred_class in range(7):
+            n_support = cell_support.get(f"{category}|{pred_class}", 0)
+            if category not in seen:
+                # No training row was routed to this category (possible in a bootstrap
+                # resample when a category is rarely predicted): with no evidence only
+                # the reference rung is admissible.
+                out[f"{category}|{pred_class}"] = {
+                    "low_support": True, "n_support_tasks": 0, "no_data": True,
+                    "acc_point": {rung: 0.0 for rung in LADDER},
+                    "acc_lcb": {rung: -1.0 for rung in LADDER},
+                    "flip_ucb": {rung: 1.0 for rung in NON_REFERENCE},
+                    "cost": {rung: cost_fn(rung, category) for rung in LADDER},
+                }
+                continue
+            low_support = n_support < MIN_SUPPORT_TASKS
+            acc_newdata = pd.DataFrame([
+                {"category_pred": category, "pred_class_oof": pred_class, "rung": rung, "log_bpp": log_bpp[rung]}
+                for rung in LADDER
+            ])
+            flip_newdata = pd.DataFrame([
+                {"category_pred": category, "pred_class_oof": pred_class, "rung": rung, "log_bpp": log_bpp[rung]}
+                for rung in NON_REFERENCE
+            ])
+            if low_support:
+                acc_point, acc_lcb_arr, _ = predict_with_bounds_coarse(acc_coarse_res, acc_newdata, z, acc_levels)
+                _, _, flip_ucb_arr = predict_with_bounds_coarse(flip_coarse_res, flip_newdata, z, flip_levels)
+            else:
+                acc_point, acc_lcb_arr, _ = predict_with_bounds(acc_res, acc_newdata, z, acc_levels)
+                _, _, flip_ucb_arr = predict_with_bounds(flip_res, flip_newdata, z, flip_levels)
+            out[f"{category}|{pred_class}"] = {
+                "low_support": low_support, "n_support_tasks": n_support,
+                "acc_point": {rung: float(acc_point[i]) for i, rung in enumerate(LADDER)},
+                "acc_lcb": {rung: float(acc_lcb_arr[i]) for i, rung in enumerate(LADDER)},
+                "flip_ucb": {rung: float(flip_ucb_arr[i]) for i, rung in enumerate(NON_REFERENCE)},
+                "cost": {rung: cost_fn(rung, category) for rung in LADDER},
+            }
+    return out
+
+
 def fit_policy(
     pooled_models_path: str | Path = "results/raw/pooled_models.joblib",
     profiles_path: str | Path = "results/profiles.json",
@@ -101,14 +159,9 @@ def fit_policy(
     out_path: str | Path = "results/policy.json",
 ) -> dict[str, Any]:
     import joblib
-    import pandas as pd
     import numpy as np
 
     from .config import load_config
-    from .pooled import predict_with_bounds, predict_with_bounds_coarse
-    from .tasktype import CATEGORIES
-
-    MIN_SUPPORT_TASKS = 5
 
     cfg = load_config()
     delta = cfg["policy"]["delta"]
@@ -118,10 +171,6 @@ def fit_policy(
     gpu_hourly_rate = cfg["cost"]["gpu_hourly_rate"]
 
     models = joblib.load(pooled_models_path)
-    acc_res, flip_res = models["acc_res"], models["flip_res"]
-    acc_levels, flip_levels = models["acc_levels"], models["flip_levels"]
-    acc_coarse_res, flip_coarse_res = models["acc_coarse_res"], models["flip_coarse_res"]
-    cell_support = models["cell_support"]
 
     with open(profiles_path, encoding="utf-8") as f:
         profiles = json.load(f)
@@ -144,48 +193,21 @@ def fit_policy(
     })
 
     cells: dict[str, dict] = {}
-    for category in CATEGORIES:
-        for pred_class in range(7):
-            n_support = cell_support.get(f"{category}|{pred_class}", 0)
-            low_support = n_support < MIN_SUPPORT_TASKS
-
-            acc_newdata = pd.DataFrame([
-                {"category_pred": category, "pred_class_oof": pred_class, "rung": rung, "log_bpp": log_bpp[rung]}
-                for rung in LADDER
-            ])
-            flip_newdata = pd.DataFrame([
-                {"category_pred": category, "pred_class_oof": pred_class, "rung": rung, "log_bpp": log_bpp[rung]}
-                for rung in NON_REFERENCE
-            ])
-
-            if low_support:
-                acc_point, acc_lcb_arr, _ = predict_with_bounds_coarse(acc_coarse_res, acc_newdata, z, acc_levels)
-                _, _, flip_ucb_arr = predict_with_bounds_coarse(flip_coarse_res, flip_newdata, z, flip_levels)
-            else:
-                acc_point, acc_lcb_arr, _ = predict_with_bounds(acc_res, acc_newdata, z, acc_levels)
-                _, _, flip_ucb_arr = predict_with_bounds(flip_res, flip_newdata, z, flip_levels)
-
-            acc_by_rung = {rung: float(acc_point[i]) for i, rung in enumerate(LADDER)}
-            acc_lcb_by_rung = {rung: float(acc_lcb_arr[i]) for i, rung in enumerate(LADDER)}
-            flip_ucb_by_rung = {rung: float(flip_ucb_arr[i]) for i, rung in enumerate(NON_REFERENCE)}
-
-            acc_ref = acc_by_rung[REFERENCE]
-            cost_by_rung = {rung: cost_fn(rung, category) for rung in LADDER}
-
-            chosen, admissible = choose(
-                acc_ref=acc_ref, acc_lcb=acc_lcb_by_rung, flip_ucb=flip_ucb_by_rung,
-                safety_flip_ucb=safety_flip_ucb_train, cost=cost_by_rung,
-                delta=delta, phi=phi, psi=psi,
-            )
-
-            cells[f"{category}|{pred_class}"] = {
-                "rung": chosen, "admissible": admissible,
-                "low_support": low_support, "n_support_tasks": n_support,
-                "acc_lcb": {b: acc_lcb_by_rung[b] for b in NON_REFERENCE},
-                "acc_ref": acc_ref,
-                "flip_ucb": {b: flip_ucb_by_rung[b] for b in NON_REFERENCE},
-                "cost": cost_by_rung,
-            }
+    for key, cb in cell_bounds(models, log_bpp, z, cost_fn).items():
+        acc_ref = cb["acc_point"][REFERENCE]
+        chosen, admissible = choose(
+            acc_ref=acc_ref, acc_lcb=cb["acc_lcb"], flip_ucb=cb["flip_ucb"],
+            safety_flip_ucb=safety_flip_ucb_train, cost=cb["cost"],
+            delta=delta, phi=phi, psi=psi,
+        )
+        cells[key] = {
+            "rung": chosen, "admissible": admissible,
+            "low_support": cb["low_support"], "n_support_tasks": cb["n_support_tasks"],
+            "acc_lcb": {b: cb["acc_lcb"][b] for b in NON_REFERENCE},
+            "acc_ref": acc_ref,
+            "flip_ucb": {b: cb["flip_ucb"][b] for b in NON_REFERENCE},
+            "cost": cb["cost"],
+        }
 
     result = {
         "operating_point": {"delta": delta, "phi": phi, "psi": psi},
