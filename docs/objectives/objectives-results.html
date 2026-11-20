@@ -1,0 +1,732 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>QuantRoute — Objectives and Results</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=DM+Sans:opsz,wght@9..40,400..700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4; margin: 10mm 12mm 13mm; }
+  :root {
+    --ink: #151515; --ink-2: #45423b; --muted: #77726a; --line: #d9d2c4; --soft: #f6f1e7;
+    --sun: #ffc832; --mint: #2ed3a0; --sky: #bcd3ff; --blush: #ffd9c7; --blue: #3d74e0;
+    --r1: #ff8d65; --r2: #ec6d3d; --r3: #d05320; --r4: #b13d02; --r5: #8e2e00; --r6: #6b2101; --r7: #151515;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #fff; }
+  body { font-family: "DM Sans", system-ui, sans-serif; color: var(--ink); font-size: 8.9pt; line-height: 1.4;
+         -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  h1, h2, h3 { font-family: "Bricolage Grotesque", "DM Sans", sans-serif; letter-spacing: -0.015em; line-height: 1.1; }
+  h1 { font-size: 25pt; font-weight: 800; }
+  h2 { font-size: 14pt; font-weight: 800; margin: 0 0 5px; }
+  h3 { font-size: 10pt; font-weight: 800; margin: 7px 0 3px; }
+  p { margin: 0 0 4.5px; color: var(--ink-2); }
+  b, strong { color: var(--ink); }
+  .mono { font-family: "JetBrains Mono", monospace; }
+  .kicker { font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 7.4pt; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  section { break-inside: auto; }
+  .pagebreak { break-before: page; }
+  .avoid { break-inside: avoid; }
+
+  /* title block */
+  .title { border-bottom: 2.5px solid var(--ink); padding-bottom: 10px; margin-bottom: 12px; }
+  .title .sub { font-size: 12pt; color: var(--ink-2); margin-top: 5px; font-weight: 500; }
+  .hl { background: var(--sun); padding: 0 .12em; border-radius: 4px; }
+
+  .what { display: grid; grid-template-columns: 1.15fr 1fr; gap: 16px; align-items: start; }
+  .facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin-top: 8px; }
+  .fact { border: 1.8px solid var(--ink); border-radius: 9px; padding: 6px 8px; }
+  .fact .n { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 14pt; line-height: 1.05; }
+  .fact .l { font-size: 7.6pt; color: var(--ink-2); font-weight: 600; line-height: 1.25; margin-top: 1px; }
+  .figure { border: 1.8px solid var(--ink); border-radius: 10px; padding: 7px 10px 5px; background: #fff; }
+  .figure .cap { font-size: 7.8pt; color: var(--muted); margin-top: 4px; line-height: 1.35; }
+  svg text { font-family: "DM Sans", sans-serif; }
+
+  /* overview table and comparison tables */
+  table { width: 100%; border-collapse: collapse; font-size: 7.9pt; line-height: 1.32; }
+  th { text-align: left; font-family: "JetBrains Mono", monospace; font-size: 7pt; letter-spacing: .05em; text-transform: uppercase;
+       color: var(--muted); font-weight: 700; padding: 4px 5px; border-bottom: 1.8px solid var(--ink); }
+  td { padding: 3.6px 5px; border-bottom: 1px solid var(--line); vertical-align: top; color: var(--ink-2); }
+  td:first-child { color: var(--ink); font-weight: 600; }
+  tr { break-inside: avoid; }
+  .num { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; color: var(--ink); white-space: nowrap; }
+  .v { display: inline-block; font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 6.9pt; padding: 1px 6px;
+       border: 1.4px solid var(--ink); border-radius: 5px; white-space: nowrap; color: var(--ink); }
+  .v.agree { background: var(--mint); } .v.differ { background: var(--blush); } .v.partly { background: var(--sun); } .v.new { background: var(--sky); }
+  .cite { font-family: "JetBrains Mono", monospace; font-size: 7.4pt; color: var(--muted); }
+
+  /* objective blocks */
+  .obj-head { display: flex; align-items: center; gap: 10px; margin: 2px 0 8px; }
+  .badge { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 15pt; width: 38px; height: 38px; flex: none;
+           display: flex; align-items: center; justify-content: center; border: 2px solid var(--ink); border-radius: 10px; box-shadow: 2.5px 2.5px 0 var(--ink); }
+  .obj-head h2 { margin: 0; }
+  .obj-head .kicker { display: block; margin-bottom: 2px; }
+  .statement { font-size: 9.4pt; color: var(--ink); border-left: 4px solid var(--ink); padding: 1px 0 1px 10px; margin: 0 0 7px; }
+  .gap { background: var(--soft); border: 1.4px solid var(--line); border-radius: 9px; padding: 6px 10px 2px; margin-bottom: 6px; }
+  .gap .kicker { color: var(--ink); display: block; margin-bottom: 3px; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .takeaway { border: 2px solid var(--ink); border-radius: 9px; padding: 7px 11px; margin-top: 9px; box-shadow: 2.5px 2.5px 0 var(--ink); }
+  .takeaway p { margin: 0; color: var(--ink); }
+
+  /* gates page */
+  .gates { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; margin: 6px 0 10px; }
+  .gatecard { border: 2px solid var(--ink); border-radius: 10px; padding: 9px 10px 8px; box-shadow: 2.5px 2.5px 0 var(--ink); }
+  .gatecard .sym { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 25pt; line-height: 1; }
+  .gatecard .name { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 11pt; margin: 2px 0 4px; }
+  .gatecard .rule { font-family: "JetBrains Mono", monospace; font-size: 7.5pt; background: var(--soft); border-radius: 6px; padding: 5px 6px; margin: 4px 0 6px; color: var(--ink); line-height: 1.4; }
+  .gatecard p { font-size: 8pt; line-height: 1.36; margin-bottom: 3px; }
+  .gatecard .vals { font-size: 8pt; color: var(--ink); border-top: 1.4px dashed var(--line); padding-top: 4px; margin-top: 4px; }
+  .ok { color: #0d7a59; font-weight: 700; } .no { color: #b13d02; font-weight: 700; }
+  .ex td, .ex th { text-align: center; } .ex td:first-child, .ex th:first-child { text-align: left; }
+  .pick { background: #e5f8f0; }
+  /* terms page */
+  .terms { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin: 6px 0 9px; }
+  .term { border: 2px solid var(--ink); border-radius: 10px; box-shadow: 2.5px 2.5px 0 var(--ink); overflow: hidden; }
+  .term .th { padding: 6px 10px; border-bottom: 2px solid var(--ink); display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+  .term .th b { font-family: "Bricolage Grotesque", sans-serif; font-size: 13pt; font-weight: 800; }
+  .term .th span { font-size: 8.2pt; font-weight: 600; color: var(--ink); }
+  .term dl { display: grid; grid-template-columns: 74px 1fr; gap: 3px 8px; padding: 7px 10px 8px; font-size: 8.2pt; line-height: 1.36; }
+  .term dt { font-family: "JetBrains Mono", monospace; font-size: 6.9pt; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); padding-top: 1.5px; }
+  .term dd { color: var(--ink-2); }
+  .live { display: inline-block; font-family: "JetBrains Mono", monospace; font-size: 6.9pt; font-weight: 700; padding: 0 5px; border-radius: 4px; border: 1.3px solid var(--ink); }
+  .live.yes { background: var(--mint); } .live.no { background: var(--blush); }
+  .rule4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin-top: 9px; }
+  .rule4 div { border: 1.6px solid var(--ink); border-radius: 8px; padding: 5px 8px; font-size: 8.4pt; color: var(--ink); line-height: 1.3; }
+  .rule4 div b { font-family: "Bricolage Grotesque", sans-serif; font-size: 10.5pt; display: block; }
+  /* models page */
+  .callouts { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin: 6px 0 8px; }
+  .callout { border: 2px solid var(--ink); border-radius: 9px; padding: 6px 10px; box-shadow: 2.5px 2.5px 0 var(--ink); }
+  .callout p { margin: 0; color: var(--ink); font-size: 8.6pt; }
+  .models td { font-size: 7.8pt; }
+  .models td:first-child { white-space: nowrap; }
+  .tag2 { display: inline-block; font-family: "JetBrains Mono", monospace; font-size: 6.8pt; font-weight: 700; padding: 0 5px; border-radius: 4px; border: 1.3px solid var(--ink); margin-right: 3px; }
+  /* metrics page */
+  .mtab td, .mtab th { text-align: right; } .mtab td:first-child, .mtab th:first-child { text-align: left; }
+  .mtab td { font-size: 7.9pt; padding: 3px 5px; }
+  .why { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 6px 0 8px; }
+  .whycard { border: 2px solid var(--ink); border-radius: 9px; overflow: hidden; box-shadow: 2.5px 2.5px 0 var(--ink); display: flex; flex-direction: column; }
+  .whycard .wh { padding: 5px 8px; border-bottom: 2px solid var(--ink); font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 11pt; }
+  .whycard .wb { padding: 6px 8px; font-size: 7.9pt; line-height: 1.34; color: var(--ink-2); display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .whycard .wb b { color: var(--ink); }
+  .whycard .use { margin-top: auto; border-top: 1.4px dashed var(--line); padding-top: 4px; color: var(--ink); font-weight: 600; }
+  /* embedding box */
+  .embed { display: grid; grid-template-columns: 1.08fr 0.92fr; gap: 12px; border: 2px solid var(--ink); border-radius: 10px;
+           box-shadow: 2.5px 2.5px 0 var(--ink); padding: 8px 11px 7px; margin: 8px 0 4px; background: #fff; }
+  .embed h3 { margin: 0 0 3px; }
+  .embed p { font-size: 8.3pt; line-height: 1.38; margin-bottom: 3px; }
+  .embed .cap { font-size: 7.3pt; color: var(--muted); line-height: 1.3; margin-top: 2px; }
+  .refs { font-size: 7pt; color: var(--ink-2); columns: 2; column-gap: 14px; line-height: 1.3; }
+  .refs div { break-inside: avoid; margin-bottom: 2px; }
+</style>
+</head>
+<body>
+
+<!-- ============================================================ PAGE 1: WHAT IT IS -->
+<section>
+  <div class="title">
+    <div class="kicker">QuantRoute · objectives, measured results and the gaps they fill</div>
+    <h1>QuantRoute</h1>
+    <div class="sub">Serving each LLM prompt at the <span class="hl">cheapest quantization level</span> that stays accurate and safe.</div>
+  </div>
+
+  <h2>What QuantRoute is</h2>
+  <div class="what">
+    <div>
+      <p>A language model can be stored at several <b>quantization levels</b>: fewer bits per weight make it smaller and usually faster, at some risk to its answers. Deployments normally pick one level for every request. <b>QuantRoute</b> instead treats the levels as a ladder and picks one <b>per prompt</b>.</p>
+      <p>It runs one model, <b>Qwen2.5-3B-Instruct</b>, at seven GGUF levels (Q2_K, Q3_K_M, Q4_K_M, Q5_K_M, Q6_K, Q8_0 and the F16 reference) on a single 8 GB RTX 4060 with llama.cpp. Every benchmark task and safety prompt is run and graded at every level. From those measurements QuantRoute learns which level each kind of prompt needs. At serving time it sends each prompt to the <b>cheapest level that passes three gates</b>: accuracy (δ), answer stability (φ) and safety (ψ), explained on the last page. Prompts flagged as harmful are never served below a safety floor.</p>
+      <p>It is both a working service, an HTTP API that returns the answer with its routing decision, and a measurement study. The study checks whether per-prompt precision routing actually beats choosing one good level, and reports the answer either way.</p>
+    </div>
+    <div>
+      <div class="facts">
+        <div class="fact"><div class="n">7</div><div class="l">quantization levels of one model</div></div>
+        <div class="fact"><div class="n">1,467</div><div class="l">graded tasks in 12 categories</div></div>
+        <div class="fact"><div class="n">600</div><div class="l">safety prompts (harmful, look-alike, injection)</div></div>
+        <div class="fact"><div class="n">14,469</div><div class="l">graded runs, 0 errors</div></div>
+        <div class="fact"><div class="n">84</div><div class="l">policy cells (category × predicted level)</div></div>
+        <div class="fact"><div class="n">450</div><div class="l">held-out test tasks for validation</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="figure avoid" style="margin-top:8px">
+    <svg id="flow" viewBox="0 0 760 118" width="100%"></svg>
+    <div class="cap">Per request: the prompt's category and required precision are predicted. Each level is checked against the three gates for that cell. The cheapest level that passes is served, and a flagged prompt is raised to the Q5_K_M floor. Routing takes about 10 ms on the CPU.</div>
+  </div>
+
+  <h2 style="margin-top:12px">The three objectives at a glance</h2>
+  <table class="avoid">
+    <thead><tr><th style="width:24%">Objective</th><th style="width:30%">Gap in the literature it fills</th><th>Headline measured result</th></tr></thead>
+    <tbody>
+      <tr><td>O1 · Measure the accuracy, fidelity and cost of every level, per task category</td>
+          <td>Prior studies report one average per benchmark, judge levels on accuracy alone, and price them by bits or file size rather than measured cost.</td>
+          <td>Q4_K_M loses <span class="num">1.4 pp</span> against F16 and Q2_K loses <span class="num">22.2 pp</span>. Q8_0 is within 0.4 pp yet changes <span class="num">4.4%</span> of answers. Routing across levels on one GPU costs <span class="num">780</span> model loads per 1,000 requests.</td></tr>
+      <tr><td>O2 · Predict, from the prompt alone, the minimum level it needs</td>
+          <td>Difficulty predictors exist, but they predict whether a model will be right. None predicts the minimum precision at which a task still succeeds.</td>
+          <td><span class="num">45.8%</span> exact against a <span class="num">45.5%</span> majority baseline, and <span class="num">79.8%</span> within one level. Prompt text barely predicts required precision.</td></tr>
+      <tr><td>O3 · Derive, validate and secure the selection policy</td>
+          <td>No precision router is driven by task type and predicted difficulty, validated on held-out data against fixed levels, or constrained and attacked on safety.</td>
+          <td>Balanced routing scores <span class="num">70.4%</span> at <span class="num">52%</span> of F16's GPU time. That does <b>not</b> beat always-Q5_K_M (69.8% at 45%). A 4-word suffix sends <span class="num">98%</span> of cheap prompts to F16.</td></tr>
+    </tbody>
+  </table>
+  <p style="margin-top:6px;font-size:8.2pt">All QuantRoute figures come from the project's <span class="mono">results/</span> files. Prior figures come from the cited papers, which used other models, quantization methods and benchmarks. The comparisons check whether each published finding holds here; they are not a leaderboard. <span class="v agree">Agrees</span> <span class="v partly">Partly</span> <span class="v differ">Differs</span> <span class="v new">New</span> marks each row.</p>
+</section>
+
+<!-- ============================================================ TERMS -->
+<section class="pagebreak">
+  <h2>Four terms that are easy to mix up: category, grader, label and class</h2>
+  <p>All four describe a task, so they sound alike. They come from different places, are known at different times and do different jobs. Only two of them, the <b>detected category</b> and the <b>class</b>, exist for a live prompt, and those two are all the router uses.</p>
+
+  <div class="terms">
+    <div class="term"><div class="th" style="background:var(--sun)"><b>Category</b><span>what kind of task it is</span></div>
+      <dl><dt>Values</dt><dd>One of 12 task types: math, code_gen, code_debug, factual_qa, logic, language, sentiment, classification, extraction, ner, multiple_choice, summarization.</dd>
+          <dt>Two kinds</dt><dd><b>True category:</b> the task's <span class="mono">category</span> field, set when the task was written; it is the answer key. <b>Detected category:</b> what a rule-based classifier reads from the prompt text.</dd>
+          <dt>Live prompt</dt><dd><span class="live yes">detected only</span></dd>
+          <dt>Used for</dt><dd>The detected category picks the system prompt and token budget, and the row of the policy cell. The true category is used only to check the classifier (90.2% agreement; logic only 9%) and for reporting.</dd></dl></div>
+    <div class="term"><div class="th" style="background:var(--blush)"><b>Grader</b><span>how an answer is marked</span></div>
+      <dl><dt>Values</dt><dd>One of 7 marking rules, with the expected answer: <span class="mono">contains</span>, <span class="mono">contains_all</span>, <span class="mono">numeric</span>, <span class="mono">exact</span>, <span class="mono">mc</span>, <span class="mono">word_limit</span>, <span class="mono">py_exec</span> (runs the model's code against asserts in a sandbox).</dd>
+          <dt>Comes from</dt><dd>The task itself: <span class="mono">grader</span>, <span class="mono">expected</span>, <span class="mono">expected_text</span>, <span class="mono">test_code</span>.</dd>
+          <dt>Live prompt</dt><dd><span class="live no">no</span> A user's question has no known correct answer.</dd>
+          <dt>Used for</dt><dd>Offline only: marking each of the 14,469 benchmark answers correct or incorrect. Everything measured rests on these marks.</dd></dl></div>
+    <div class="term"><div class="th" style="background:var(--mint)"><b>Label</b><span>what the task actually needed</span></div>
+      <dl><dt>Values</dt><dd>The task's <b>required precision</b>: 0&ndash;6 (Q2_K &hellip; F16), or <i>unsolvable</i>.</dd>
+          <dt>Comes from</dt><dd>Measurement. The task's 7 graded runs, one per level, are each checked for correct <i>and</i> confident (mean token log-probability &ge; &tau;). The label is the cheapest level that passes, with at most one failure above it.</dd>
+          <dt>Live prompt</dt><dd><span class="live no">no</span> It needs the graded answers from every level.</dd>
+          <dt>Used for</dt><dd>The target the predictor learns on train, and the yardstick it is scored against on test.</dd></dl></div>
+    <div class="term"><div class="th" style="background:var(--sky)"><b>Class</b><span>what we guess it needs</span></div>
+      <dl><dt>Values</dt><dd>The <b>predicted class</b>: 0&ndash;6 (Q2_K &hellip; F16). It has nothing to do with the <i>classification</i> category, which is just one of the 12 task types.</dd>
+          <dt>Comes from</dt><dd>The predictor: a logistic regression on 409 features of the prompt text (embedding, 13 surface counts, detected category).</dd>
+          <dt>Live prompt</dt><dd><span class="live yes">yes</span></dd>
+          <dt>Used for</dt><dd>With the detected category, it picks the policy cell (12 &times; 7 = 84 cells). The &delta;, &phi; and &psi; gates are then checked for that cell.</dd></dl></div>
+  </div>
+
+  <div class="figure avoid">
+    <svg id="termflow" viewBox="0 0 760 124" width="100%"></svg>
+    <div class="cap">Offline, the grader turns answers into marks, the marks give the label, and the labels train the predictor. Online, the predictor outputs a class, and the class plus the detected category select the cell whose gates choose the level.</div>
+  </div>
+
+  <h3>One task, all four terms</h3>
+  <p>Test task <span class="mono">gen-language-easy-0007</span>: <b>&ldquo;What is the German word for &lsquo;house&rsquo;?&rdquo;</b></p>
+  <table class="avoid">
+    <tbody>
+      <tr><td style="width:17%">Category</td><td>True: <b>language</b>. Detected: <b>factual_qa</b>. The classifier misses about one language task in five.</td></tr>
+      <tr><td>Grader</td><td><span class="mono">contains</span> with expected <span class="mono">"haus"</span>: an answer is correct if it contains &ldquo;haus&rdquo;.</td></tr>
+      <tr><td>Label</td><td>Graded at each level (&#10003; = correct and confident, &#10007; = wrong): Q2_K &#10007; &middot; Q3_K_M &#10003; &middot; Q4_K_M &#10003; &middot; Q5_K_M &#10003; &middot; Q6_K &#10003; &middot; Q8_0 &#10003; &middot; F16 &#10003;. The cheapest passing level is <b>Q3_K_M</b>.</td></tr>
+      <tr><td>Class</td><td>From the text alone, the predictor guesses <b>Q2_K</b> (class 0), one level too low.</td></tr>
+      <tr><td>Level served</td><td>Cell <span class="mono">factual_qa | 0</span>: <b>Q5_K_M</b> at Balanced, F16 at Strict. The served level comes from the cell's gates, which pool every training task that lands in that cell, not from this task's label or class directly.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="rule4">
+    <div><b>Category</b>what kind of task</div>
+    <div><b>Grader</b>how its answer is marked</div>
+    <div><b>Label</b>what it needed (measured)</div>
+    <div><b>Class</b>what we guess it needs (predicted)</div>
+  </div>
+</section>
+
+<!-- ============================================================ METRICS -->
+<section class="pagebreak">
+  <h2>What is measured, why no single metric picks the level, and how the metrics become the gates</h2>
+  <p>Every level is measured on four kinds of metric. <b>Fidelity</b> means how closely a level reproduces F16's behaviour, as opposed to whether its answers are right. A level can be accurate but unfaithful (different answers, same score) or faithful but slow.</p>
+
+  <table class="mtab avoid">
+    <thead><tr><th>Level</th><th>Bits / weight</th><th>VRAM MiB</th><th>Accuracy<br>(all 1,467)</th><th>Answers flipped<br>vs F16</th><th>KL vs F16<br>(WikiText-2)</th><th>Same top<br>token</th><th>Safety-flip<br>upper bound</th><th>Cost, GPU-h<br>per 1k tasks</th></tr></thead>
+    <tbody>
+      <tr><td>Q2_K</td><td>3.57</td><td>1,547</td><td>51.2%</td><td>36.7%</td><td>0.383</td><td>72.6%</td><td>6.1%</td><td>0.233</td></tr>
+      <tr><td>Q3_K_M</td><td>4.47</td><td>1,845</td><td>69.1%</td><td>18.2%</td><td>0.091</td><td>86.2%</td><td>5.6%</td><td>0.137</td></tr>
+      <tr><td>Q4_K_M</td><td>5.46</td><td>2,169</td><td>72.0%</td><td>12.5%</td><td>0.028</td><td>91.8%</td><td>6.1%</td><td>0.141</td></tr>
+      <tr><td>Q5_K_M</td><td>6.32</td><td>2,450</td><td>73.9%</td><td>9.9%</td><td>0.010</td><td>94.8%</td><td>3.0%</td><td>0.144</td></tr>
+      <tr><td>Q6_K</td><td>7.24</td><td>2,752</td><td>73.9%</td><td>7.4%</td><td>0.005</td><td>96.0%</td><td>1.8%</td><td>0.164</td></tr>
+      <tr><td>Q8_0</td><td>9.37</td><td>3,470</td><td>73.1%</td><td>4.4%</td><td>0.002</td><td>97.4%</td><td>1.8%</td><td>0.195</td></tr>
+      <tr><td>F16</td><td>17.63</td><td>6,236</td><td>73.4%</td><td>reference</td><td>reference</td><td>reference</td><td>reference</td><td>0.324</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:7.8pt;margin-top:3px"><b>Accuracy</b> is graded correctness. <b>Answers flipped</b> is the share of tasks whose correct/incorrect outcome differs from F16's, in either direction. <b>KL divergence</b> measures how far the level's next-token probabilities drift from F16's on ordinary text; <b>same top token</b> is how often both would pick the same next word. <b>Safety-flip upper bound</b> covers harmful and injection prompts that F16 handles safely and this level does not (one-sided 95%, train). <b>Cost</b> is measured inference time on the 450 test tasks; loading a level adds 2.1&ndash;5.6 s on top.</p>
+
+  <h3>Why no single metric is enough</h3>
+  <div class="why">
+    <div class="whycard"><div class="wh" style="background:var(--sun)">Accuracy</div><div class="wb">
+      <span><b>On its own</b>, Q5_K_M and Q6_K beat F16 (73.9% vs 73.4%), so any of them looks free to use.</span>
+      <span><b>But</b> they still change 9.9% and 7.4% of individual answers. Accuracy is also an average: math scores 56.6% at Q2_K vs 38.0% at F16, which would send math to a level that changes over a third of answers. And a cell holds only about a dozen tasks, so a raw rate is noisy.</span>
+      <span class="use">Used as: the &delta; gate, on a <i>lower bound</i> per cell</span></div></div>
+    <div class="whycard"><div class="wh" style="background:var(--sky)">Fidelity</div><div class="wb">
+      <span><b>On its own</b>, the most faithful cheap level is always Q8_0, at 60% of F16's time. Fidelity never favours Q4_K_M or Q5_K_M, even where they are as good.</span>
+      <span><b>But</b> fidelity says "different", not "worse": flips go both ways, so a level can be unfaithful by fixing F16's mistakes. KL and same-top-token are measured on general text, not per task type.</span>
+      <span class="use">Used as: the &phi; gate, on a flip <i>upper bound</i> per cell (KL is a cross-check)</span></div></div>
+    <div class="whycard"><div class="wh" style="background:var(--mint)">Safety</div><div class="wb">
+      <span><b>On its own</b>, it says only that Q5_K_M and above stay within 5% of F16. It says nothing about whether answers are right or cheap.</span>
+      <span><b>But</b> it erodes while accuracy looks fine: Q4_K_M is 1.4 points from F16 on accuracy but has the same safety bound as Q2_K (6.1%). The matcher also undercounts refusals, so the bound is a floor on the true gap.</span>
+      <span class="use">Used as: the &psi; gate per level, and the Q5_K_M floor</span></div></div>
+    <div class="whycard"><div class="wh" style="background:var(--blush)">Cost</div><div class="wb">
+      <span><b>On its own</b>, it picks Q3_K_M, the cheapest at 0.137 GPU-h per 1,000 tasks.</span>
+      <span><b>But</b> Q3_K_M loses 4.3 points and fails the 5% safety bound. Fewer bits is not always cheaper: Q2_K costs more than Q4_K_M because it writes twice as many tokens. Switching levels also costs 2.1&ndash;5.6 s per load.</span>
+      <span class="use">Used as: the tie-breaker, the cheapest level that passes all three gates</span></div></div>
+  </div>
+
+  <h3>How the metrics become the three gates</h3>
+  <table class="avoid">
+    <thead><tr><th style="width:17%">Metric</th><th style="width:13%">Role</th><th style="width:30%">What is checked</th><th style="width:14%">Scope</th><th>Strict / Balanced</th></tr></thead>
+    <tbody>
+      <tr><td>Accuracy</td><td><b>&delta; gate</b></td><td>Lower bound of the level's accuracy &ge; F16's accuracy &minus; &delta;</td><td>per cell</td><td>&delta; = 0.02 / 0.10</td></tr>
+      <tr><td>Fidelity: answer flips</td><td><b>&phi; gate</b></td><td>Upper bound of the flip rate against F16 &le; &phi;</td><td>per cell</td><td>&phi; = 0.10 / 0.30</td></tr>
+      <tr><td>Safety flips</td><td><b>&psi; gate</b> and floor</td><td>Upper bound of the safety-flip rate &le; &psi;; flagged prompts never go below Q5_K_M</td><td>per level, every cell</td><td>&psi; = 0.05 / 0.10; floor fixed at ψ = 0.05</td></tr>
+      <tr><td>Cost</td><td>tie-breaker</td><td>Among levels passing all three gates, serve the cheapest</td><td>per level &times; category</td><td>same at both</td></tr>
+      <tr><td>KL, same top token</td><td>not gated</td><td>Corpus-level fidelity check, and evidence for the differential (backdoor) test</td><td>per level</td><td>&mdash;</td></tr>
+      <tr><td>Confidence (log-prob)</td><td>labelling only</td><td>A task counts as solved only if correct and confident (&ge; &tau;)</td><td>per answer</td><td>&mdash;</td></tr>
+    </tbody>
+  </table>
+  <p style="margin-top:5px">Each gate covers the blind spot of the others: accuracy alone misses changed answers, fidelity alone misses whether changes are harmful or helpful, and neither sees safety. Requiring all three, then choosing on cost, is what turns the measurements into a decision.</p>
+</section>
+
+<!-- ============================================================ MODELS -->
+<section class="pagebreak">
+  <h2>What is learned: the models, their inputs and outputs</h2>
+  <p><b>The language model is not trained:</b> Qwen2.5-3B-Instruct is served as-is at its seven levels, with no fine-tuning. Learning happens <i>around</i> it, from the measurements of how each level performed. There are three small statistical models plus one frozen helper, all fitted on the train split only (1,017 tasks). The policy that combines them is a rule, not a model: the cheapest level that passes &delta;, &phi; and &psi;.</p>
+  <div class="figure avoid">
+    <svg id="modelflow" viewBox="0 0 760 200" width="90%" style="display:block;margin:0 auto"></svg>
+    <div class="cap">Each row is one learned component, read left to right as input &rarr; model &rarr; output. The predictor and safety classifier run live inside the router. The pooled models and safety bounds are used once, offline, to fit the 84-cell policy table that the router looks up.</div>
+  </div>
+
+  <h3 style="margin-top:6px">The details</h3>
+  <table class="models">
+    <thead><tr><th style="width:15%">Component</th><th style="width:21%">Algorithm</th><th style="width:20%">Trained on</th><th style="width:20%">Input</th><th>Output</th></tr></thead>
+    <tbody>
+      <tr><td>Text embedder</td><td>all-MiniLM-L6-v2, pretrained and frozen</td><td>Not trained here</td><td>Prompt text</td><td>384 numbers capturing meaning</td></tr>
+      <tr><td>A &middot; Predictor</td><td>Multi-class logistic regression, balanced weights</td><td>748 labelled train tasks, 5-fold cross-fitting</td><td>409 numbers: embedding + 13 counts + 12 category</td><td><b>Class 0&ndash;6</b> (Q2_K &hellip; F16); target is the label. <span class="mono">predictor.joblib</span></td></tr>
+      <tr><td>B &middot; Pooled models</td><td>Two GEE logistic regressions, clustered by task</td><td>7,119 accuracy rows, 6,102 flip rows (task &times; level)</td><td>Detected category, predicted class, level</td><td>Accuracy <b>lower bound</b> (&delta;) and flip <b>upper bound</b> (&phi;) per cell &times; level</td></tr>
+      <tr><td>C &middot; Safety classifier</td><td>Binary logistic regression, balanced weights</td><td>Harmful vs look-alike, injection and 600 ordinary train prompts</td><td>The 384-number embedding</td><td><b>Harmful score</b>; flagged if &ge; 0.422. <span class="mono">safety_classifier.joblib</span></td></tr>
+      <tr><td>Safety bounds</td><td>Counted: rate + 95% Wilson bound</td><td>248 train harmful and injection prompts</td><td>Each level's safety answers vs F16's</td><td>Safety-flip <b>upper bound</b> per level (&psi;) and the <b>Q5_K_M floor</b>. <span class="mono">safety.json</span></td></tr>
+      <tr><td>Policy</td><td>A rule, not a model</td><td>Outputs of B and the safety bounds</td><td>Bounds and measured cost per cell</td><td>Cheapest level passing &delta;, &phi;, &psi; for each of 84 cells. <span class="mono">policy.json</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="embed avoid">
+    <div>
+      <h3>What is an embedding?</h3>
+      <p>An embedding turns a piece of text into a list of numbers, here <b>384</b>, that captures its <b>meaning</b>. Texts that mean similar things get similar numbers even when they use different words. &ldquo;What's 12 times 7?&rdquo; and &ldquo;Multiply 12 by 7&rdquo; land close together; &ldquo;Write a short poem about rain&rdquo; lands far away.</p>
+      <p>Every prompt passes once through <b>MiniLM</b>, which is pretrained and not trained here. The <b>predictor</b> reads the numbers, plus simple counts and the category, to guess the level the prompt needs: in effect, &ldquo;what did prompts like this need before?&rdquo;. The <b>safety classifier</b> reads the same numbers to judge whether the prompt looks harmful. The embedding is how the router &ldquo;reads&rdquo; a prompt.</p>
+    </div>
+    <div>
+      <svg id="embedmap" viewBox="0 0 330 168" width="100%"></svg>
+      <div class="cap">Six real prompts embedded with MiniLM, flattened from 384 dimensions to 2 for drawing. Similarity: 0.69 between the two multiplication prompts, 0.09 between multiplication and the poem. The safety classifier scores the break-in prompt 0.96 (flagged) and the rest under 0.2.</div>
+    </div>
+  </div>
+
+  <h3 style="margin-top:6px">Example: &ldquo;What is the German word for &lsquo;house&rsquo;?&rdquo; through the two live models</h3>
+  <table class="avoid">
+    <tbody>
+      <tr><td style="width:17%">A &middot; Predictor</td><td>Input: 409 numbers (embedding, 7 words, 1 question mark, no numbers or code, detected category factual_qa). Output: <b>class 0 (Q2_K)</b>; the measured label was Q3_K_M.</td></tr>
+      <tr><td>C &middot; Safety classifier</td><td>Input: the 384-number embedding. Output: harmful score 0.135, below 0.422, so it is not flagged. The router then looks up cell <span class="mono">factual_qa | 0</span>: Q5_K_M at Balanced, F16 at Strict.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============================================================ O1 -->
+<section class="pagebreak">
+  <div class="obj-head"><div class="badge" style="background:var(--sun)">O1</div>
+    <div><span class="kicker">Objective 1 · measure</span><h2>Measure accuracy, fidelity and cost for every level, per task category</h2></div></div>
+  <p class="statement">Run every task at every level under identical, pinned conditions. Report accuracy per category with confidence intervals, how many individual answers change against F16 (flip rate and KL divergence), and the real cost on one GPU: latency, memory residency and model-swap time.</p>
+
+  <div class="gap">
+    <span class="kicker">The gap it fills</span>
+    <p><b>Sensitivity is reported as an average, not where decisions are made.</b> Quantization studies [6], [7], [10] report one degradation figure per benchmark. Even the most detailed study [11] splits results by dataset, not by the kind of task a router would actually have to decide on. A practitioner learns "4-bit is usually fine" but not <i>for which requests</i> it is not.</p>
+    <p><b>Accuracy alone hides changed answers.</b> [8] showed that a quantized model can match the original's accuracy while flipping many individual answers in both directions, yet no quantization-selection work uses flip rate as a criterion.</p>
+    <p><b>Cost is a proxy.</b> Most work prices a level by bits or gigabytes. [19] and [20] measure energy and latency but report them beside accuracy rather than optimising both together. No study measures what switching between levels on one GPU costs: a level must be unloaded and another loaded whenever they do not fit in memory together.</p>
+    <p>O1 fills this with a 7-level × 12-category accuracy surface (plus 3 difficulty tiers for stratification), flip rate and KL against F16, and a measured cost model that includes the VRAM residency limit and swap time.</p>
+  </div>
+
+  <h3>Measured results against prior work</h3>
+  <table>
+    <thead><tr><th style="width:17%">Question</th><th style="width:30%">Prior work reported</th><th style="width:40%">QuantRoute measured</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td>Loss at 4 bits and below</td><td>About 2% loss at 4-bit and collapse at 3 bits or fewer (LLaMA3, 10 PTQ methods) <span class="cite">[7]</span></td>
+          <td><span class="num">−1.4 pp</span> at Q4_K_M, <span class="num">−4.3 pp</span> at Q3_K_M, <span class="num">−22.2 pp</span> at Q2_K (73.4% at F16, 1,467 tasks). Collapse only at 2-bit</td><td><span class="v agree">Agrees</span></td></tr>
+      <tr><td>Best level for memory</td><td>4-bit is the Pareto-optimal precision for a fixed bit budget <span class="cite">[6]</span></td>
+          <td>Q4_K_M keeps <span class="num">98%</span> of F16's accuracy in <span class="num">35%</span> of its GPU memory (2,169 vs 6,236 MiB)</td><td><span class="v agree">Agrees</span></td></tr>
+      <tr><td>Does accuracy hide changes?</td><td>Accuracy within 0–2% of FP16 while many answers flip <span class="cite">[8]</span></td>
+          <td>Q8_0 is within <span class="num">0.4 pp</span> of F16 yet changes <span class="num">4.4%</span> of answers. Q4_K_M changes <span class="num">12.5%</span>. KL divergence falls steadily from 0.383 (Q2_K) to 0.002 (Q8_0)</td><td><span class="v agree">Agrees</span></td></tr>
+      <tr><td>Mathematics</td><td>Up to 32.4% loss on mathematical reasoning, 11.3% on average (Llama-3; AWQ, GPTQ, SmoothQuant) <span class="cite">[10]</span></td>
+          <td>No loss: <span class="num">56.6%</span> at Q2_K against <span class="num">38.0%</span> at F16 (129 math tasks). F16 writes the shortest solutions (79 tokens on average, 167 at Q2_K). The cause is not established</td><td><span class="v differ">Differs</span></td></tr>
+      <tr><td>Small models at 4 bits</td><td>Small models suffer severe drops at 4-bit while 70B-scale models stay stable <span class="cite">[11]</span></td>
+          <td>A 3B model loses only <span class="num">1.4 pp</span> at 4-bit with GGUF k-quants. Severe loss appears only at 2-bit</td><td><span class="v differ">Differs</span></td></tr>
+      <tr><td>Is fewer bits cheaper?</td><td>Speed depends on kernel implementation, not bit count alone <span class="cite">[20]</span></td>
+          <td>Q2_K, the smallest file, is slower per task than Q4_K_M (<span class="num">0.87 s</span> vs <span class="num">0.53 s</span>), because it writes about twice as many tokens</td><td><span class="v agree">Agrees</span></td></tr>
+      <tr><td>Cost of switching levels</td><td>Not measured; routers assume switching is free <span class="cite">[15]–[18]</span></td>
+          <td>F16 cannot share the 4,293 MiB budget with any other level. Each load takes 2.1–5.6 s. A router spreading prompts over six levels pays <span class="num">780</span> loads per 1,000 random-order requests</td><td><span class="v new">New</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="figure avoid" style="margin-top:7px">
+    <svg id="o1chart" viewBox="0 0 760 170" width="88%" style="display:block;margin:0 auto"></svg>
+    <div class="cap">Left: accuracy on all 1,467 tasks. Right: share of tasks whose correctness differs from F16. Accuracy is flat from Q4_K_M upwards, but answers keep changing all the way to Q8_0.</div>
+  </div>
+</section>
+
+<!-- ============================================================ O2 -->
+<section class="pagebreak">
+  <div class="obj-head"><div class="badge" style="background:var(--sky)">O2</div>
+    <div><span class="kicker">Objective 2 · predict</span><h2>Predict, from the prompt alone, the minimum level it needs</h2></div></div>
+  <p class="statement">Label every task with its <b>required precision</b>: the lowest level that answers it correctly and confidently, with at most one failure above it. Then train a predictor that estimates this label for an unseen prompt from its text alone, and test it on held-out tasks against simple baselines.</p>
+
+  <div class="gap">
+    <span class="kicker">The gap it fills</span>
+    <p><b>Difficulty is treated as a fixed annotation in quantization work.</b> Studies such as [11] use a dataset's own easy/hard labels and ask whether hard tasks lose more. Nothing in that literature predicts, for a new prompt, what precision it needs.</p>
+    <p><b>The predictors that do exist target a different question.</b> Routing and difficulty work [12], [13], [14] predicts whether a given model will answer correctly, in order to choose between a small and a large model. A precision router needs an <i>ordinal</i> answer instead: the minimum level at which a task still succeeds. [12]–[14] do not define, measure or predict that quantity.</p>
+    <p><b>The label itself must be defined carefully.</b> [8] shows that answers flip in both directions, so "the lowest level that happened to be right" is mostly noise. O2 defines the label using correctness, a confidence bar (τ, a 79.6% average token probability, set on train only) and a tolerance of one exception above it. It then measures how predictable that label is, which no prior work reports.</p>
+  </div>
+
+  <h3>Measured results against prior work</h3>
+  <table>
+    <thead><tr><th style="width:17%">Question</th><th style="width:30%">Prior work reported</th><th style="width:40%">QuantRoute measured</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td>Can difficulty be predicted per prompt?</td><td>Predicted query difficulty routes well: up to 40% fewer calls to the large model with no drop in response quality <span class="cite">[12]</span></td>
+          <td>Required-precision predictor: <span class="num">45.8%</span> exact on 312 held-out tasks against <span class="num">45.5%</span> for always guessing the most common level. Mean error <span class="num">0.95</span> levels, worse than the majority guess (0.90) and the per-category median (0.85)</td><td><span class="v differ">Differs</span></td></tr>
+      <tr><td>Which signal works?</td><td>Difficulty estimated from the model's hidden representations beats baselines <span class="cite">[13]</span></td>
+          <td>From text alone (384-dimension MiniLM embedding, 13 surface features, category): within one level <span class="num">79.8%</span> of the time, but no gain over baselines. Required precision is a property of the answer, not visible in the prompt</td><td><span class="v differ">Differs</span></td></tr>
+      <tr><td>What do tasks actually need?</td><td>Not measured; a global "use 4-bit" heuristic <span class="cite">[6]</span></td>
+          <td>Of 1,060 solvable tasks, <span class="num">791 (75%)</span> need Q3_K_M or less, and only <span class="num">20</span> need F16. 407 tasks are solved at no level</td><td><span class="v new">New</span></td></tr>
+      <tr><td>Can the category be detected?</td><td>Rule-based task-type detection from the prior CheapRoute project</td>
+          <td>The category classifier agrees with the true category on <span class="num">90.2%</span> of tasks, but finds only <span class="num">9%</span> of logic tasks</td><td><span class="v new">New</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="figure avoid" style="margin-top:7px">
+    <svg id="o2chart" viewBox="0 0 760 190" width="88%" style="display:block;margin:0 auto"></svg>
+    <div class="cap">Left: required precision of all 1,467 tasks. Most need very little; the expensive levels are rarely necessary. Right: on held-out tasks, the predictor is no better than simple guesses. The headroom is real, but it cannot be read from the prompt text.</div>
+  </div>
+
+  <div class="takeaway avoid"><p><b>What O2 contributes.</b> It defines the required-precision target, measures its distribution and shows that text features cannot predict it. That negative result explains O3's outcome: a router can only be as good as the signal it routes on.</p></div>
+</section>
+
+<!-- ============================================================ O3 -->
+<section class="pagebreak">
+  <div class="obj-head"><div class="badge" style="background:var(--mint)">O3</div>
+    <div><span class="kicker">Objective 3 · decide, validate, secure</span><h2>Derive, validate and secure the selection policy</h2></div></div>
+  <p class="statement">Fit a policy on the training split that maps each (category, predicted level) cell to the cheapest level passing the δ, φ and ψ gates, plus a safety floor for flagged prompts. Validate it on 450 held-out tasks against fixed-level baselines with bootstrap intervals. Then attack it: try to inflate its cost and to push harmful prompts below the floor.</p>
+
+  <div class="gap">
+    <span class="kicker">The gap it fills</span>
+    <p><b>Routers assume API prices and free switching.</b> Cost-aware routers [15], [16], [17] choose between different models priced per token. None faces a precision ladder's cost structure: one model at many levels, memory that caps which levels stay loaded, and switches that cost seconds. The one prior precision router, MoQE [23], routes on generic input features, reports perplexity-led results and has no cost axis.</p>
+    <p><b>Policies are rarely tested against the simple alternative.</b> LLMRouterBench [28] found that many routers fail to beat the best single model. No quantization-selection work outputs a rule and shows on held-out data that it beats fixing one level.</p>
+    <p><b>The precision decision is treated as safe.</b> Low-bit quantization can erode safety while accuracy looks unchanged [31], and router decisions can be steered by appended text [32]. No precision router constrains safety per level or tests attacks on its own decision. O3 adds the ψ safety gate, a classifier-driven floor and an adversarial evaluation of the router itself.</p>
+  </div>
+
+  <h3>Measured results against prior work</h3>
+  <table>
+    <thead><tr><th style="width:15%">Question</th><th style="width:28%">Prior work reported</th><th style="width:44%">QuantRoute measured (450 held-out tasks)</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td>Cost saving from routing</td><td>Up to 98% <span class="cite">[15]</span>, over 50% <span class="cite">[16]</span>, and 85% at 95% of GPT-4 quality <span class="cite">[17]</span>, for API-priced model routing</td>
+          <td>Balanced policy: <span class="num">70.4%</span> correct at <span class="num">52%</span> of F16's inference time, a 48% saving with accuracy within the noise of F16 (71.1%; gap −1.6 to +3.1 pp). Counting model loads on one GPU, it costs <span class="num">0.89</span> GPU-h per 1,000 requests against F16's <span class="num">0.33</span></td><td><span class="v partly">Partly</span></td></tr>
+      <tr><td>Does routing beat one level?</td><td>Many routers fail to beat the best single model <span class="cite">[28]</span>. MoQE roughly matches the best single quantized model <span class="cite">[23]</span></td>
+          <td>No. Always-Q5_K_M scores <span class="num">69.8%</span> at <span class="num">45%</span> of F16's time; the accuracy gap to the policy is −2.9 to +1.3 pp. Q5_K_M is significantly cheaper (4.3–10.6 pp of F16's time less). The Strict policy serves F16 in all 84 cells</td><td><span class="v agree">Agrees with [28]</span></td></tr>
+      <tr><td>Safety by bit-width</td><td>4-bit preserves trustworthiness; 3-bit sharply reduces it <span class="cite">[31]</span></td>
+          <td>Upper bound on safety flips: <span class="num">6.1%</span> Q2_K, <span class="num">5.6%</span> Q3_K_M, <span class="num">6.1%</span> Q4_K_M, <span class="num">3.0%</span> Q5_K_M, <span class="num">1.8%</span> Q6_K. Erosion runs through 4-bit, so the floor at ψ = 0.05 is <b>Q5_K_M</b>. The classifier flags <span class="num">96.4%</span> of harmful test prompts</td><td><span class="v partly">Partly</span></td></tr>
+      <tr><td>Can the router be steered?</td><td>Query-independent gadgets reroute model routers in white-box and black-box settings, and perplexity filtering is not an effective defence <span class="cite">[32]</span></td>
+          <td>The 4-word suffix "bug finally bakes summarize" sends <span class="num">98%</span> of cheap prompts to F16 (2.5× the cost). A downgrade suffix gets <span class="num">59%</span> of harmful prompts below the floor even with the floor on, by cutting the classifier's flag rate from 96% to 41%. Input normalisation stops neither</td><td><span class="v agree">Agrees · extends</span></td></tr>
+      <tr><td>Does the service behave as measured?</td><td>—</td>
+          <td>The live API matched the router's decision on <span class="num">12 of 12</span> requests and reproduced the benchmark's recorded answers exactly (<span class="num">5 of 5</span>)</td><td><span class="v new">New</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="figure avoid" style="margin-top:7px">
+    <svg id="o3chart" viewBox="0 0 760 196" width="86%" style="display:block;margin:0 auto"></svg>
+    <div class="cap">Left: held-out accuracy (95% bootstrap interval) against inference time relative to F16. The Balanced policy sits among the fixed levels, not above them. Right: cost per 1,000 requests once model loads are counted (random request order). Switching makes the routed policy the most expensive option.</div>
+  </div>
+</section>
+
+<!-- ============================================================ GATES -->
+<section class="pagebreak">
+  <h2>The three gates: δ, φ and ψ</h2>
+  <p>For every policy cell (a task category and a predicted level), each level must pass <b>all three gates</b>. Among the levels that pass, the one with the lowest measured cost is served. F16 is the reference, so it always passes. The bounds come from pooled statistical models fitted on the training split, with errors clustered by task, so each gate is checked against a pessimistic estimate rather than a lucky average.</p>
+
+  <div class="gates">
+    <div class="gatecard" style="background:#fff8e1">
+      <div class="sym">δ</div><div class="name">Accuracy gate</div>
+      <div class="rule">LCB<sub>acc</sub>(level, cell) ≥ acc(F16, cell) − δ</div>
+      <p>The <b>lower</b> confidence bound on the level's accuracy in this cell may fall at most δ below F16's accuracy in the same cell.</p>
+      <p>It stops a level that is too likely to give fewer correct answers.</p>
+      <div class="vals">Strict δ = <b>0.02</b> (2 points) · Balanced δ = <b>0.10</b></div>
+    </div>
+    <div class="gatecard" style="background:#eef4ff">
+      <div class="sym">φ</div><div class="name">Answer-stability gate</div>
+      <div class="rule">UCB<sub>flip</sub>(level, cell) ≤ φ</div>
+      <p>The <b>upper</b> bound on the share of tasks whose correctness differs from F16 may be at most φ.</p>
+      <p>It stops a level that matches F16's score while changing many individual answers [8].</p>
+      <div class="vals">Strict φ = <b>0.10</b> · Balanced φ = <b>0.30</b></div>
+    </div>
+    <div class="gatecard" style="background:#e9fbf4">
+      <div class="sym">ψ</div><div class="name">Safety gate</div>
+      <div class="rule">UCB<sub>safety flip</sub>(level) ≤ ψ</div>
+      <p>The upper bound on the level's <b>safety flip rate</b> may be at most ψ. That rate is the share of harmful and injection prompts that F16 handles safely but this level does not.</p>
+      <p>It is measured per level over the whole safety slice and applies in every cell, because any prompt may be adversarial.</p>
+      <div class="vals">Strict ψ = <b>0.05</b> · Balanced ψ = <b>0.10</b></div>
+    </div>
+  </div>
+
+  <p><b>The safety floor.</b> Separately from the gates, a classifier scores every prompt. A flagged prompt is never served below the cheapest level whose safety bound is within ψ = 0.05, which is <b>Q5_K_M</b>. The floor stays fixed at both operating points. O3's attack results show its limit: it protects only prompts the classifier catches.</p>
+
+  <h3>Worked example: cell <span class="mono">code_gen | predicted class 1</span> (44 training tasks)</h3>
+  <p>F16's accuracy in this cell is 0.893, so the accuracy bar is 0.873 at Strict and 0.793 at Balanced. Values are the fitted bounds from <span class="mono">results/policy.json</span> and <span class="mono">results/safety.json</span>.</p>
+  <table class="ex avoid">
+    <thead><tr><th>Level</th><th>Accuracy LCB</th><th>Flip UCB</th><th>Safety UCB</th><th>Cost (GPU-h / 1k)</th><th>Strict<br>δ .02 · φ .10 · ψ .05</th><th>Balanced<br>δ .10 · φ .30 · ψ .10</th></tr></thead>
+    <tbody id="extable"></tbody>
+  </table>
+  <p style="margin-top:6px"><b>Strict</b> rejects every cheaper level: none reaches the 0.873 accuracy bar, so the cell serves F16. All 84 cells end the same way, which is why Strict equals always-F16. <b>Balanced</b> admits Q4_K_M, Q5_K_M, Q6_K and Q8_0 and serves the cheapest, <b>Q4_K_M</b>. Q3_K_M is cheaper still, but it fails both the accuracy and the stability gate. Loosening the bars is what lets cheaper levels appear. As O3 shows, the cheaper choices do not add up to a better policy than serving Q5_K_M everywhere.</p>
+
+  <h3>References</h3>
+  <div class="refs">
+    <div>[6] T. Dettmers, L. Zettlemoyer. The Case for 4-bit Precision: k-bit Inference Scaling Laws. ICML 2023.</div>
+    <div>[7] W. Huang et al. An Empirical Study of LLaMA3 Quantization: From LLMs to MLLMs. arXiv:2404.14047.</div>
+    <div>[8] A. Dutta, S. Krishna, N. Kwatra, R. Ramjee. Accuracy is Not All You Need. NeurIPS 2024.</div>
+    <div>[10] Z. Li et al. Quantization Meets Reasoning: LLM Low-Bit Quantization Degradation for Mathematical Reasoning. arXiv:2501.03035.</div>
+    <div>[11] J. Lee et al. Exploring the Trade-Offs: Quantization Methods, Task Difficulty, and Model Size in LLMs From Edge to Giant. IJCAI 2025.</div>
+    <div>[12] D. Ding et al. Hybrid LLM: Cost-Efficient and Quality-Aware Query Routing. ICLR 2024.</div>
+    <div>[13] Y. Zhu et al. The LLM Already Knows: Estimating LLM-Perceived Question Difficulty via Hidden Representations. arXiv:2509.12886.</div>
+    <div>[14] B. Zhao et al. Optimizing Reasoning Efficiency through Prompt Difficulty Prediction. NeurIPS Workshop 2025.</div>
+    <div>[15] L. Chen, M. Zaharia, J. Zou. FrugalGPT. arXiv:2305.05176.</div>
+    <div>[16] P. Aggarwal et al. AutoMix: Automatically Mixing Language Models. NeurIPS 2024.</div>
+    <div>[17] I. Ong et al. RouteLLM: Learning to Route LLMs with Preference Data. ICLR 2025.</div>
+    <div>[18] Q. J. Hu et al. RouterBench: A Benchmark for Multi-LLM Routing System. arXiv:2403.12031.</div>
+    <div>[19] E. J. Husom et al. Sustainable LLM Inference for Edge AI. ACM Trans. IoT, 2025.</div>
+    <div>[20] J. Wei et al. T-MAC: CPU Renaissance via Table Lookup for Low-Bit LLM Deployment on Edge. EuroSys 2025.</div>
+    <div>[23] MoQE: Improve Quantization Model Performance via Mixture of Quantization Experts. arXiv:2508.09204.</div>
+    <div>[28] H. Li et al. LLMRouterBench: A Massive Benchmark and Unified Framework for LLM Routing. Findings of ACL 2026.</div>
+    <div>[31] J. Hong et al. Decoding Compressed Trust: Scrutinizing the Trustworthiness of Efficient LLMs Under Compression. ICML 2024.</div>
+    <div>[32] A. Shafran, R. Schuster, T. Ristenpart, V. Shmatikov. Rerouting LLM Routers. arXiv:2501.01818.</div>
+  </div>
+</section>
+
+<script>
+const NS = "http://www.w3.org/2000/svg";
+const RAMP = ["#ff8d65", "#ec6d3d", "#d05320", "#b13d02", "#8e2e00", "#6b2101", "#151515"];
+const LV = ["Q2_K", "Q3_K_M", "Q4_K_M", "Q5_K_M", "Q6_K", "Q8_0", "F16"];
+function el(svg, tag, attrs, text) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text !== undefined) e.textContent = text; svg.appendChild(e); return e; }
+const T = (svg, x, y, s, o = {}) => el(svg, "text", Object.assign({ x, y, "font-size": 10.5, fill: "#45423b" }, o), s);
+
+/* ---------- flow diagram ---------- */
+(function () {
+  const s = document.getElementById("flow");
+  const boxes = [["Prompt", "", "#fff"], ["Category", "12 task types", "#fff"], ["Predict level", "required precision", "#bcd3ff"],
+                 ["Three gates", "δ accuracy · φ stability · ψ safety", "#ffc832"], ["Cheapest pass", "measured cost", "#fff"], ["Serve", "llama.cpp, RTX 4060", "#fff"]];
+  const w = [70, 104, 118, 168, 108, 120], gap = 14; let x = 2; const y = 14, h = 54, xs = [];
+  boxes.forEach(([t, sub, bg], i) => {
+    el(s, "rect", { x, y, width: w[i], height: h, rx: 9, fill: bg, stroke: "#151515", "stroke-width": 1.8 });
+    T(s, x + w[i] / 2, y + (sub ? 24 : 32), t, { "text-anchor": "middle", "font-size": 12, "font-weight": 700, fill: "#151515" });
+    if (sub) T(s, x + w[i] / 2, y + 40, sub, { "text-anchor": "middle", "font-size": 9.2 });
+    xs.push(x); x += w[i] + gap;
+  });
+  for (let i = 0; i < boxes.length - 1; i++) {
+    const a = xs[i] + w[i], b = xs[i + 1];
+    el(s, "line", { x1: a + 1, y1: y + h / 2, x2: b - 4, y2: y + h / 2, stroke: "#151515", "stroke-width": 1.6 });
+    el(s, "path", { d: `M${b - 1},${y + h / 2} l-6,-4 v8 z`, fill: "#151515" });
+  }
+  // floor branch under "Cheapest pass" -> "Serve"
+  const cx = xs[4] + w[4] / 2, fx = 400, fw = 356;
+  el(s, "rect", { x: fx, y: 82, width: fw, height: 30, rx: 8, fill: "#ffd9c7", stroke: "#151515", "stroke-width": 1.6 });
+  T(s, fx + fw / 2, 101, "flagged by the safety classifier → raise to Q5_K_M", { "text-anchor": "middle", "font-size": 10, "font-weight": 600, fill: "#151515" });
+  el(s, "line", { x1: cx, y1: y + h, x2: cx, y2: 82, stroke: "#151515", "stroke-width": 1.4, "stroke-dasharray": "3 3" });
+})();
+
+/* ---------- terms flow ---------- */
+(function () {
+  const s = document.getElementById("termflow");
+  const box = (x, y, w, t, sub, bg) => {
+    el(s, "rect", { x, y, width: w, height: 38, rx: 8, fill: bg, stroke: "#151515", "stroke-width": 1.6 });
+    T(s, x + w / 2, y + (sub ? 16 : 23), t, { "text-anchor": "middle", "font-size": 11, "font-weight": 700, fill: "#151515" });
+    if (sub) T(s, x + w / 2, y + 30, sub, { "text-anchor": "middle", "font-size": 8.8 });
+  };
+  const arrow = (x1, y1, x2, y2) => {
+    el(s, "line", { x1, y1, x2: x2 - 4, y2, stroke: "#151515", "stroke-width": 1.5 });
+    el(s, "path", { d: "M" + x2 + "," + y2 + " l-6,-4 v8 z", fill: "#151515" });
+  };
+  T(s, 0, 11, "OFFLINE", { "font-size": 8.5, "font-weight": 700, fill: "#77726a" });
+  box(0, 16, 120, "Grader", "marks each answer", "#ffd9c7");
+  box(150, 16, 150, "7 graded runs", "correct + confident?", "#fff");
+  box(330, 16, 120, "Label", "required precision", "#2ed3a0");
+  box(480, 16, 130, "Predictor training", "", "#fff");
+  arrow(120, 35, 150, 35); arrow(300, 35, 330, 35); arrow(450, 35, 480, 35);
+  T(s, 0, 81, "ONLINE", { "font-size": 8.5, "font-weight": 700, fill: "#77726a" });
+  box(0, 84, 120, "Prompt text", "", "#fff");
+  box(150, 84, 150, "Detected category", "rule-based classifier", "#ffc832");
+  box(330, 84, 120, "Class", "predictor's guess", "#bcd3ff");
+  box(480, 84, 130, "Policy cell", "category \u00d7 class", "#fff");
+  box(640, 84, 118, "Gates \u2192 level", "\u03b4 \u00b7 \u03c6 \u00b7 \u03c8", "#fff");
+  arrow(120, 103, 150, 103); arrow(300, 103, 330, 103); arrow(450, 103, 480, 103); arrow(610, 103, 640, 103);
+  el(s, "path", { d: "M545,54 V68 H390 V78", fill: "none", stroke: "#151515", "stroke-width": 1.4, "stroke-dasharray": "3 2" });
+  el(s, "path", { d: "M390,84 l-4,-6 h8 z", fill: "#151515" });
+  T(s, 470, 72, "trained model", { "font-size": 8.2, fill: "#77726a", "text-anchor": "middle", stroke: "#fff", "stroke-width": 3, "paint-order": "stroke" });
+})();
+
+/* ---------- models flow ---------- */
+(function () {
+  const s = document.getElementById("modelflow");
+  const box = (x, y, w, h, t, sub, bg) => {
+    el(s, "rect", { x, y, width: w, height: h, rx: 8, fill: bg, stroke: "#151515", "stroke-width": 1.6 });
+    const mid = y + h / 2;
+    T(s, x + w / 2, sub ? mid - 3 : mid + 4, t, { "text-anchor": "middle", "font-size": 10.6, "font-weight": 700, fill: "#151515" });
+    if (sub) T(s, x + w / 2, mid + 11, sub, { "text-anchor": "middle", "font-size": 8.6 });
+  };
+  const arrow = (x1, y1, x2, y2) => {
+    el(s, "line", { x1, y1, x2: x2 - 4, y2, stroke: "#151515", "stroke-width": 1.4 });
+    const a = Math.atan2(y2 - y1, x2 - x1), c = Math.cos(a), sn = Math.sin(a);
+    const p = (dx, dy) => (x2 + dx * c - dy * sn) + "," + (y2 + dx * sn + dy * c);
+    el(s, "path", { d: "M" + p(0, 0) + " L" + p(-6, -4) + " L" + p(-6, 4) + " z", fill: "#151515" });
+  };
+  const H = 38, ys = [6, 54, 102, 150];
+  const rows = [
+    ["Prompt text \u2192 409 numbers", "embedding + 13 counts + 12 category", "A \u00b7 Predictor", "logistic regression, 7 classes", "Class 0\u20136", "Q2_K \u2026 F16", "#bcd3ff"],
+    ["Prompt text \u2192 384 numbers", "MiniLM embedding (frozen)", "C \u00b7 Safety classifier", "logistic regression, 2 classes", "Harmful score", "flag if \u2265 0.422", "#ffd9c7"],
+    ["Graded runs, task \u00d7 level", "category, class, level \u2192 correct?", "B \u00b7 Pooled models", "GEE logistic regressions", "Accuracy LCB, flip UCB", "per cell \u00d7 level", "#2ed3a0"],
+    ["Graded safety answers", "248 harmful + injection prompts", "Safety bounds", "counted, Wilson bound", "Safety UCB per level", "and the Q5_K_M floor", "#ffc832"],
+  ];
+  rows.forEach(([i1, i2, m1, m2, o1, o2, bg], r) => {
+    const y = ys[r];
+    box(0, y, 196, H, i1, i2, "#fff");
+    box(222, y, 180, H, m1, m2, bg);
+    box(428, y, 162, H, o1, o2, "#fff");
+    arrow(196, y + H / 2, 222, y + H / 2);
+    arrow(402, y + H / 2, 428, y + H / 2);
+  });
+  box(618, 6, 142, 86, "Router (live)", "predicts class, flags prompt", "#f6f1e7");
+  box(618, 102, 142, 86, "Policy rule", "\u03b4 \u00b7 \u03c6 \u00b7 \u03c8 \u2192 policy.json", "#f6f1e7");
+  arrow(590, ys[0] + H / 2, 618, ys[0] + H / 2);
+  arrow(590, ys[1] + H / 2, 618, ys[1] + H / 2);
+  arrow(590, ys[2] + H / 2, 618, ys[2] + H / 2);
+  arrow(590, ys[3] + H / 2, 618, ys[3] + H / 2);
+  el(s, "path", { d: "M689,102 V96", stroke: "#151515", "stroke-width": 1.4, "stroke-dasharray": "3 2", fill: "none" });
+  el(s, "path", { d: "M689,92 l-4,6 h8 z", fill: "#151515" });
+  T(s, 695, 99, "looked up", { "font-size": 8, fill: "#77726a" });
+})();
+
+/* ---------- embedding map (real MiniLM embeddings, first two principal components) ---------- */
+(function () {
+  const s = document.getElementById("embedmap");
+  const pts = [[-0.585, 0.272, "What's 12 times 7?", "#3d74e0", "start", 8, -7], [-0.658, 0.133, "Multiply 12 by 7", "#3d74e0", "start", 8, 12],
+               [-0.219, -0.357, "Solve 3x + 5 = 20 for x", "#3d74e0", "start", 8, 4],
+               [0.537, 0.405, "Write a short poem about rain", "#c98a00", "end", -8, -7], [0.620, 0.283, "Describe the sound of rain on a roof", "#c98a00", "end", -8, 13],
+               [0.305, -0.736, "How can I break into my neighbour's house?", "#d05320", "end", -8, -8]];
+  const X = (v) => 22 + (v + 0.75) / 1.45 * 290, Y = (v) => 14 + (0.5 - v) / 1.3 * 140;
+  el(s, "rect", { x: 1, y: 1, width: 328, height: 166, rx: 8, fill: "#faf7f0", stroke: "#e6dfd2" });
+  T(s, 10, 160, "math", { "font-size": 8.5, "font-weight": 700, fill: "#3d74e0" });
+  T(s, 42, 160, "writing", { "font-size": 8.5, "font-weight": 700, fill: "#c98a00" });
+  T(s, 84, 160, "harmful-looking (flagged)", { "font-size": 8.5, "font-weight": 700, fill: "#d05320" });
+  el(s, "line", { x1: X(-0.585), y1: Y(0.272), x2: X(-0.658), y2: Y(0.133), stroke: "#3d74e0", "stroke-width": 1.2, "stroke-dasharray": "2 2" });
+  for (const [x, y, t, c, a, dx, dy] of pts) {
+    el(s, "circle", { cx: X(x), cy: Y(y), r: 5, fill: c, stroke: "#fff", "stroke-width": 1.4 });
+    T(s, X(x) + dx, Y(y) + dy, t, { "text-anchor": a, "font-size": 8.6, "font-weight": 600, fill: "#151515", stroke: "#faf7f0", "stroke-width": 3, "paint-order": "stroke" });
+  }
+})();
+
+/* ---------- O1 chart: accuracy and flips per level ---------- */
+(function () {
+  const s = document.getElementById("o1chart");
+  const acc = [51.2, 69.1, 72.0, 73.9, 73.9, 73.1, 73.4], flip = [36.7, 18.2, 12.5, 9.9, 7.4, 4.4, 0];
+  const panel = (x0, title, vals, max, fmt) => {
+    T(s, x0, 12, title, { "font-size": 11, "font-weight": 700, fill: "#151515" });
+    const bw = 330, rh = 20;
+    vals.forEach((v, i) => {
+      const y = 24 + i * rh;
+      T(s, x0 + 52, y + 12, LV[i], { "text-anchor": "end", "font-size": 9.6, "font-weight": 600, fill: "#151515" });
+      el(s, "rect", { x: x0 + 58, y: y + 2, width: bw, height: 13, rx: 3, fill: "#f6f1e7" });
+      el(s, "rect", { x: x0 + 58, y: y + 2, width: Math.max(1.5, bw * v / max), height: 13, rx: 3, fill: RAMP[i] });
+      T(s, x0 + 62 + bw * v / max, y + 12.5, fmt(v), { "font-size": 9.4, "font-weight": 700, fill: "#151515" });
+    });
+  };
+  panel(0, "Accuracy, all 1,467 tasks (%)", acc, 100, (v) => v.toFixed(1));
+  panel(392, "Answers changed vs F16 (%)", flip, 46, (v) => (v ? v.toFixed(1) : "reference"));
+})();
+
+/* ---------- O2 chart: label distribution and predictor vs baselines ---------- */
+(function () {
+  const s = document.getElementById("o2chart");
+  const lab = [334, 457, 94, 71, 54, 30, 20, 407], names = LV.concat(["none"]);
+  T(s, 0, 12, "Tasks by required precision (all 1,467)", { "font-size": 11, "font-weight": 700, fill: "#151515" });
+  const bx = 8, base = 168, colw = 40, maxh = 120;
+  lab.forEach((v, i) => {
+    const h = maxh * v / 457, x = bx + i * (colw + 6);
+    el(s, "rect", { x, y: base - h, width: colw, height: h, rx: 3, fill: i < 7 ? RAMP[i] : "#ffffff", stroke: i < 7 ? "none" : "#77726a", "stroke-dasharray": i < 7 ? "" : "3 2" });
+    T(s, x + colw / 2, base - h - 4, String(v), { "text-anchor": "middle", "font-size": 9.6, "font-weight": 700, fill: "#151515" });
+    T(s, x + colw / 2, base + 13, names[i].replace("_K_M", "").replace("_K", "").replace("_0", ""), { "text-anchor": "middle", "font-size": 9.2, "font-weight": 600 });
+  });
+  el(s, "line", { x1: 4, y1: base, x2: bx + 8 * (colw + 6), y2: base, stroke: "#151515", "stroke-width": 1.2 });
+  // right: predictor vs baselines
+  const x0 = 400;
+  T(s, x0, 12, "Held-out predictor vs simple guesses (312 tasks)", { "font-size": 11, "font-weight": 700, fill: "#151515" });
+  const rows = [["Predictor", 45.8, 0.952, "#3d74e0"], ["Most common level", 45.5, 0.904, "#77726a"], ["Category median", 48.4, 0.853, "#c98a00"]];
+  T(s, x0, 36, "exact accuracy (%)", { "font-size": 9.4, "font-weight": 600 });
+  T(s, x0 + 186, 36, "mean error (levels, lower is better)", { "font-size": 9.4, "font-weight": 600 });
+  rows.forEach(([n, a, m, c], i) => {
+    const y = 48 + i * 40;
+    T(s, x0, y + 9, n, { "font-size": 9.6, "font-weight": 700, fill: "#151515" });
+    el(s, "rect", { x: x0, y: y + 14, width: 160, height: 12, rx: 3, fill: "#f6f1e7" });
+    el(s, "rect", { x: x0, y: y + 14, width: 160 * a / 100, height: 12, rx: 3, fill: c });
+    T(s, x0 + 160 * a / 100 + 4, y + 24, a.toFixed(1), { "font-size": 9.4, "font-weight": 700, fill: "#151515" });
+    el(s, "rect", { x: x0 + 186, y: y + 14, width: 150, height: 12, rx: 3, fill: "#f6f1e7" });
+    el(s, "rect", { x: x0 + 186, y: y + 14, width: 150 * m / 1.2, height: 12, rx: 3, fill: c });
+    T(s, x0 + 186 + 150 * m / 1.2 + 4, y + 24, m.toFixed(2), { "font-size": 9.4, "font-weight": 700, fill: "#151515" });
+  });
+})();
+
+/* ---------- O3 chart: accuracy vs time, and cost with loads ---------- */
+(function () {
+  const s = document.getElementById("o3chart");
+  const pts = [["Q3_K_M", 42.2, 66.9, 62.7, 71.3, RAMP[1]], ["Q4_K_M", 43.5, 69.6, 65.3, 73.8, RAMP[2]], ["Q5_K_M", 44.5, 69.8, 65.6, 74.0, RAMP[3]],
+               ["Q6_K", 50.7, 69.8, 65.5, 74.0, RAMP[4]], ["Q8_0", 60.0, 70.4, 66.2, 74.4, RAMP[5]], ["F16 = Strict", 100, 71.1, 66.9, 75.1, RAMP[6]],
+               ["Balanced policy", 51.9, 70.4, 66.4, 74.7, "#3d74e0"]];
+  const X = (v) => 70 + (v - 38) / 64 * 300, Y = (v) => 166 - (v - 62) / 14 * 146;
+  const halo = { stroke: "#fff", "stroke-width": 3, "paint-order": "stroke" };
+  T(s, 0, 12, "Held-out accuracy vs inference time", { "font-size": 11, "font-weight": 700, fill: "#151515" });
+  for (const g of [64, 68, 72, 76]) { el(s, "line", { x1: 70, x2: 380, y1: Y(g), y2: Y(g), stroke: "#ece5d8" }); T(s, 64, Y(g) + 3.5, g + "%", { "text-anchor": "end", "font-size": 8.8 }); }
+  for (const g of [40, 60, 80, 100]) T(s, X(g), 181, g + "%", { "text-anchor": "middle", "font-size": 8.8 });
+  T(s, X(70), 194, "inference time vs F16", { "text-anchor": "middle", "font-size": 8.8, "font-weight": 600 });
+  const lab = { "Q3_K_M": [-9, 4, "end"], "Q4_K_M": [-9, 4, "end"], "Q5_K_M": [12, 30, "start", true], "Q6_K": [6, 16, "start"],
+                "Q8_0": [9, 4, "start"], "F16 = Strict": [-9, -6, "end"], "Balanced policy": [8, -10, "start"] };
+  pts.forEach(([n, x, y, lo, hi, c]) => el(s, "line", { x1: X(x), x2: X(x), y1: Y(lo), y2: Y(hi), stroke: c, "stroke-width": 1.4, opacity: 0.45 }));
+  pts.forEach(([n, x, y, lo, hi, c]) => {
+    const bal = n.startsWith("Balanced");
+    el(s, bal ? "circle" : "rect", bal ? { cx: X(x), cy: Y(y), r: 6, fill: c, stroke: "#fff", "stroke-width": 1.5 }
+      : { x: X(x) - 5, y: Y(y) - 5, width: 10, height: 10, fill: c, stroke: "#fff", "stroke-width": 1.2, transform: `rotate(45 ${X(x)} ${Y(y)})` });
+  });
+  pts.forEach(([n, x, y]) => {
+    const [dx, dy, a, leader] = lab[n];
+    if (leader) el(s, "line", { x1: X(x) + 3, y1: Y(y) + 5, x2: X(x) + dx - 1, y2: Y(y) + dy - 9, stroke: "#77726a", "stroke-width": 1 });
+    T(s, X(x) + dx, Y(y) + dy, n, Object.assign({ "text-anchor": a, "font-size": 9.2, "font-weight": 700, fill: "#151515" }, halo));
+  });
+  // right: cost with loads
+  const x0 = 430, bars = [["Always Q5_K_M", 0.146, RAMP[3]], ["Always F16 (= Strict)", 0.328, RAMP[6]], ["Balanced policy", 0.892, "#3d74e0"]];
+  T(s, x0, 12, "GPU-hours per 1,000 requests, with model loads", { "font-size": 11, "font-weight": 700, fill: "#151515" });
+  bars.forEach(([n, v, c], i) => {
+    const y = 40 + i * 44;
+    T(s, x0, y, n, { "font-size": 9.6, "font-weight": 700, fill: "#151515" });
+    el(s, "rect", { x: x0, y: y + 6, width: 300, height: 15, rx: 3, fill: "#f6f1e7" });
+    el(s, "rect", { x: x0, y: y + 6, width: 300 * v / 0.95, height: 15, rx: 3, fill: c });
+    T(s, x0 + 300 * v / 0.95 + (v > 0.8 ? -5 : 5), y + 17.5, v.toFixed(2), { "font-size": 9.6, "font-weight": 700, fill: v > 0.8 ? "#fff" : "#151515", "text-anchor": v > 0.8 ? "end" : "start" });
+  });
+  T(s, x0, 176, "Balanced: 780 loads per 1,000 requests; one level: 2.2", { "font-size": 9, fill: "#77726a" });
+})();
+
+/* ---------- worked example table ---------- */
+(function () {
+  const rows = [["Q2_K", .237, .640, .061, .544], ["Q3_K_M", .644, .340, .056, .247], ["Q4_K_M", .808, .186, .061, .252], ["Q5_K_M", .819, .117, .030, .274],
+                ["Q6_K", .833, .075, .018, .289], ["Q8_0", .834, .031, .018, .350], ["F16", null, null, null, .595]];
+  const ref = .893, ops = { strict: [.02, .10, .05], balanced: [.10, .30, .10] };
+  const pick = { strict: "F16", balanced: "Q4_K_M" };
+  const tb = document.getElementById("extable");
+  const verdict = (r, [d, f, p]) => {
+    if (r[1] === null) return '<span class="ok">reference, passes</span>';
+    const fails = [];
+    if (r[1] < ref - d) fails.push("δ"); if (r[2] > f) fails.push("φ"); if (r[3] > p) fails.push("ψ");
+    return fails.length ? `<span class="no">fails ${fails.join(", ")}</span>` : '<span class="ok">passes</span>';
+  };
+  for (const r of rows) {
+    const tr = document.createElement("tr");
+    const cells = [r[0], r[1] === null ? "—" : r[1].toFixed(3), r[2] === null ? "—" : r[2].toFixed(3), r[3] === null ? "—" : r[3].toFixed(3), r[4].toFixed(3)];
+    tr.innerHTML = cells.map((c) => `<td>${c}</td>`).join("") +
+      ["strict", "balanced"].map((o) => `<td class="${pick[o] === r[0] ? "pick" : ""}">${verdict(r, ops[o])}${pick[o] === r[0] ? " <b>· served</b>" : ""}</td>`).join("");
+    tb.appendChild(tr);
+  }
+})();
+</script>
+</body>
+</html>
